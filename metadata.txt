@@ -13,9 +13,19 @@ version=2.0.1
 qgisMinimumVersion=2.0
 qgisMaximumVersion=2.99
 class_name=PgVersion
-website=http://www.kappasys.ch
+website=http://www.sourcepole.com
 author=Horst Duester / Sourcepole AG Zürich
 email=horst.duester@sourcepole.ch
-homepage=http://goo.gl/44PTg
+about=Sourcepole AG - Linux & Open Source Solutions, Weberstrasse 5, 8004 Zurich, Switzerland
+
+; Optional items:
+
+changelog=
+    2.0.1
+    - More robust DB Handling
+    2.0.0
+    - First release for QGIS 2 API
+
+homepage=https://gitlab.sourcepole.ch/sourcepole/pgversion
 tracker=http://hub.qgis.org/projects/pgversion/issues
-repository=https://www.kappasys.ch/svn/pgversion/trunk
+repository=https://git.sourcepole.ch/sourcepole/pgversion.git
