@@ -1,0 +1,21 @@
+# This file contains metadata for your plugin. Beginning
+# with version 1.8 this is the preferred way to supply information about a
+# plugin. The current method of embedding metadata in __init__.py will
+# be supported until version 2.0
+
+# This file should be included when you package your plugin.
+
+[general]
+name=PgVersion
+description=Client for the Postgres Versioning System pgvs
+category=Database
+version=2.0.1
+qgisMinimumVersion=2.0
+qgisMaximumVersion=2.99
+class_name=PgVersion
+website=http://www.kappasys.ch
+author=Horst Duester / Sourcepole AG Zürich
+email=horst.duester@sourcepole.ch
+homepage=http://goo.gl/44PTg
+tracker=http://hub.qgis.org/projects/pgversion/issues
+repository=https://www.kappasys.ch/svn/pgversion/trunk

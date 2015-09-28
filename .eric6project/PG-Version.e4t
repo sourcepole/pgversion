@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Tasks SYSTEM "Tasks-5.1.dtd">
+<!-- eric6 tasks file for project PG-Version -->
+<!-- Saved: 2015-09-17, 15:30:38 -->
+<Tasks version="5.1">
+  <ProjectScanFilter></ProjectScanFilter>
+  <Task priority="1" completed="False" type="1">
+    <Summary>TODO: not implemented yet</Summary>
+    <Description></Description>
+    <Created>2015-07-06, 11:45:03</Created>
+    <Resource>
+      <Filename>forms/Ui_CommitMessage.py</Filename>
+      <Linenumber>35</Linenumber>
+    </Resource>
+  </Task>
+  <Task priority="1" completed="False" type="1">
+    <Summary>TODO: not implemented yet</Summary>
+    <Description></Description>
+    <Created>2015-08-18, 17:08:57</Created>
+    <Resource>
+      <Filename>dbtools/login.py</Filename>
+      <Linenumber>42</Linenumber>
+    </Resource>
+  </Task>
+  <Task priority="1" completed="False" type="1">
+    <Summary>TODO: not implemented yet</Summary>
+    <Description></Description>
+    <Created>2015-09-15, 10:26:44</Created>
+    <Resource>
+      <Filename>forms/Ui_pgLoadVersion.py</Filename>
+      <Linenumber>105</Linenumber>
+    </Resource>
+  </Task>
+  <Task priority="1" completed="False" type="1">
+    <Summary>TODO: not implemented yet</Summary>
+    <Description></Description>
+    <Created>2015-09-15, 10:26:44</Created>
+    <Resource>
+      <Filename>forms/Ui_pgLoadVersion.py</Filename>
+      <Linenumber>128</Linenumber>
+    </Resource>
+  </Task>
+</Tasks>
