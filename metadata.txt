@@ -26,6 +26,6 @@ changelog=
     2.0.0
     - First release for QGIS 2 API
 
-homepage=https://gitlab.sourcepole.ch/sourcepole/pgversion
+homepage=https://github.com/sourcepole/pgversion
 tracker=http://hub.qgis.org/projects/pgversion/issues
-repository=https://git.sourcepole.ch/sourcepole/pgversion.git
+repository=https://github.com/sourcepole/pgversion.git
