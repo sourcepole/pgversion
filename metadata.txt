@@ -9,7 +9,7 @@
 name=PgVersion
 description=Client for the Postgres Versioning System pgvs
 category=Database
-version=2.0.2
+version=2.0.2RC1
 qgisMinimumVersion=2.0
 qgisMaximumVersion=2.99
 class_name=PgVersion
