@@ -262,16 +262,6 @@ This function will work reliable since pgvs db-version 1.8.0 and QGIS-Plugin ver
 <P>
 To make your life easier, the pgversion plugin for QGIS supports you by the use of <CODE>pgvs</CODE>. 
 </P>
-<P>
-To make the plugin available for your QGIS installation add the kappasys plugin repository 
-</P>
-<P>
-<A HREF="http://www.kappasys.org/qgis/plugins.xml">http://www.kappasys.org/qgis/plugins.xml</A>  
-</P>
-<P>
-to the 3rd party repositories of the plugin manager.
-Starting with QGIS 1.7 the kappasys plugin repository will be added automatically.
-</P>
 
 <A NAME="toc17"></A>
 <H2>7.1. Prepare layer for versioning</H2>
