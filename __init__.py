@@ -42,25 +42,6 @@ if QFileInfo(localePath).exists():
       
     if qVersion() > '4.3.3':        
         QCoreApplication.installTranslator(translator)      
-    
-#    
-#def name(): 
-#  return "pgVersion" 
-#  
-#def author(): 
-#  return "Dr. Horst Duester - Sourcepole AG" 
-#  
-#def email(): 
-#  return "horst.duester@sourcepole.ch"       
-#  
-#def description():
-#  return QCoreApplication.translate("init","Client for the Postgres Versioning System pgvs")
-#  
-#def version(): 
-#  return "2.0.0" 
-#  
-#def qgisMinimumVersion():
-#  return "2.0"
   
 def classFactory(iface): 
   # load pgVersion class from file pgVersion
