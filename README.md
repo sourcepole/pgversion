@@ -267,7 +267,7 @@ To make your life easier, the pgversion plugin for QGIS supports you by the use 
 <H2>7.1. Prepare layer for versioning</H2>
 
 <P>
-<IMG ALIGN="middle" SRC="images/qgis_001.png" BORDER="0" ALT="">
+<IMG ALIGN="middle" SRC="docs/images/qgis_001.png" BORDER="0" ALT="">
 </P>
 <P>
 With this option you start the versioning for a PostGIS layer. You have to do this once for every layer versioning should be available. Select the layer and the versioning system will be available for this layer. After this step you have to remove the layer from QGIS. To work with the versioned layer you have to do the next step.
@@ -277,20 +277,20 @@ With this option you start the versioning for a PostGIS layer. You have to do th
 <H2>7.2. Load versioned layer</H2>
 
 <P>
-<IMG ALIGN="middle" SRC="images/qgis_002.png" BORDER="0" ALT="">
+<IMG ALIGN="middle" SRC="docs/images/qgis_002.png" BORDER="0" ALT="">
 </P>
 <P>
 Now you can select the versioned layer from your database. In fact the corresponding layer view is loaded. Select your QGIS-PostGIS-Connection. You also will see the connected user. Than select the versioned layer from the list. The layer will be loaded to the QGIS Mapcanvas and you can start with editing.
 </P>
 <P>
-<IMG ALIGN="middle" SRC="images/qgis_005.png" BORDER="0" ALT="">
+<IMG ALIGN="middle" SRC="docs/images/qgis_005.png" BORDER="0" ALT="">
 </P>
 
 <A NAME="toc19"></A>
 <H2>7.3. Commit changes</H2>
 
 <P>
-<IMG ALIGN="middle" SRC="images/qgis_003.png" BORDER="0" ALT="">
+<IMG ALIGN="middle" SRC="docs/images/qgis_003.png" BORDER="0" ALT="">
 </P>
 <P>
 When you have finished your editings you can commit your changes to the database. 
@@ -298,13 +298,13 @@ When no conflicts between your editings and editings of an other user have been 
 After a successful commit you will see this message.
 </P>
 <P>
-<IMG ALIGN="middle" SRC="images/qgis_006.png" BORDER="0" ALT="">
+<IMG ALIGN="middle" SRC="docs/images/qgis_006.png" BORDER="0" ALT="">
 </P>
 <P>
 In the case that a different editor has changed one or more objects you edited as well, a new window will appear to support the merging of concurrent objects.
 </P>
 <P>
-<IMG ALIGN="middle" SRC="images/qgis_007.png" BORDER="0" ALT="">
+<IMG ALIGN="middle" SRC="docs/images/qgis_007.png" BORDER="0" ALT="">
 </P>
 <P>
 The conflicting objects are shown up in red with and labled with the  corresponding username.
@@ -313,23 +313,23 @@ The conflicting objects are shown up in red with and labled with the  correspond
 To hightlight the object of a single record from the table below the map, click a row and the corresponding object will be hightlighted in blue color.
 </P>
 <P>
-<IMG ALIGN="middle" SRC="images/qgis_013.png" BORDER="0" ALT="">
+<IMG ALIGN="middle" SRC="docs/images/qgis_013.png" BORDER="0" ALT="">
 </P>
 <P>
 Now you can select the object to commit from the select box.
 </P>
 <P>
-<IMG ALIGN="middle" SRC="images/qgis_008.png" BORDER="0" ALT="">
+<IMG ALIGN="middle" SRC="docs/images/qgis_008.png" BORDER="0" ALT="">
 </P>
 <P>
-Click <IMG ALIGN="middle" SRC="images/qgis_009.png" BORDER="0" ALT=""> to complete merging for this single object.
+Click <IMG ALIGN="middle" SRC="docs/images/qgis_009.png" BORDER="0" ALT=""> to complete merging for this single object.
 </P>
 
 <A NAME="toc20"></A>
 <H2>7.4. Revert to head revision</H2>
 
 <P>
-<IMG ALIGN="middle" SRC="images/qgis_010.png" BORDER="0" ALT="">
+<IMG ALIGN="middle" SRC="docs/images/qgis_010.png" BORDER="0" ALT="">
 </P>
 <P>
 Sometimes you like to remove your non committed changes. That means that you can set your view back to the HEAD revision. In this case all of your editings will be removed.
@@ -340,7 +340,7 @@ To revert your editings activate the corresponding layer in the legend and selec
 <H2>7.5. Drop versioning from layer</H2>
 
 <P>
-<IMG ALIGN="middle" SRC="images/qgis_011.png" BORDER="0" ALT="">
+<IMG ALIGN="middle" SRC="docs/images/qgis_011.png" BORDER="0" ALT="">
 </P>
 <P>
 Drop versioning from layer does not drop the main layer itself. It only drops the versioning environment of the layer. 
@@ -352,7 +352,7 @@ To drop versioning from layer activate the corresponding layer in the legend and
 <H2>7.6. Help</H2>
 
 <P>
-<IMG ALIGN="middle" SRC="images/qgis_004.png" BORDER="0" ALT="">
+<IMG ALIGN="middle" SRC="docs/images/qgis_004.png" BORDER="0" ALT="">
 </P>
 <P>
 You will get this help.
