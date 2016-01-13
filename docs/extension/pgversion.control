@@ -1,0 +1,4 @@
+# pgversion extension
+comment = 'Postgis Versioning System'
+default_version = '1.0.0'
+relocatable = true

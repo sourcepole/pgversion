@@ -17,7 +17,7 @@ SET client_min_messages = warning;
 -- TOC entry 13 (class 2615 OID 86572)
 -- Name: versions; Type: SCHEMA; Schema: -; Owner: -
 --
-
+\echo Use "CREATE EXTENSION pgversion" to load this file. \quit
 CREATE SCHEMA versions;
 
 
