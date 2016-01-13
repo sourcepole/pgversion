@@ -9,7 +9,7 @@
 name=PgVersion
 description=Client for the Postgres Versioning System pgvs
 category=Database
-version=2.0.1
+version=2.0.2RC1
 qgisMinimumVersion=2.0
 qgisMaximumVersion=2.99
 class_name=PgVersion
@@ -26,6 +26,6 @@ changelog=
     2.0.0
     - First release for QGIS 2 API
 
-homepage=https://gitlab.sourcepole.ch/sourcepole/pgversion
-tracker=http://hub.qgis.org/projects/pgversion/issues
-repository=https://git.sourcepole.ch/sourcepole/pgversion.git
+homepage=https://github.com/sourcepole/pgversion
+tracker=https://github.com/sourcepole/pgversion/issues
+repository=https://github.com/sourcepole/pgversion.git
