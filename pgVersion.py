@@ -140,7 +140,7 @@ class PgVersion:
       
       for l in layerList:
           
-          if l.type() == QgsMapLayer.VectorLayer:
+          if l.type() == QgsMapLayer.VectorLayer and l.providerType() == 'postgres':
               self.tools.setModified(l)
               l.editingStopped.connect(self.tools.setModified)
           
@@ -197,8 +197,6 @@ Please set the user permissions for table {0} and reload it via Database -> PG V
 #          QgsMapLayerRegistry.instance().addMapLayer(vLayer)
 #          canvas.setExtent(myExtent)
 #          canvas.zoomToPreviousExtent()
-
-
 
           QApplication.restoreOverrideCursor()
       else:

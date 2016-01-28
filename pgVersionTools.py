@@ -115,7 +115,7 @@ class PgVersionTools:
       if '(modified)' not in myLayer.name():
         myLayer.setLayerName(myLayer.name()+' (modified)')
     else:
-      myLayer.setLayerName(myLayer.name().replace('(modified)', ''))      
+      myLayer.setLayerName(myLayer.name().replace(' (modified)', ''))      
       
 # Return QgsVectorLayer from a layer name ( as string )
   def vectorLayerExists(self,   myName ):
