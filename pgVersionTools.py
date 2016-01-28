@@ -132,6 +132,8 @@ class PgVersionTools:
   def versionExists(self,layer):
   
       myDb = self.layerDB('versionExists',  layer)
+      provider = layer.dataProvider()
+      uri = provider.dataSourceUri()    
   
       try: 
           myTable = QgsDataSourceURI(uri).table()       
@@ -381,7 +383,8 @@ class PgVersionTools:
 # Check the revision of the DB-Functions
   def checkPGVSRevision(self,  myDb):      
 #      try:
-          check = pystring(myDb.runError('select * from versions.pgvsrevision()'))
+          check = pystring(myDb.runError('select pgvsrevision from versions.pgvsrevision()'))
+          print "Check: "+str(check)+"  len "+ str(len(check))
           if len(check) > 1:
                 self.vsCheck = DbVersionCheckDialog(myDb,  '0.0.0')
                 revisionMessage =QCoreApplication.translate('PgVersionTools', 'pgvs is not installed in the selected DB.\n\nPlease contact your DB-administrator to install the DB-functions from the file:\n\n<Plugin-Directory>/pgversion/tools/createFunctions.sql\n\nIf you have appropriate DB permissions you can install the DB functions directly with click on Install pgvs.')
@@ -390,7 +393,7 @@ class PgVersionTools:
                 self.vsCheck.show()
                 return False
           else:  
-            result = myDb.read('select * from versions.pgvsrevision()')
+            result = myDb.read('select pgvsrevision from versions.pgvsrevision()')
             if self.pgvsRevision != result["PGVSREVISION"][0]:
                 self.vsCheck = DbVersionCheckDialog(myDb,  result["PGVSREVISION"][0])              
                 revisionMessage =QCoreApplication.translate('PgVersionTools', 'The Plugin expects pgvs revision ')+self.pgvsRevision+QCoreApplication.translate('PgVersionTools', ' but DB-functions revision ')+result["PGVSREVISION"][0]+QCoreApplication.translate('PgVersionTools', ' are installed.\n\nPlease contact your DB-administrator to update the DB-functions from the file:\n\n<Plugin-Directory>/pgversion/tools/updateFunctions.sql\n\nIf you have appropriate DB permissions you can update the DB directly with click on DB-Update.')
