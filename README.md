@@ -339,10 +339,6 @@ To revert your editings activate the corresponding layer in the legend and selec
 
 <A NAME="toc24"></A>
 <H2>7.5. Logview</H2>
-
-<P>
-<IMG ALIGN="middle" SRC="docs/images/qgis_010.png" BORDER="0" ALT="">
-</P>
 <P>
 The Logview Dialog gives you the option to get an overview over the changes of a single layer. You also are able rollback to a  specific release. The rollback will be loaded to QGIS. As the result you will lose all possible changes you made before. If you want to keep this changes, you have to commit them. After the loading of the rollback your layer will be named as modified. That means only you can see this rollback. If you like to make it persistent, you have to commit it.
 </P>
