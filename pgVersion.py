@@ -289,7 +289,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
                     myDb.run(sql)
                     canvas.refresh()
                     self.iface.messageBar().pushMessage("Info", QCoreApplication.translate('PgVersion','Commit of your changes was successful'), level=QgsMessageBar.INFO, duration=3)            
-                    self.tools.setModified()
+                    self.tools.setModified(None,  True)
                     QApplication.restoreOverrideCursor()
           else:
             if self.w != None:
@@ -299,7 +299,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
             self.w.show()
             
           myDb.close()
-          self.tools.setModified()
+          self.tools.setModified(None,  True)
       else:
           self.iface.messageBar().pushMessage('INFO', QCoreApplication.translate('PgVersion','No layer changes for committing, everything is OK'), level=QgsMessageBar.INFO, duration=3)
 
@@ -473,7 +473,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
             QMessageBox.information(None, '',result)
         else:
             self.iface.messageBar().pushMessage("Info", QCoreApplication.translate('PgVersion','All changes are set back to the HEAD revision: {0}').format(str(result["PGVSREVERT"][0])), level=QgsMessageBar.INFO, duration=3)            
-        self.tools.setModified()
+        self.tools.setModified(None,  True)
     canvas.refresh()
     myDb.close()
     pass

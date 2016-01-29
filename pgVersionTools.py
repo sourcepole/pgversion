@@ -106,7 +106,7 @@ class PgVersionTools:
 #        except:
 #            pass
       
-  def setModified(self, myLayer=None):
+  def setModified(self, myLayer=None,  unsetModified=False):
       
     if myLayer==None:
       myLayer = self.iface.mapCanvas().currentLayer()
@@ -114,7 +114,7 @@ class PgVersionTools:
     if self.isModified(myLayer):
       if '(modified)' not in myLayer.name():
         myLayer.setLayerName(myLayer.name()+' (modified)')
-    else:
+    elif unsetModified:
       myLayer.setLayerName(myLayer.name().replace(' (modified)', ''))      
       
 # Return QgsVectorLayer from a layer name ( as string )
