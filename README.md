@@ -88,7 +88,7 @@ A <A HREF="tutorial">http://www.portailsig.org/content/pgversion-le-plugin-de-ve
 <H1>5. Download:</H1>
 
 <P>
-Download the createFunctions.sql from <A HREF="http://www.kappasys.ch/pgtools/pgversion/createFunctions.sql">http://www.kappasys.org/pgtools/pgversion/createFunctions.sql</A>
+Download the createFunctions.sql from <A HREF="https://github.com/sourcepole/pgversion/blob/master/docs/extension/pgversion--2.0.0.sql">https://github.com/sourcepole/pgversion/blob/master/docs/extension/pgversion--2.0.0.sql</A>
 </P>
 
 <A NAME="toc7"></A>
