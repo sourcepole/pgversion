@@ -42,8 +42,9 @@
     <LI><A HREF="#toc18">7.2. Load versioned layer</A>
     <LI><A HREF="#toc19">7.3. Commit changes</A>
     <LI><A HREF="#toc20">7.4. Revert to head revision</A>
-    <LI><A HREF="#toc21">7.5. Drop versioning from layer</A>
-    <LI><A HREF="#toc22">7.6. Help</A>
+    <LI><A HREF="#toc24">7.5. Logview</A>
+    <LI><A HREF="#toc21">7.6. Drop versioning from layer</A>
+    <LI><A HREF="#toc22">7.7. Help</A>
     </UL>
   <LI><A HREF="#toc23">License</A>
   </OL>
@@ -253,7 +254,7 @@ select * from versions.pgvsrollback('&lt;tablename&gt;',revision integer);
 </PRE></div>
 
 <P>
-This function will work reliable since pgvs db-version 1.8.0 and QGIS-Plugin version 0.9.2. All prior created revisions of the layer are not ready to rollback.
+This function will work reliable since pgvs db-version 1.8.4 and QGIS-Plugin version 2.0.2. All prior created revisions of the layer are not ready to rollback.
 </P>
 
 <A NAME="toc16"></A>
@@ -336,8 +337,18 @@ Sometimes you like to remove your non committed changes. That means that you can
 To revert your editings activate the corresponding layer in the legend and select the menue "Revert to head revision"
 </P>
 
+<A NAME="toc24"></A>
+<H2>7.5. Logview</H2>
+
+<P>
+<IMG ALIGN="middle" SRC="docs/images/qgis_010.png" BORDER="0" ALT="">
+</P>
+<P>
+The Logview Dialog gives you the option to get an overview over the changes of a single layer. You also are able rollback to a  specific release. The rollback will be loaded to QGIS. As the result you will lose all possible changes you made before. If you want to keep this changes, you have to commit them. After the loading of the rollback your layer will be named as modified. That means only you can see this rollback. If you like to make it persistent, you have to commit it.
+</P>
+
 <A NAME="toc21"></A>
-<H2>7.5. Drop versioning from layer</H2>
+<H2>7.6. Drop versioning from layer</H2>
 
 <P>
 <IMG ALIGN="middle" SRC="docs/images/qgis_011.png" BORDER="0" ALT="">
@@ -349,7 +360,7 @@ To drop versioning from layer activate the corresponding layer in the legend and
 </P>
 
 <A NAME="toc22"></A>
-<H2>7.6. Help</H2>
+<H2>7.7. Help</H2>
 
 <P>
 <IMG ALIGN="middle" SRC="docs/images/qgis_004.png" BORDER="0" ALT="">
@@ -365,10 +376,10 @@ You will get this help.
 LICENSING INFORMATION:
 </P>
 <P>
-pgvs Postgres-Functions and PgVersion QGIS Plugin is copyright (C) 2010  Dr. Horst Duester
+pgvs Postgres-Functions and PgVersion QGIS Plugin is copyright (C) 2010  Dr. Horst Duester / Sourcepole AG, Zurich
 </P>
 <P>
-<A HREF="mailto:horst.duester@kappasys.ch">horst.duester@kappasys.ch</A>
+<A HREF="mailto:horst.duester@sourcepole.ch">horst.duester@sourcepole.ch</A>
 </P>
 <P>
 QGIS-Plugin icons is copyright (C) 2010 Robert Szczepanek
