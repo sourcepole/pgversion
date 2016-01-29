@@ -141,7 +141,7 @@ class PgVersion:
       for l in layerList:
           
           if l.type() == QgsMapLayer.VectorLayer and l.providerType() == 'postgres':
-              self.tools.setModified(l)
+#              self.tools.setModified(l)
               l.editingStopped.connect(self.tools.setModified)
           
 
