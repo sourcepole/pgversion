@@ -1,23 +1,22 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML>
+<p><HTML>
 <HEAD>
 <META NAME="generator" CONTENT="http://txt2tags.org">
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
-<TITLE>PostGIS Versioning - pgVersion 2.0.0</TITLE>
+<TITLE>PostGIS Versioning - pgVersion 2.0.0</TITLE></p>
 
 <!-- CSS include failed for style.css -->
 
-</HEAD>
-<BODY>
+<p></HEAD>
+<BODY></p>
 
-<DIV CLASS="header" ID="header">
-<H1>PostGIS Versioning - pgVersion 2.0.0</H1>
+<p><DIV CLASS="header" ID="header">
+<H1>PostGIS Versioning - pgVersion 2.0</H1>
 <H3>Dr. Horst Duester, 2015, horst.duester@sourcepole.ch</H3>
-</DIV>
+</DIV></p>
 
-<DIV CLASS="toc">
+<p><DIV CLASS="toc"></p>
 
-  <OL>
+<p><OL>
   <LI><A HREF="#toc1">Change log</A>
   <LI><A HREF="#toc2">TODO</A>
   <LI><A HREF="#toc3">Prerequisits</A>
@@ -43,78 +42,80 @@
     <LI><A HREF="#toc18">7.2. Load versioned layer</A>
     <LI><A HREF="#toc19">7.3. Commit changes</A>
     <LI><A HREF="#toc20">7.4. Revert to head revision</A>
-    <LI><A HREF="#toc21">7.5. Drop versioning from layer</A>
-    <LI><A HREF="#toc22">7.6. Help</A>
+    <LI><A HREF="#toc24">7.5. Logview</A>
+    <LI><A HREF="#toc21">7.6. Drop versioning from layer</A>
+    <LI><A HREF="#toc22">7.7. Help</A>
     </UL>
   <LI><A HREF="#toc23">License</A>
-  </OL>
+  </OL></p>
 
-</DIV>
-<DIV CLASS="body" ID="body">
+<p></DIV>
+<DIV CLASS="body" ID="body"></p>
 
-<A NAME="toc1"></A>
-<H1>1. Change log</H1>
+<p><A NAME="toc1"></A>
+<H1>1. Change log</H1></p>
 
-<A NAME="toc2"></A>
-<H1>2. TODO</H1>
+<p><A NAME="toc2"></A>
+<H1>2. TODO</H1></p>
 
-<UL>
+<p><UL>
+<LI>Version Diffs
 <LI>Tagged versions
 <LI>Branches 
 <LI>Merging of branches
-</UL>
+</UL></p>
 
-<A NAME="toc3"></A>
-<H1>3. Prerequisits</H1>
+<p><A NAME="toc3"></A>
+<H1>3. Prerequisits</H1></p>
 
-<A NAME="toc4"></A>
-<H2>3.1. Ubuntu</H2>
+<p><A NAME="toc4"></A>
+<H2>3.1. Ubuntu</H2></p>
 
-<P>
+<p><P>
 You have to install Qt4SQL  and the Qt4SQL PostgreSQL driver with:
 </P>
 <P>
 <CODE>$ sudo apt-get install libqt4-sql libqt4-sql-psql python-qt4-sql</CODE>
-</P>
+</P></p>
 
-<A NAME="toc5"></A>
-<H1>4. Introduction</H1>
+<p><A NAME="toc5"></A>
+<H1>4. Introduction</H1></p>
 
-<P>
+<p><P>
 Versioning of Postgis-Layers will become essential, when more than one person edits the same layer concurrently. To manage concurrencing editing of a single Postgis Layer the pgVersion management system supports your work. The idea is to create a versioning system for editing PostGIS-Layers similar to source code versioning systems like CVS or Subversion.
 A <A HREF="tutorial">http://www.portailsig.org/content/pgversion-le-plugin-de-versionnement-pour-postgis-qgis french</A> was created by Nicolas Rochard. 
-</P>
+</P></p>
 
-<A NAME="toc6"></A>
-<H1>5. Download:</H1>
+<p><A NAME="toc6"></A>
+<H1>5. Download:</H1></p>
 
-<P>
-Download the createFunctions.sql from <A HREF="http://www.kappasys.ch/pgtools/pgversion/createFunctions.sql">http://www.kappasys.org/pgtools/pgversion/createFunctions.sql</A>
-</P>
+<p><P>
+Download the createFunctions.sql from <A HREF="https://github.com/sourcepole/pgversion/blob/master/docs/extension/pgversion--2.0.0.sql">https://github.com/sourcepole/pgversion/blob/master/docs/extension/pgversion--2.0.0.sql</A>
+</P></p>
 
-<A NAME="toc7"></A>
-<H1>6. Functions</H1>
+<p><A NAME="toc7"></A>
+<H1>6. Functions</H1></p>
 
-<P>
+<p><P>
 To create the new <CODE>pgvs</CODE> functions you should run the SQL-Script:
-</P>
+</P></p>
 
 <div class="code"><PRE>
 psql -d &lt;databasename&gt; -U &lt;username&gt; -h &lt;hostname&gt; \
      -f &lt;Path to&gt;/createFunctions.sql
 </PRE></div>
 
-<P>
+<p><P>
 After running this command, a new schema is created:
-</P>
+</P></p>
 
 <div class="code"><PRE>
 versions
 </PRE></div>
 
-<P>
+<p><P>
 and some new functions have been created in the schema <CODE>versions</CODE>:
-</P>
+</P></p>
 
 <div class="code"><PRE>
 pgvsinit()
@@ -127,181 +128,171 @@ pgvslogview()
 pgvsrollback()
 </PRE></div>
 
-<P>
+<p><P>
 This schema contains all information which are neccessary to manage the versioned tables. I highly advise that you should not make any changes in the schema <CODE>versions</CODE>. Now your database is ready for versioning.
 You also have the option to install the <CODE>pgvs</CODE> environment in the <CODE>template1</CODE> database. In this case every new created database will automatically contain the <CODE>pgvs</CODE> environment.
-</P>
+</P></p>
 
-<A NAME="toc8"></A>
-<H2>6.1. pgvsinit</H2>
+<p><A NAME="toc8"></A>
+<H2>6.1. pgvsinit</H2></p>
 
-<P>
+<p><P>
 The <CODE>pgvsinit()</CODE> function initializes the versioning environment for a single geometry layer.
 </P>
 <P>
 The init command:
-</P>
+</P></p>
 
 <div class="code"><PRE>
 select * from versions.pgvsinit('&lt;schema&gt;.&lt;tablename&gt;');
 </PRE></div>
 
-<P>
+<p><P>
 The initialisation process works in 3 steps:
-</P>
+</P></p>
 
- <UL>
- <LI>creating a view with the name <CODE>&lt;tablename&gt;_version</CODE>. This view has the same structure as the origional table.
+<p><UL>
+ <LI>creating a view with the name <CODE>&lt;tablename&gt;<em>version</CODE>. This view has the same structure as the origional table.
  <LI>creating of some rules and triggers for the new view
- <LI>add a record to the meta table <CODE>versions.version_tables</CODE>
- </UL>
+ <LI>add a record to the meta table <CODE>versions.version</em>tables</CODE>
+ </UL></p>
 
-<P>
+<p><P>
 All future editings have to be done on the view <CODE>&lt;tablename&gt;_version</CODE>. If you want to change the geometry or an attribute value of a versioned PostGIS-Layer you can do this in the same way like you would edit a real table. After saving of changes on the Layer, you will see all changes you made. But your changes are only visible for you, they are saved in a temporary state. To make your changes available for the rest of the world, you have to commit your changes to the database.
 </P>
 <P>
 It is not possible to change the structure of the underlaying table. If you want to do this, you have to drop the versioning system from the table like described later. Than you can make your changes. As the last step you have to initialize the versioning system for the table again.
-</P>
+</P></p>
 
-<A NAME="toc9"></A>
-<H2>6.2. pgvscommit</H2>
+<p><A NAME="toc9"></A>
+<H2>6.2. pgvscommit</H2></p>
 
-<P>
+<p><P>
 When you finish your editings after a while, you have to commit your editings to the main PostGIS-Layer table. In this way you make your editings available for the rest of the world.
 </P>
 <P>
 The commit command:
-</P>
+</P></p>
 
 <div class="code"><PRE>
 select * from versions.psvscommit('&lt;schema&gt;.&lt;tablename&gt;','&lt;log-message&gt;';
 </PRE></div>
 
-<P>
+<p><P>
 Sometimes it happens, that two or more different users edit the same table record. In this case <CODE>pgvscommit()</CODE>
 lists the conflicting records. The conflicting objects are not saved to the database. Please contact the user mentioned in the error message to discuss, which change should be committed to the database.
-</P>
+</P></p>
 
-<A NAME="toc10"></A>
-<H2>6.3. pgvsmerge</H2>
+<p><A NAME="toc10"></A>
+<H2>6.3. pgvsmerge</H2></p>
 
-<P>
+<p><P>
 To solve conflicts user the command:
-</P>
+</P></p>
 
 <div class="code"><PRE>
 select * from versions.pgvsmerge('&lt;schema&gt;.&lt;tablename&gt;',&lt;record-id&gt;,'&lt;username&gt;');
 </PRE></div>
 
-<A NAME="toc11"></A>
-<H2>6.4. pgvsdrop</H2>
+<p><A NAME="toc11"></A>
+<H2>6.4. pgvsdrop</H2></p>
 
-<P>
+<p><P>
 To remove the versioning system from a specific table, you can use the command:
-</P>
+</P></p>
 
 <div class="code"><PRE>
 select * from versions.pgvsdrop('&lt;tablename&gt;');
 </PRE></div>
 
-<P>
+<p><P>
 Than all versioning stuff will be removed from the PostGIS-Layer table. You only can drop versioning from a table when all changes of all users are committed. Don't worry, the command <CODE>pgvsdrop('&lt;tablename&gt;');</CODE> only removes the versioning system. The main PostGIS-Layer table with all former committs still exists of course!
-</P>
+</P></p>
 
-<A NAME="toc12"></A>
-<H2>6.5. pgvsrevert</H2>
+<p><A NAME="toc12"></A>
+<H2>6.5. pgvsrevert</H2></p>
 
-<P>
+<p><P>
 The pgvsrevert function gives you the option to remove all your uncommitted editings and set back your data to the HEAD revision.
 The revision number of the HEAD revision will be returned.
-</P>
+</P></p>
 
 <div class="code"><PRE>
 select * from versions.pgvsrevert('&lt;tablename&gt;');
 </PRE></div>
 
-<A NAME="toc13"></A>
-<H2>6.6. pgvsrevision</H2>
+<p><A NAME="toc13"></A>
+<H2>6.6. pgvsrevision</H2></p>
 
-<P>
+<p><P>
 The pgvsrevision function returns the installed revison of pgvs:
-</P>
+</P></p>
 
 <div class="code"><PRE>
 select * from versions.pgvsrevision();
 </PRE></div>
 
-<A NAME="toc14"></A>
-<H2>6.7. pgvslogview</H2>
+<p><A NAME="toc14"></A>
+<H2>6.7. pgvslogview</H2></p>
 
-<P>
+<p><P>
 The pgvslogview function returns all logs of a specific versioned table:
-</P>
+</P></p>
 
 <div class="code"><PRE>
 select * from versions.pgpslogview('&lt;tablename&gt;');
 </PRE></div>
 
-<A NAME="toc15"></A>
-<H2>6.8. pgvsrollback</H2>
+<p><A NAME="toc15"></A>
+<H2>6.8. pgvsrollback</H2></p>
 
-<P>
+<p><P>
 The pgvsrollback function will push a revision into HEAD revision:
-</P>
+</P></p>
 
 <div class="code"><PRE>
 select * from versions.pgvsrollback('&lt;tablename&gt;',revision integer);
 </PRE></div>
 
-<P>
-This function will work reliable since pgvs db-version 1.8.0 and QGIS-Plugin version 0.9.2. All prior created revisions of the layer are not ready to rollback.
-</P>
+<p><P>
+This function will work reliable since pgvs db-version 1.8.4 and QGIS-Plugin version 2.0.2. All prior created revisions of the layer are not ready to rollback.
+</P></p>
 
-<A NAME="toc16"></A>
-<H1>7. QGIS Plugin</H1>
+<p><A NAME="toc16"></A>
+<H1>7. QGIS Plugin</H1></p>
 
-<P>
+<p><P>
 To make your life easier, the pgversion plugin for QGIS supports you by the use of <CODE>pgvs</CODE>. 
-</P>
-<P>
-To make the plugin available for your QGIS installation add the kappasys plugin repository 
-</P>
-<P>
-<A HREF="http://www.kappasys.org/qgis/plugins.xml">http://www.kappasys.org/qgis/plugins.xml</A>  
-</P>
-<P>
-to the 3rd party repositories of the plugin manager.
-Starting with QGIS 1.7 the kappasys plugin repository will be added automatically.
-</P>
+</P></p>
 
-<A NAME="toc17"></A>
-<H2>7.1. Prepare layer for versioning</H2>
+<p><A NAME="toc17"></A>
+<H2>7.1. Prepare layer for versioning</H2></p>
 
-<P>
-<IMG ALIGN="middle" SRC="images/qgis_001.png" BORDER="0" ALT="">
+<p><P>
+<IMG ALIGN="middle" SRC="docs/images/qgis_001.png" BORDER="0" ALT="">
 </P>
 <P>
 With this option you start the versioning for a PostGIS layer. You have to do this once for every layer versioning should be available. Select the layer and the versioning system will be available for this layer. After this step you have to remove the layer from QGIS. To work with the versioned layer you have to do the next step.
-</P>
+</P></p>
 
-<A NAME="toc18"></A>
-<H2>7.2. Load versioned layer</H2>
+<p><A NAME="toc18"></A>
+<H2>7.2. Load versioned layer</H2></p>
 
-<P>
-<IMG ALIGN="middle" SRC="images/qgis_002.png" BORDER="0" ALT="">
+<p><P>
+<IMG ALIGN="middle" SRC="docs/images/qgis_002.png" BORDER="0" ALT="">
 </P>
 <P>
 Now you can select the versioned layer from your database. In fact the corresponding layer view is loaded. Select your QGIS-PostGIS-Connection. You also will see the connected user. Than select the versioned layer from the list. The layer will be loaded to the QGIS Mapcanvas and you can start with editing.
 </P>
 <P>
-<IMG ALIGN="middle" SRC="images/qgis_005.png" BORDER="0" ALT="">
-</P>
+<IMG ALIGN="middle" SRC="docs/images/qgis_005.png" BORDER="0" ALT="">
+</P></p>
 
-<A NAME="toc19"></A>
-<H2>7.3. Commit changes</H2>
+<p><A NAME="toc19"></A>
+<H2>7.3. Commit changes</H2></p>
 
-<P>
-<IMG ALIGN="middle" SRC="images/qgis_003.png" BORDER="0" ALT="">
+<p><P>
+<IMG ALIGN="middle" SRC="docs/images/qgis_003.png" BORDER="0" ALT="">
 </P>
 <P>
 When you have finished your editings you can commit your changes to the database. 
@@ -309,13 +300,13 @@ When no conflicts between your editings and editings of an other user have been 
 After a successful commit you will see this message.
 </P>
 <P>
-<IMG ALIGN="middle" SRC="images/qgis_006.png" BORDER="0" ALT="">
+<IMG ALIGN="middle" SRC="docs/images/qgis_006.png" BORDER="0" ALT="">
 </P>
 <P>
 In the case that a different editor has changed one or more objects you edited as well, a new window will appear to support the merging of concurrent objects.
 </P>
 <P>
-<IMG ALIGN="middle" SRC="images/qgis_007.png" BORDER="0" ALT="">
+<IMG ALIGN="middle" SRC="docs/images/qgis_007.png" BORDER="0" ALT="">
 </P>
 <P>
 The conflicting objects are shown up in red with and labled with the  corresponding username.
@@ -324,62 +315,68 @@ The conflicting objects are shown up in red with and labled with the  correspond
 To hightlight the object of a single record from the table below the map, click a row and the corresponding object will be hightlighted in blue color.
 </P>
 <P>
-<IMG ALIGN="middle" SRC="images/qgis_013.png" BORDER="0" ALT="">
+<IMG ALIGN="middle" SRC="docs/images/qgis_013.png" BORDER="0" ALT="">
 </P>
 <P>
 Now you can select the object to commit from the select box.
 </P>
 <P>
-<IMG ALIGN="middle" SRC="images/qgis_008.png" BORDER="0" ALT="">
+<IMG ALIGN="middle" SRC="docs/images/qgis_008.png" BORDER="0" ALT="">
 </P>
 <P>
-Click <IMG ALIGN="middle" SRC="images/qgis_009.png" BORDER="0" ALT=""> to complete merging for this single object.
-</P>
+Click <IMG ALIGN="middle" SRC="docs/images/qgis_009.png" BORDER="0" ALT=""> to complete merging for this single object.
+</P></p>
 
-<A NAME="toc20"></A>
-<H2>7.4. Revert to head revision</H2>
+<p><A NAME="toc20"></A>
+<H2>7.4. Revert to head revision</H2></p>
 
-<P>
-<IMG ALIGN="middle" SRC="images/qgis_010.png" BORDER="0" ALT="">
+<p><P>
+<IMG ALIGN="middle" SRC="docs/images/qgis_010.png" BORDER="0" ALT="">
 </P>
 <P>
 Sometimes you like to remove your non committed changes. That means that you can set your view back to the HEAD revision. In this case all of your editings will be removed.
 To revert your editings activate the corresponding layer in the legend and select the menue "Revert to head revision"
-</P>
+</P></p>
 
-<A NAME="toc21"></A>
-<H2>7.5. Drop versioning from layer</H2>
-
+<p><A NAME="toc24"></A>
+<H2>7.5. Logview</H2>
 <P>
-<IMG ALIGN="middle" SRC="images/qgis_011.png" BORDER="0" ALT="">
+The Logview Dialog gives you the option to get an overview over the changes of a single layer. You also are able rollback to a  specific release. The rollback will be loaded to QGIS. As the result you will lose all possible changes you made before. If you want to keep this changes, you have to commit them. After the loading of the rollback your layer will be named as modified. That means only you can see this rollback. If you like to make it persistent, you have to commit it.
+</P></p>
+
+<p><A NAME="toc21"></A>
+<H2>7.6. Drop versioning from layer</H2></p>
+
+<p><P>
+<IMG ALIGN="middle" SRC="docs/images/qgis_011.png" BORDER="0" ALT="">
 </P>
 <P>
 Drop versioning from layer does not drop the main layer itself. It only drops the versioning environment of the layer. 
 This is necessary in the case you changed the model of the main table or you don't want to use the versioning environment in the future.
 To drop versioning from layer activate the corresponding layer in the legend and select "Drop versioning from layer" in the menue.
-</P>
+</P></p>
 
-<A NAME="toc22"></A>
-<H2>7.6. Help</H2>
+<p><A NAME="toc22"></A>
+<H2>7.7. Help</H2></p>
 
-<P>
-<IMG ALIGN="middle" SRC="images/qgis_004.png" BORDER="0" ALT="">
+<p><P>
+<IMG ALIGN="middle" SRC="docs/images/qgis_004.png" BORDER="0" ALT="">
 </P>
 <P>
 You will get this help.
-</P>
+</P></p>
 
-<A NAME="toc23"></A>
-<H1>8. License</H1>
+<p><A NAME="toc23"></A>
+<H1>8. License</H1></p>
 
-<P>
+<p><P>
 LICENSING INFORMATION:
 </P>
 <P>
-pgvs Postgres-Functions and PgVersion QGIS Plugin is copyright (C) 2010  Dr. Horst Duester
+pgvs Postgres-Functions and PgVersion QGIS Plugin is copyright (C) 2010  Dr. Horst Duester / Sourcepole AG, Zurich
 </P>
 <P>
-<A HREF="mailto:horst.duester@kappasys.ch">horst.duester@kappasys.ch</A>
+<A HREF="mailto:horst.duester@sourcepole.ch">horst.duester@sourcepole.ch</A>
 </P>
 <P>
 QGIS-Plugin icons is copyright (C) 2010 Robert Szczepanek
@@ -395,8 +392,8 @@ This program is free software; you can redistribute it and/or modify it under th
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 </P>
-</DIV>
+</DIV></p>
 
-<!-- html code generated by txt2tags 2.6 (http://txt2tags.org) -->
+<p><!-- html code generated by txt2tags 2.6 (http://txt2tags.org) -->
 <!-- cmdline: txt2tags -i help.t2t -o ../help.html -t html -->
-</BODY></HTML>
+</BODY></HTML></p>
