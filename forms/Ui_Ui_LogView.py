@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/home/hdus/dev/qgis/pgversion-plugin/pgversion/forms/Ui_LogView.ui'
 #
-# Created: Wed Jul  1 12:54:18 2015
+# Created: Thu Feb  4 16:08:06 2016
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -42,10 +42,10 @@ class Ui_LogView(object):
         self.btnRollback.setMinimumSize(QtCore.QSize(0, 0))
         self.btnRollback.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.btnRollback.setObjectName(_fromUtf8("btnRollback"))
-        self.gridLayout.addWidget(self.splitter, 0, 1, 1, 1)
+        self.gridLayout.addWidget(self.splitter, 1, 1, 1, 1)
         self.treeWidget = QtGui.QTreeWidget(LogView)
         self.treeWidget.setObjectName(_fromUtf8("treeWidget"))
-        self.gridLayout.addWidget(self.treeWidget, 1, 0, 1, 2)
+        self.gridLayout.addWidget(self.treeWidget, 2, 0, 1, 2)
         self.btnClose = QtGui.QDialogButtonBox(LogView)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Maximum, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -54,7 +54,10 @@ class Ui_LogView(object):
         self.btnClose.setSizePolicy(sizePolicy)
         self.btnClose.setStandardButtons(QtGui.QDialogButtonBox.Close)
         self.btnClose.setObjectName(_fromUtf8("btnClose"))
-        self.gridLayout.addWidget(self.btnClose, 2, 1, 1, 1)
+        self.gridLayout.addWidget(self.btnClose, 3, 1, 1, 1)
+        self.btnDiff = QtGui.QPushButton(LogView)
+        self.btnDiff.setObjectName(_fromUtf8("btnDiff"))
+        self.gridLayout.addWidget(self.btnDiff, 0, 1, 1, 1)
 
         self.retranslateUi(LogView)
         QtCore.QMetaObject.connectSlotsByName(LogView)
@@ -66,6 +69,7 @@ class Ui_LogView(object):
         self.treeWidget.headerItem().setText(1, _translate("LogView", "Date", None))
         self.treeWidget.headerItem().setText(2, _translate("LogView", "User", None))
         self.treeWidget.headerItem().setText(3, _translate("LogView", "Log-Message", None))
+        self.btnDiff.setText(_translate("LogView", "diff to selected revision", None))
 
 
 if __name__ == "__main__":

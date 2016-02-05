@@ -130,6 +130,7 @@ class PgVersion:
     self.actionHelp.triggered.connect(self.doHelp) 
     self.actionAbout.triggered.connect(self.doAbout) 
     
+    self.LogViewDialog.diffLayer.connect(self.doDiff) 
     self.LogViewDialog.rollbackLayer.connect(self.doRollback) 
     self.LogViewDialog.checkoutLayer.connect(self.doCheckout) 
 
@@ -520,20 +521,61 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
         
         pass
     
-  def doDiff(self):
-#      QMessageBox.information(None, 'Message', 'Diff is not implemented yet!')
-#    try:
-        canvas = self.iface.mapCanvas()
-        theLayer = canvas.currentLayer()
-        provider = theLayer.dataProvider()
-        uri = provider.dataSourceUri()    
-#        myDb = self.tools.layerDB('commit',  theLayer)
+  def doDiff(self,  item):
 
-        type='diff'
-        self.diff = DiffDlg(self.iface)
-        self.diff.show()
-#    except:
-#        QMessageBox.information(None, '', QCoreApplication.translate('PgVersion','Please select a layer to show the diffs to HEAD'))
+      if item == None:
+        QMessageBox.information(None, QCoreApplication.translate('PgVersion','Error'),  QCoreApplication.translate('PgVersion','Please select a valid revision'))
+        return
+
+      revision = item.text(0)
+
+      canvas = self.iface.mapCanvas()
+      currentLayer = canvas.currentLayer()
+    
+    
+      if currentLayer == None:
+        QMessageBox.information(None, '', QCoreApplication.translate('PgVersion','Please select a versioned layer'))
+        return    
+      else:
+        answer = QMessageBox.question(None, '', QCoreApplication.translate('PgVersion','Are you sure to checkout diffs to revision {0}?').format(revision), QCoreApplication.translate('PgVersion','Yes'),  QCoreApplication.translate('PgVersion','No'))
+        if answer == 0:
+                    
+            QApplication.setOverrideCursor(Qt.WaitCursor)
+            provider = currentLayer.dataProvider()
+            uri = provider.dataSourceUri()    
+            uniqueCol = QgsDataSourceURI(uri).keyColumn()
+            geomCol = QgsDataSourceURI(uri).geometryColumn()
+            geometryType = currentLayer.geometryType()
+
+            mySchema = QgsDataSourceURI(uri).schema()
+            myTable = QgsDataSourceURI(uri).table()
+
+            if len(mySchema) == 0:
+                mySchema = 'public'
+
+            sql = "select v.* from versions.pgvsdiff('"+mySchema+"."+myTable.replace('_version', '')+"', "+revision+") as d, versions."+mySchema+"_"+myTable+"_log as v where d.log_id = v."+uniqueCol+" and revision > "+revision
+            
+            myUri = QgsDataSourceURI(uri)
+            myUri.setDataSource("", u"(%s\n)" % sql, geomCol, "", uniqueCol)
+
+            layer = None
+            layer = QgsVectorLayer(myUri.uri(), myTable+" (Diff to Revision"+revision+")", "postgres")         
+            userPluginPath = QFileInfo(QgsApplication.qgisUserDbFilePath()).path()+"/python/plugins/pgversion"  
+            layer.setRendererV2(None)
+            
+            if geometryType == 0:
+                pass
+            elif geometryType == 1:
+                layer.loadNamedStyle(userPluginPath+"/legends/diff_linestring.qml")             
+            elif geometryType == 2:
+                layer.loadNamedStyle(userPluginPath+"/legends/diff_polygon.qml")             
+                
+            QgsMapLayerRegistry.instance().addMapLayer(layer)
+            QApplication.restoreOverrideCursor()
+            self.iface.messageBar().pushMessage('INFO', QCoreApplication.translate('PgVersion','Diff to revision {0} was successful!').format(revision), level=QgsMessageBar.INFO, duration=3)
+            self.LogViewDialog.close()            
+            return
+
 
   def doDrop(self): 
       

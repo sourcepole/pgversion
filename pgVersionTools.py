@@ -330,7 +330,7 @@ class PgVersionTools:
            vLayer = QgsVectorLayer(uri.uri(), layerName, "postgres")
            userPluginPath = QFileInfo(QgsApplication.qgisUserDbFilePath()).path()+"/python/plugins/pgversion"  
            vLayer.setRendererV2(None)
-           vLayer.loadNamedStyle(userPluginPath+"/tools/conflict.qml")   
+           vLayer.loadNamedStyle(userPluginPath+"/legends/conflict.qml")   
            myDb.close()
            if vLayer.isValid():
                return vLayer    
