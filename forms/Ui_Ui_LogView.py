@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/home/hdus/dev/qgis/pgversion-plugin/pgversion/forms/Ui_LogView.ui'
 #
-# Created: Mon Feb  8 13:13:01 2016
+# Created: Mon Feb  8 13:28:04 2016
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -69,7 +69,7 @@ class Ui_LogView(object):
         self.treeWidget.headerItem().setText(2, _translate("LogView", "User", None))
         self.treeWidget.headerItem().setText(3, _translate("LogView", "Log-Message", None))
         self.btnRollback.setText(_translate("LogView", "rollback to selected revision", None))
-        self.btnDiff.setText(_translate("LogView", "diff to selected revision", None))
+        self.btnDiff.setText(_translate("LogView", "diff to HEAD revision", None))
         self.btnCheckout.setText(_translate("LogView", "checkout selected revision", None))
 
 

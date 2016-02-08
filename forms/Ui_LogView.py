@@ -14,7 +14,7 @@ class LogView(QDialog, Ui_LogView):
     Class documentation goes here.
     """
     rollbackLayer = pyqtSignal(QTreeWidgetItem)
-    diffLayer = pyqtSignal(QTreeWidgetItem)
+    diffLayer = pyqtSignal()
     checkoutLayer = pyqtSignal(QTreeWidgetItem)
       
     def __init__(self, parent = None):
@@ -37,7 +37,7 @@ class LogView(QDialog, Ui_LogView):
     
     @pyqtSignature("")
     def on_btnDiff_clicked(self):
-       self.diffLayer.emit(self.treeWidget.currentItem())    
+       self.diffLayer.emit()    
        self.close()
     
     @pyqtSignature("")

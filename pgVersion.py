@@ -429,13 +429,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
 
         pass
 
-  def doDiff(self,  item):
-
-      if item == None:
-        QMessageBox.information(None, QCoreApplication.translate('PgVersion','Error'),  QCoreApplication.translate('PgVersion','Please select a valid revision'))
-        return
-
-      revision = item.text(0)
+  def doDiff(self):
 
       canvas = self.iface.mapCanvas()
       currentLayer = canvas.currentLayer()
@@ -446,7 +440,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
         QMessageBox.information(None, '', QCoreApplication.translate('PgVersion','Please select a versioned layer'))
         return    
       else:
-        answer = QMessageBox.question(None, '', QCoreApplication.translate('PgVersion','Are you sure to checkout diffs to revision {0}?').format(revision), QCoreApplication.translate('PgVersion','Yes'),  QCoreApplication.translate('PgVersion','No'))
+        answer = QMessageBox.question(None, '', QCoreApplication.translate('PgVersion','Are you sure to checkout diffs to HEAD revision?'), QCoreApplication.translate('PgVersion','Yes'),  QCoreApplication.translate('PgVersion','No'))
         if answer == 0:
 
             QApplication.setOverrideCursor(Qt.WaitCursor)
@@ -468,10 +462,11 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
             myCols = ', '.join(cols)
 
             sql = "select row_number() OVER () AS rownum, * \
-from (select *, 'delete'::varchar as action, "+revision+"::bigint as revision \
-from ( \
+from (select *, 'delete'::varchar as action, head.head as revision \
+from (select max(revision) as head from versions."+mySchema+"_"+myTable+"_log) as head, \
+( \
 (select v."+myCols+" \
-from versions.pgvscheckout('"+mySchema+"."+myTable.replace('_version', '')+"', "+revision+") as c,  \
+from versions.pgvscheckout('"+mySchema+"."+myTable.replace('_version', '')+"', (select max(revision) as head from versions."+mySchema+"_"+myTable+"_log)) as c,  \
      versions."+mySchema+"_"+myTable+"_log as v \
 where c.log_id = v."+uniqueCol+"  \
   and c.systime = v.systime \
@@ -479,13 +474,14 @@ except \
 select v."+myCols+"  \
 from "+mySchema+"."+myTable+" as v)) as foo \
 union \
-select *, 'insert'::varchar as action, "+revision+"::bigint as revision \
-from (\
+select *, 'insert'::varchar as action, head.head as revision \
+from (select max(revision) as head from versions."+mySchema+"_"+myTable+"_log) as head, \
+(\
 select v."+myCols+" \
 from "+mySchema+"."+myTable+" as v \
 except \
 select v."+myCols+" \
-from versions.pgvscheckout('"+mySchema+"."+myTable.replace('_version', '')+"', "+revision+") as c, \
+from versions.pgvscheckout('"+mySchema+"."+myTable.replace('_version', '')+"', (select max(revision) as head from versions."+mySchema+"_"+myTable+"_log)) as c, \
      versions."+mySchema+"_"+myTable+"_log as v \
 where c.log_id = v."+uniqueCol+" and c.systime = v.systime) as foo1) as foo "
 
@@ -493,8 +489,7 @@ where c.log_id = v."+uniqueCol+" and c.systime = v.systime) as foo1) as foo "
             myUri = QgsDataSourceURI(uri)
             myUri.setDataSource("", u"(%s\n)" % sql, geomCol, "", "rownum")
 
-            layer = None
-            layer = QgsVectorLayer(myUri.uri(), myTable+" (Diff to Revision "+revision+")", "postgres")         
+            layer = QgsVectorLayer(myUri.uri(), myTable+" (Diff to HEAD Revision)", "postgres")         
             userPluginPath = QFileInfo(QgsApplication.qgisUserDbFilePath()).path()+"/python/plugins/pgversion"  
             layer.setRendererV2(None)
 
@@ -507,7 +502,7 @@ where c.log_id = v."+uniqueCol+" and c.systime = v.systime) as foo1) as foo "
 
             QgsMapLayerRegistry.instance().addMapLayer(layer)
             QApplication.restoreOverrideCursor()
-            self.iface.messageBar().pushMessage('INFO', QCoreApplication.translate('PgVersion','Diff to revision {0} was successful!').format(revision), level=QgsMessageBar.INFO, duration=3)
+            self.iface.messageBar().pushMessage('INFO', QCoreApplication.translate('PgVersion','Diff to HEAD revision was successful!'), level=QgsMessageBar.INFO, duration=3)
             self.LogViewDialog.close()            
             return
 
