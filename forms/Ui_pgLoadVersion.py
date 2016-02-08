@@ -162,6 +162,7 @@ class PgVersionLoadDialog(QDialog, Ui_pgLoadVersion):
         layerName = layer["VERSION_TABLE_NAME"][0]
         vLayer = QgsVectorLayer(uri.uri(), layerName, "postgres")
         vLayer.editingStopped.connect(self.tools.setModified)
+        self.tools.setModified(vLayer)
         
         if self.tools.vectorLayerExists(vLayer.name()) or self.tools.vectorLayerExists(vLayer.name()+" (modified)"):
           QMessageBox.warning(None, '', QCoreApplication.translate('PgVersion','Layer {0} is already loaded').formate(table))
