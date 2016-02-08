@@ -29,18 +29,18 @@ import time,  sys
 import apicompat
 
 class PgVersionTools:
-    
+
 # Konstruktor 
   def __init__(self,  iface):
       self.pgvsRevision = '1.8.4'
       self.iface = iface
       pass
 
-     
+
   def layerDB(self, connectionName,  layer):
-      
+
       myUri = QgsDataSourceURI(layer.source())
-      
+
       # If username and password are not saved in the DB settings
       if myUri.username() == '':
           connectionInfo = myUri.connectionInfo()
@@ -48,18 +48,18 @@ class PgVersionTools:
           QgsCredentials.instance().put( connectionInfo, user, password )
           myUri.setPassword(password)
           myUri.setUsername(user)
-      
+
       try:
           myDb = DbObj(pluginname=connectionName,typ='pg',hostname=myUri.host(),port=myUri.port(),dbname=myUri.database(),username=myUri.username(), passwort=myUri.password())
           return myDb
       except:
           QMessageBox.information(None, QCoreApplication.translate('PgVersionTools','Error'), QCoreApplication.translate('PgVersionTools','No Database Connection Established.'))
           return None
-    
+
       if not self.tools.checkPGVSRevision(myDb):
         return
-     
-        
+
+
   def setConfTable(self,  theLayer):
       provider = theLayer.dataProvider()
       uri = provider.dataSourceUri() 
@@ -73,31 +73,58 @@ class PgVersionTools:
       sql = "select versions.pgvscommit('"+mySchema+"."+myTable+"')"
       result = myDb.read(sql)
       myDb.close()
-      
 
+  def hasVersion(self,  theLayer):
+        myLayerUri = QgsDataSourceURI(theLayer.source())
 
-  def isModified(self, myLayer=None):
-    
-        myLayerUri = QgsDataSourceURI(myLayer.source())
+        myDb = self.layerDB('hasVersion',  theLayer)
 
-        myDb = self.layerDB('isModified',  myLayer)
-        
         if myDb == None:
             return None
-    
+
         if len(myLayerUri.schema()) == 1:
           schema = 'public'
         else:
           schema = myLayerUri.schema()
-        
-    
+
+
+        sql = "select count(version_table_name) \
+          from versions.version_tables import \
+          where version_view_schema = '%s' and version_view_name = '%s'" % (schema,  myLayerUri.table())
+          
+        result = myDb.read(sql)
+        myDb.close()
+        try:
+            if result['COUNT'][0] == '1':
+                return True
+            else:
+                return False
+        except:
+            return False
+
+
+  def isModified(self, myLayer=None):
+
+        myLayerUri = QgsDataSourceURI(myLayer.source())
+
+        myDb = self.layerDB('isModified',  myLayer)
+
+        if myDb == None:
+            return None
+
+        if len(myLayerUri.schema()) == 1:
+          schema = 'public'
+        else:
+          schema = myLayerUri.schema()
+
+
         sql = 'select count(project) \
           from versions.\"'+schema+'_'+myLayerUri.table()+'_log\" \
           where project = \''+myDb.dbUser()+'\' and not commit'
-#        QMessageBox.information(None, '', sql)
+
         result = myDb.read(sql)
         myDb.close()
-        
+
 #        try:
         if int(result["COUNT"][0]) == 0:
           return False
@@ -105,18 +132,18 @@ class PgVersionTools:
           return True      
 #        except:
 #            pass
-      
+
   def setModified(self, myLayer=None,  unsetModified=False):
-      
+
     if myLayer==None:
       myLayer = self.iface.mapCanvas().currentLayer()
-        
+
     if self.isModified(myLayer):
       if '(modified)' not in myLayer.name():
         myLayer.setLayerName(myLayer.name()+' (modified)')
     elif unsetModified:
       myLayer.setLayerName(myLayer.name().replace(' (modified)', ''))      
-      
+
 # Return QgsVectorLayer from a layer name ( as string )
   def vectorLayerExists(self,   myName ):
      layermap = QgsMapLayerRegistry.instance().mapLayers()
@@ -130,26 +157,26 @@ class PgVersionTools:
 
 
   def versionExists(self,layer):
-  
+
       myDb = self.layerDB('versionExists',  layer)
       provider = layer.dataProvider()
       uri = provider.dataSourceUri()    
-  
+
       try: 
           myTable = QgsDataSourceURI(uri).table()       
           mySchema = QgsDataSourceURI(uri).schema()
-          
+
           if mySchema == '':
               mySchema = 'public'
-          
+
           sql = "select version_table_schema as schema, version_table_name as table \
            from versions.version_tables \
            where (version_view_schema = '"+mySchema+"' and version_view_name = '"+myTable+"') \
               or (version_table_schema = '"+mySchema+"' and version_table_name = '"+myTable+"')"
-            
+
           result  = myDb.read(sql)
           myDb.close()
-          
+
           if len(result["SCHEMA"]) > 1:
             QMessageBox.information(None, '', QCoreApplication.translate('PgVersionTools','Table ')+mySchema+'.'+myTable+QCoreApplication.translate('PgVersionTools',' is already versionized'))
             return True
@@ -160,30 +187,30 @@ class PgVersionTools:
             return True
 
   def createGridView(self, tabView, tabData, headerText, colWidth, rowHeight):
-    
+
     numCols = len(headerText)
     startVal = 0
-      
+
     numRows = len(tabData[headerText[0].upper()])
-   
+
     tabView.clear()
     tabView.setColumnCount(numCols)
-    
+
     tabView.setRowCount(numRows)
-      
+
     tabView.sortItems(2)
     col = startVal
-    
+
     i = 0
     for text in headerText:
       headerItem = QTableWidgetItem()
       headerItem.setData(Qt.DisplayRole,pystring(text))
       tabView.setHorizontalHeaderItem(i,headerItem)
       i = i+1
-    
-    
+
+
     for i in range(0,numRows):
-      
+
       col = startVal
 
 
@@ -194,7 +221,7 @@ class PgVersionTools:
         myItem.setSelected(False)
         col = col + 1
     return
-           
+
   def confRecords(self, theLayer):
       confRecords = []
       provider = theLayer.dataProvider()
@@ -204,12 +231,12 @@ class PgVersionTools:
       myTable = QgsDataSourceURI(uri).table()
       if len(mySchema) == 0:
           mySchema = 'public'
-            
+
       sql =    "select version_table_schema as schema, version_table_name as table "
       sql += "from versions.version_tables "
       sql += "where version_view_schema = '"+mySchema+"' and version_view_name = '"+myTable+"'"
       result  = myDb.read(sql)
-      
+
       if len(result["SCHEMA"]) == 0:
         QMessageBox.information(None, '', QCoreApplication.translate('PgVersionTools','Table {0} is not versionized').format(self.mySchema+'.'+self.myTable))
         return None
@@ -217,7 +244,7 @@ class PgVersionTools:
         sql = "select count(myuser) from versions.pgvscheck('"+result["SCHEMA"][0]+"."+result["TABLE"][0]+"')"
 #        QMessageBox.information(None, '',  sql)
         check = myDb.read(sql)
-      
+
       if check["COUNT"][0] <> "0":    
           sql = "select * from versions.pgvscheck('"+result["SCHEMA"][0]+"."+result["TABLE"][0]+"') order by objectkey"
           result = myDb.read(sql)
@@ -234,7 +261,7 @@ class PgVersionTools:
           return confRecords
       else:
           return None
-      
+
   def tableRecords(self,  theLayer):      
       provider = theLayer.dataProvider()
       uri = provider.dataSourceUri()    
@@ -243,11 +270,11 @@ class PgVersionTools:
       myTable = QgsDataSourceURI(uri).table()
       if len(mySchema) == 0:
           mySchema = 'public'
-          
+
       sql =   "select * from versions.version_tables "
       sql += "where version_view_schema = '"+mySchema+"' and version_view_name = '"+myTable+"'"
       layer = myDb.read(sql)              
-          
+
       sql = "select objectkey, myversion_log_id, conflict_version_log_id from versions.pgvscheck('"+mySchema+"."+myTable.replace("_version", "")+"')"
       result = myDb.read(sql)          
       timeListString = ''
@@ -259,40 +286,40 @@ class PgVersionTools:
 
       timeListString = timeListString[0:len(timeListString)-1]
       keyString = keyString[0:len(keyString)-1]
-      
+
       sql = "select * "
       sql += "from versions.\""+mySchema+"_"+myTable.replace("_version", "")+"_version_log\" "
       sql += "where version_log_id in ("+timeListString+")"
       sql += "order by "+layer["VERSION_VIEW_PKEY"][0]
-      
+
       result = myDb.read(sql)
-      
+
       cols = myDb.cols(sql)
-      
+
       sql = "select f_geometry_column as geocol "
       sql += "from geometry_columns "
       sql += "where f_table_schema = '"+mySchema+"' "
       sql += "  and f_table_name = '"+myTable+"' "
-      
+
       geomCol = myDb.read(sql)
-      
+
       cols.remove('ACTION')
       cols.remove('SYSTIME')
       cols.remove('COMMIT')
       cols.remove(geomCol["GEOCOL"][0].upper())
-      
+
       cols.insert(0, cols.pop(-1))
       cols.insert(0, cols.pop(-1))
       cols.insert(0, cols.pop(-1))
-      
+
       resultArray = []
       resultArray.append(result)
       resultArray.append(cols)
-      
+
       myDb.close()
       return resultArray
-      
-      
+
+
 
   def conflictLayer(self,  theLayer):
         provider = theLayer.dataProvider()
@@ -302,16 +329,16 @@ class PgVersionTools:
         myTable = QgsDataSourceURI(uri).table()
         if len(mySchema) == 0:
           mySchema = 'public'
-            
+
         sql =   "select * from versions.version_tables "
         sql += "where version_view_schema = '"+mySchema+"' and version_view_name = '"+myTable+"'"
         layer = myDb.read(sql)    
-        
+
         uri = QgsDataSourceURI()
-        
+
 #        # set host name, port, database name, username and password
         uri.setConnection(myDb.dbHost(), str(myDb.dbPort()), myDb.dbName(), myDb.dbUser(), myDb.dbPasswd())    
-        
+
         sql = "select * from versions.pgvscheck('"+mySchema+"."+myTable.replace("_version", '')+"')"
         result = myDb.read(sql)
         myFilter = ''
@@ -336,22 +363,22 @@ class PgVersionTools:
                return vLayer    
            else:
                return None
-       
-       
+
+
   def createPolygon(self, geometry, geometryType):      
-            
+
     self.mRubberBand.reset()
 #    project = QgsProject.instance()
-    
+
     color = QColor(255,0,0)
     self.mRubberBand.setColor(color)
     self.mRubberBand.setWidth(5)
     self.mRubberBand.show()
-    
+
     g = QgsGeometry.fromWkt(geometry)
-    
+
 #    self.mRubberBand.setToGeometry(g,  None)
-    
+
     if geometryType == "MULTIPOLYGON":
       for i in g.asMultiPolygon():
         index = 0
@@ -369,7 +396,7 @@ class PgVersionTools:
       for i in g.asPolygon():
         for k in i: 
           self.mRubberBand.addPoint(k,  False)
-            
+
 
     elif geometryType == "POINT":
       gBuffer = g.buffer(25, 100)
@@ -378,8 +405,8 @@ class PgVersionTools:
           self.mRubberBand.addPoint(k)
 
     return 0                      
-    
-    
+
+
 # Check the revision of the DB-Functions
   def checkPGVSRevision(self,  myDb):      
 #      try:
@@ -409,7 +436,7 @@ class PgVersionTools:
 #          self.vsCheck.show()          
 #          return False    
 
-    
+
 #Get the Fieldnames of a Vector Layer
 #Return: List of Fieldnames
   def getFieldNames(self, vLayer):
@@ -435,6 +462,6 @@ class PgVersionTools:
 
 # retrieve every feature with its attributes
     myFields = fProvider.fields().toList()
-      
+
     return myFields
-        
+

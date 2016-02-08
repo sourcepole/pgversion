@@ -388,45 +388,43 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
     pass
 
   def doLogView(self):
-#    try:
         canvas = self.iface.mapCanvas()
         theLayer = self.iface.activeLayer()
-        provider = theLayer.dataProvider()
-        uri = provider.dataSourceUri()    
-        myDb = self.tools.layerDB('logview', theLayer)
-        mySchema = QgsDataSourceURI(uri).schema()
-        myTable = QgsDataSourceURI(uri).table()
-
-        if len(mySchema) == 0:
-           mySchema = 'public'
-
-        sql = "select * from versions.pgvslogview('"+mySchema+"."+myTable.replace('_version', '')+"') order by revision desc"
-        result = myDb.read(sql)
-
-        logHTML = "<html><head></head><body><Table>"
-
-        self.LogViewDialog.treeWidget.clear()
-
-        itemList = []
-
-        for i in range(len(result["PROJECT"])):
-            myItem = QTreeWidgetItem()
-            myItem.setText(0, result["REVISION"][i])
-            myItem.setText(1, result["DATUM"][i])
-            myItem.setText(2, result["PROJECT"][i])
-            myItem.setText(3, result["LOGMSG"][i])
-            itemList.append(myItem)
-
-        self.LogViewDialog.treeWidget.addTopLevelItems(itemList)
-
-        self.LogViewDialog.show()        
-        myDb.close()
-        canvas.refresh()
-
-#    except:
-#        return
-
-
+        
+        if not self.tools.hasVersion(theLayer):
+            QMessageBox.warning(None,   QCoreApplication.translate('PgVersion','Warning'),   QCoreApplication.translate('PgVersion','Please select a versioned layer!'))
+        else:
+            provider = theLayer.dataProvider()
+            uri = provider.dataSourceUri()    
+            myDb = self.tools.layerDB('logview', theLayer)
+            mySchema = QgsDataSourceURI(uri).schema()
+            myTable = QgsDataSourceURI(uri).table()
+    
+            if len(mySchema) == 0:
+               mySchema = 'public'
+    
+            sql = "select * from versions.pgvslogview('"+mySchema+"."+myTable.replace('_version', '')+"') order by revision desc"
+            result = myDb.read(sql)
+    
+            logHTML = "<html><head></head><body><Table>"
+    
+            self.LogViewDialog.treeWidget.clear()
+    
+            itemList = []
+    
+            for i in range(len(result["PROJECT"])):
+                myItem = QTreeWidgetItem()
+                myItem.setText(0, result["REVISION"][i])
+                myItem.setText(1, result["DATUM"][i])
+                myItem.setText(2, result["PROJECT"][i])
+                myItem.setText(3, result["LOGMSG"][i])
+                itemList.append(myItem)
+    
+            self.LogViewDialog.treeWidget.addTopLevelItems(itemList)
+    
+            self.LogViewDialog.show()        
+            myDb.close()
+            canvas.refresh()
         pass
 
   def doDiff(self):
@@ -490,19 +488,25 @@ where c.log_id = v."+uniqueCol+" and c.systime = v.systime) as foo1) as foo "
             myUri.setDataSource("", u"(%s\n)" % sql, geomCol, "", "rownum")
 
             layer = QgsVectorLayer(myUri.uri(), myTable+" (Diff to HEAD Revision)", "postgres")         
-            userPluginPath = QFileInfo(QgsApplication.qgisUserDbFilePath()).path()+"/python/plugins/pgversion"  
-            layer.setRendererV2(None)
+            
+            if not layer.isValid():
+                self.iface.messageBar().pushMessage('WARNING', QCoreApplication.translate('PgVersion','No diffs to HEAD detected! Layer could not be loaded.'), level=QgsMessageBar.INFO, duration=3)
 
-            if geometryType == 0:
-                layer.loadNamedStyle(userPluginPath+"/legends/diff_point.qml")             
-            elif geometryType == 1:
-                layer.loadNamedStyle(userPluginPath+"/legends/diff_linestring.qml")             
-            elif geometryType == 2:
-                layer.loadNamedStyle(userPluginPath+"/legends/diff_polygon.qml")             
-
-            QgsMapLayerRegistry.instance().addMapLayer(layer)
+            else:                
+                userPluginPath = QFileInfo(QgsApplication.qgisUserDbFilePath()).path()+"/python/plugins/pgversion"  
+                layer.setRendererV2(None)
+    
+                if geometryType == 0:
+                    layer.loadNamedStyle(userPluginPath+"/legends/diff_point.qml")             
+                elif geometryType == 1:
+                    layer.loadNamedStyle(userPluginPath+"/legends/diff_linestring.qml")             
+                elif geometryType == 2:
+                    layer.loadNamedStyle(userPluginPath+"/legends/diff_polygon.qml")             
+    
+                QgsMapLayerRegistry.instance().addMapLayer(layer)
+                self.iface.messageBar().pushMessage('INFO', QCoreApplication.translate('PgVersion','Diff to HEAD revision was successful!'), level=QgsMessageBar.INFO, duration=3)
+                
             QApplication.restoreOverrideCursor()
-            self.iface.messageBar().pushMessage('INFO', QCoreApplication.translate('PgVersion','Diff to HEAD revision was successful!'), level=QgsMessageBar.INFO, duration=3)
             self.LogViewDialog.close()            
             return
 
