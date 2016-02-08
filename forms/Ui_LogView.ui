@@ -17,37 +17,7 @@
    <string>PG-Version LogView</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="1">
-    <widget class="QSplitter" name="splitter">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <widget class="QPushButton" name="btnRollback">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>16777215</height>
-       </size>
-      </property>
-      <property name="text">
-       <string>rollback to selected revision</string>
-      </property>
-     </widget>
-    </widget>
-   </item>
-   <item row="2" column="0" colspan="2">
+   <item row="4" column="0" colspan="4">
     <widget class="QTreeWidget" name="treeWidget">
      <column>
       <property name="text">
@@ -71,7 +41,46 @@
      </column>
     </widget>
    </item>
-   <item row="3" column="1">
+   <item row="3" column="0" colspan="4">
+    <widget class="QPushButton" name="btnRollback">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>rollback to selected revision</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1">
+    <widget class="QPushButton" name="btnDiff">
+     <property name="text">
+      <string>diff to selected revision</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0">
+    <widget class="QPushButton" name="btnCheckout">
+     <property name="text">
+      <string>checkout selected revision</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="3">
     <widget class="QDialogButtonBox" name="btnClose">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
@@ -81,13 +90,6 @@
      </property>
      <property name="standardButtons">
       <set>QDialogButtonBox::Close</set>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <widget class="QPushButton" name="btnDiff">
-     <property name="text">
-      <string>diff to selected revision</string>
      </property>
     </widget>
    </item>

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/home/hdus/dev/qgis/pgversion-plugin/pgversion/forms/Ui_LogView.ui'
 #
-# Created: Thu Feb  4 16:08:06 2016
+# Created: Mon Feb  8 13:13:01 2016
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -30,10 +30,10 @@ class Ui_LogView(object):
         LogView.resize(722, 582)
         self.gridLayout = QtGui.QGridLayout(LogView)
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
-        self.splitter = QtGui.QSplitter(LogView)
-        self.splitter.setOrientation(QtCore.Qt.Horizontal)
-        self.splitter.setObjectName(_fromUtf8("splitter"))
-        self.btnRollback = QtGui.QPushButton(self.splitter)
+        self.treeWidget = QtGui.QTreeWidget(LogView)
+        self.treeWidget.setObjectName(_fromUtf8("treeWidget"))
+        self.gridLayout.addWidget(self.treeWidget, 4, 0, 1, 4)
+        self.btnRollback = QtGui.QPushButton(LogView)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -42,10 +42,13 @@ class Ui_LogView(object):
         self.btnRollback.setMinimumSize(QtCore.QSize(0, 0))
         self.btnRollback.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.btnRollback.setObjectName(_fromUtf8("btnRollback"))
-        self.gridLayout.addWidget(self.splitter, 1, 1, 1, 1)
-        self.treeWidget = QtGui.QTreeWidget(LogView)
-        self.treeWidget.setObjectName(_fromUtf8("treeWidget"))
-        self.gridLayout.addWidget(self.treeWidget, 2, 0, 1, 2)
+        self.gridLayout.addWidget(self.btnRollback, 3, 0, 1, 4)
+        self.btnDiff = QtGui.QPushButton(LogView)
+        self.btnDiff.setObjectName(_fromUtf8("btnDiff"))
+        self.gridLayout.addWidget(self.btnDiff, 7, 1, 1, 1)
+        self.btnCheckout = QtGui.QPushButton(LogView)
+        self.btnCheckout.setObjectName(_fromUtf8("btnCheckout"))
+        self.gridLayout.addWidget(self.btnCheckout, 7, 0, 1, 1)
         self.btnClose = QtGui.QDialogButtonBox(LogView)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Maximum, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -54,22 +57,20 @@ class Ui_LogView(object):
         self.btnClose.setSizePolicy(sizePolicy)
         self.btnClose.setStandardButtons(QtGui.QDialogButtonBox.Close)
         self.btnClose.setObjectName(_fromUtf8("btnClose"))
-        self.gridLayout.addWidget(self.btnClose, 3, 1, 1, 1)
-        self.btnDiff = QtGui.QPushButton(LogView)
-        self.btnDiff.setObjectName(_fromUtf8("btnDiff"))
-        self.gridLayout.addWidget(self.btnDiff, 0, 1, 1, 1)
+        self.gridLayout.addWidget(self.btnClose, 7, 3, 1, 1)
 
         self.retranslateUi(LogView)
         QtCore.QMetaObject.connectSlotsByName(LogView)
 
     def retranslateUi(self, LogView):
         LogView.setWindowTitle(_translate("LogView", "PG-Version LogView", None))
-        self.btnRollback.setText(_translate("LogView", "rollback to selected revision", None))
         self.treeWidget.headerItem().setText(0, _translate("LogView", "Revision", None))
         self.treeWidget.headerItem().setText(1, _translate("LogView", "Date", None))
         self.treeWidget.headerItem().setText(2, _translate("LogView", "User", None))
         self.treeWidget.headerItem().setText(3, _translate("LogView", "Log-Message", None))
+        self.btnRollback.setText(_translate("LogView", "rollback to selected revision", None))
         self.btnDiff.setText(_translate("LogView", "diff to selected revision", None))
+        self.btnCheckout.setText(_translate("LogView", "checkout selected revision", None))
 
 
 if __name__ == "__main__":

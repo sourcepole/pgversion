@@ -39,3 +39,8 @@ class LogView(QDialog, Ui_LogView):
     def on_btnDiff_clicked(self):
        self.diffLayer.emit(self.treeWidget.currentItem())    
        self.close()
+    
+    @pyqtSignature("")
+    def on_btnCheckout_clicked(self):
+       self.checkoutLayer.emit(self.treeWidget.currentItem())    
+       self.close()
