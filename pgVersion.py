@@ -273,36 +273,36 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
          mySchema = 'public'
       myTable = QgsDataSourceURI(uri).table()    
 
-#                if theLayer == None:
-#            self.iface.messageBar().pushMessage('Error', QCoreApplication.translate('PgVersion','Please select a versioned layer for committing'), level=QgsMessageBar.ERROR, duration=3)
-#            return
-
-      if self.tools.isModified(theLayer):
-          confRecords = self.tools.confRecords(theLayer)            
-          if  confRecords == None:
-          # show the dialog
-              self.dlgCommitMessage.show()
-              result = self.dlgCommitMessage.exec_()
-
-              if result == QDialog.Accepted:
-                    QApplication.setOverrideCursor(Qt.WaitCursor)                    
-                    sql = "select * from versions.pgvscommit('"+mySchema+"."+myTable.replace('_version', '')+"','"+self.dlgCommitMessage.textEdit.toPlainText()+"')"
-                    myDb.run(sql)
-                    canvas.refresh()
-                    self.iface.messageBar().pushMessage("Info", QCoreApplication.translate('PgVersion','Commit of your changes was successful'), level=QgsMessageBar.INFO, duration=3)            
-                    self.tools.setModified(None,  True)
-                    QApplication.restoreOverrideCursor()
-          else:
-            if self.w != None:
-                self.w = None
-            self.w = ConflictWindow(self.iface,  theLayer,  'conflict',  self)
-            self.w.mergeCompleted.connect(self.doCommit)
-            self.w.show()
-
-          myDb.close()
-          self.tools.setModified(None,  True)
+      if not self.tools.hasVersion(theLayer):
+          QMessageBox.warning(None,   QCoreApplication.translate('PgVersion','Warning'),   QCoreApplication.translate('PgVersion','Please select a versioned layer!'))
       else:
-          self.iface.messageBar().pushMessage('INFO', QCoreApplication.translate('PgVersion','No layer changes for committing, everything is OK'), level=QgsMessageBar.INFO, duration=3)
+    
+          if self.tools.isModified(theLayer):
+              confRecords = self.tools.confRecords(theLayer)            
+              if  confRecords == None:
+              # show the dialog
+                  self.dlgCommitMessage.show()
+                  result = self.dlgCommitMessage.exec_()
+    
+                  if result == QDialog.Accepted:
+                        QApplication.setOverrideCursor(Qt.WaitCursor)                    
+                        sql = "select * from versions.pgvscommit('"+mySchema+"."+myTable.replace('_version', '')+"','"+self.dlgCommitMessage.textEdit.toPlainText()+"')"
+                        myDb.run(sql)
+                        canvas.refresh()
+                        self.iface.messageBar().pushMessage("Info", QCoreApplication.translate('PgVersion','Commit of your changes was successful'), level=QgsMessageBar.INFO, duration=3)            
+                        self.tools.setModified(None,  True)
+                        QApplication.restoreOverrideCursor()
+              else:
+                if self.w != None:
+                    self.w = None
+                self.w = ConflictWindow(self.iface,  theLayer,  'conflict',  self)
+                self.w.mergeCompleted.connect(self.doCommit)
+                self.w.show()
+    
+              myDb.close()
+              self.tools.setModified(None,  True)
+          else:
+              self.iface.messageBar().pushMessage('INFO', QCoreApplication.translate('PgVersion','No layer changes for committing, everything is OK'), level=QgsMessageBar.INFO, duration=3)
 
 
   def doCheckout(self,  item):
@@ -320,7 +320,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
         QMessageBox.information(None, '', QCoreApplication.translate('PgVersion','Please select a versioned layer'))
         return    
       else:
-        answer = QMessageBox.question(None, '', QCoreApplication.translate('PgVersion','Are you sure to checkout diffs to revision {0}?').format(revision), QCoreApplication.translate('PgVersion','Yes'),  QCoreApplication.translate('PgVersion','No'))
+        answer = QMessageBox.question(None, '', QCoreApplication.translate('PgVersion','Are you sure to checkout the layer to revision {0}?').format(revision), QCoreApplication.translate('PgVersion','Yes'),  QCoreApplication.translate('PgVersion','No'))
         if answer == 0:
 
             QApplication.setOverrideCursor(Qt.WaitCursor)
@@ -358,33 +358,33 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
 
 
   def doRevert(self):
-    try:
-        canvas = self.iface.mapCanvas()
-        theLayer = self.iface.activeLayer()
-        provider = theLayer.dataProvider()
-        uri = provider.dataSourceUri()    
-        myDb = self.tools.layerDB('revert', theLayer)
-        mySchema = QgsDataSourceURI(uri).schema()
-        myTable = QgsDataSourceURI(uri).table()    
-
+    canvas = self.iface.mapCanvas()
+    theLayer = self.iface.activeLayer()
+    provider = theLayer.dataProvider()
+    uri = provider.dataSourceUri()    
+    myDb = self.tools.layerDB('revert', theLayer)
+    mySchema = QgsDataSourceURI(uri).schema()
+    myTable = QgsDataSourceURI(uri).table()    
+    
+    if not self.tools.hasVersion(theLayer):
+       QMessageBox.warning(None,   QCoreApplication.translate('PgVersion','Warning'),   QCoreApplication.translate('PgVersion','Please select a versioned layer!'))
+    else:
         if len(mySchema) == 1:
           mySchema = 'public'
-    except:
-        self.iface.messageBar().pushMessage('Error', QCoreApplication.translate('PgVersion','Please select a versioned layer for reverting'), level=QgsMessageBar.CRITICAL, duration=3)
-        return
-    answer = QMessageBox.question(None, '', QCoreApplication.translate('PgVersion','are you sure to revert to the HEAD revision?'), QCoreApplication.translate('PgVersion','Yes'),  QCoreApplication.translate('PgVersion','No'))
-
-    if answer == 0:
-        sql = "select * from versions.pgvsrevert('"+mySchema+"."+myTable.replace('_version', '')+"')"
-        result = myDb.read(sql)
-
-        if len(result)>1:
-            QMessageBox.information(None, '',result)
-        else:
-            self.iface.messageBar().pushMessage("Info", QCoreApplication.translate('PgVersion','All changes are set back to the HEAD revision: {0}').format(str(result["PGVSREVERT"][0])), level=QgsMessageBar.INFO, duration=3)            
-        self.tools.setModified(None,  True)
-    canvas.refresh()
-    myDb.close()
+    
+        answer = QMessageBox.question(None, '', QCoreApplication.translate('PgVersion','are you sure to revert to the HEAD revision?'), QCoreApplication.translate('PgVersion','Yes'),  QCoreApplication.translate('PgVersion','No'))
+    
+        if answer == 0:
+            sql = "select * from versions.pgvsrevert('"+mySchema+"."+myTable.replace('_version', '')+"')"
+            result = myDb.read(sql)
+    
+            if len(result)>1:
+                QMessageBox.information(None, '',result)
+            else:
+                self.iface.messageBar().pushMessage("Info", QCoreApplication.translate('PgVersion','All changes are set back to the HEAD revision: {0}').format(str(result["PGVSREVERT"][0])), level=QgsMessageBar.INFO, duration=3)            
+            self.tools.setModified(None,  True)
+        canvas.refresh()
+        myDb.close()
     pass
 
   def doLogView(self):
