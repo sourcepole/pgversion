@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.0" language="de_CH">
+<!DOCTYPE TS><TS version="2.0" language="de_CH" sourcelanguage="">
 <context>
     <name>CommitMessage</name>
     <message>
@@ -143,7 +142,7 @@
     </message>
     <message>
         <location filename="../about/doAbout.py" line="50"/>
-        <source>Weberstrasse 5, 8004 Zürich, Switzerland
+        <source>Weberstrasse 5, 8004 Z&#xfc;rich, Switzerland
 </source>
         <translation></translation>
     </message>
@@ -490,33 +489,6 @@ Bitte definieren sie eine korrekte Datenbankverbindung und versuchen Sie es erne
         <location filename="../pgVersionTools.py" line="181"/>
         <source> is already versionized</source>
         <translation> ist bereits versioniert</translation>
-    </message>
-    <message>
-        <location filename="../pgVersionTools.py" line="429"/>
-        <source>The Plugin expects pgvs revision </source>
-        <translation>Das Plugin erwartet die pgvs Version </translation>
-    </message>
-    <message>
-        <location filename="../pgVersionTools.py" line="429"/>
-        <source> but DB-functions revision </source>
-        <translation> aber die DB-Funktionen der Version </translation>
-    </message>
-    <message>
-        <location filename="../pgVersionTools.py" line="429"/>
-        <source> are installed.
-
-Please contact your DB-administrator to update the DB-functions from the file:
-
-&lt;Plugin-Directory&gt;/pgversion/tools/updateFunctions.sql
-
-If you have appropriate DB permissions you can update the DB directly with click on DB-Update.</source>
-        <translation> sind installiert.
-
-Bitte informieren Sie den DB-Administrator zur Aktualisierung der Datenbank-Funktionen aus der Datei:
-
-&lt;Plugin-Directory&gt;/pgversion/tools/updateFunctions.sql
-
-Wenn Sie die entsprechenden Datenbank-Rechte besitzen können Sie die Datenbank mit einem Klick auf DB-Aktualisieren anpassen.</translation>
     </message>
     <message>
         <location filename="../pgVersionTools.py" line="420"/>

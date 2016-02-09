@@ -32,7 +32,7 @@ class PgVersionTools:
 
 # Konstruktor 
   def __init__(self,  iface):
-      self.pgvsRevision = '1.8.4'
+      self.pgvsRevision = '2.0.0'
       self.iface = iface
       pass
 
@@ -224,13 +224,9 @@ class PgVersionTools:
 
   def confRecords(self, theLayer):
       confRecords = []
-      provider = theLayer.dataProvider()
-      uri = provider.dataSourceUri()    
-      myDb = self.layerDB('getConfRecord',  theLayer)
-      mySchema = QgsDataSourceURI(uri).schema()
-      myTable = QgsDataSourceURI(uri).table()
-      if len(mySchema) == 0:
-          mySchema = 'public'
+      myDb = self.layerDB('commit',theLayer)
+      mySchema = self.layerSchema(theLayer)
+      myTable = self.layerTable(theLayer).replace('_version', '')
 
       sql =    "select version_table_schema as schema, version_table_name as table "
       sql += "from versions.version_tables "
@@ -241,38 +237,40 @@ class PgVersionTools:
         QMessageBox.information(None, '', QCoreApplication.translate('PgVersionTools','Table {0} is not versionized').format(self.mySchema+'.'+self.myTable))
         return None
       else:
-        sql = "select count(myuser) from versions.pgvscheck('"+result["SCHEMA"][0]+"."+result["TABLE"][0]+"')"
+        sql = "select count(myuser) from versions.pgvscheck('%s.%s')" % (mySchema, myTable)
 #        QMessageBox.information(None, '',  sql)
         check = myDb.read(sql)
 
       if check["COUNT"][0] <> "0":    
-          sql = "select * from versions.pgvscheck('"+result["SCHEMA"][0]+"."+result["TABLE"][0]+"') order by objectkey"
+          sql = "select * from versions.pgvscheck('%s.%s') order by objectkey" % (mySchema, myTable)
+#          QMessageBox.information(None, '',  sql)
           result = myDb.read(sql)
           myDb.close()        
+          
+          for i in range(len(result["CONFLICT_USER"])):
+              confRecords.append("Commit all changes of - %s" % (result['MYUSER'][i]))
+              confRecords.append("Commit all changes of - %s" % (result['CONFLICT_USER'][i]))
+          
+          confRecords = list(set(confRecords))
 
           for i in range(len(result["CONFLICT_USER"])):
               resString = result["OBJECTKEY"][i]+" - "+result["MYUSER"][i].strip()+" - "+datetime.strftime(datetime.fromtimestamp(float(result["MYSYSTIME"][i])/1000.0), "%x %H:%M:%S")
               confRecords.append(resString)
               resString = result["OBJECTKEY"][i]+" - "+result["CONFLICT_USER"][i].strip()+" - "+datetime.strftime(datetime.fromtimestamp(float(result["CONFLICT_SYSTIME"][i])/1000.0), "%x %H:%M:%S")
               confRecords.append(resString)
-
-#          confRecords =list(set(confRecords))
           confRecords.insert(0, QCoreApplication.translate('PgVersionTools','select Candidate'))          
           return confRecords
       else:
           return None
 
   def tableRecords(self,  theLayer):      
-      provider = theLayer.dataProvider()
-      uri = provider.dataSourceUri()    
       myDb = self.layerDB('tableRecords',  theLayer)
-      mySchema = QgsDataSourceURI(uri).schema()
-      myTable = QgsDataSourceURI(uri).table()
-      if len(mySchema) == 0:
-          mySchema = 'public'
+      mySchema = self.layerSchema(theLayer)
+      myTable = self.layerTable(theLayer)
+      geomCol = self.layerGeomCol(theLayer)
 
-      sql =   "select * from versions.version_tables "
-      sql += "where version_view_schema = '"+mySchema+"' and version_view_name = '"+myTable+"'"
+      sql =   "select * from versions.version_tables \
+          where version_view_schema = '%s' and version_view_name = '%s'" %(mySchema,  myTable)
       layer = myDb.read(sql)              
 
       sql = "select objectkey, myversion_log_id, conflict_version_log_id from versions.pgvscheck('"+mySchema+"."+myTable.replace("_version", "")+"')"
@@ -287,37 +285,30 @@ class PgVersionTools:
       timeListString = timeListString[0:len(timeListString)-1]
       keyString = keyString[0:len(keyString)-1]
 
-      sql = "select * "
-      sql += "from versions.\""+mySchema+"_"+myTable.replace("_version", "")+"_version_log\" "
-      sql += "where version_log_id in ("+timeListString+")"
-      sql += "order by "+layer["VERSION_VIEW_PKEY"][0]
-
+      sql = "select * from versions.%s_%s_log \
+           where version_log_id in (%s)\
+           order by %s" % (mySchema,  myTable,  timeListString,  layer["VERSION_VIEW_PKEY"][0])
       result = myDb.read(sql)
-
       cols = myDb.cols(sql)
-
-      sql = "select f_geometry_column as geocol "
-      sql += "from geometry_columns "
-      sql += "where f_table_schema = '"+mySchema+"' "
-      sql += "  and f_table_name = '"+myTable+"' "
-
-      geomCol = myDb.read(sql)
-
-      cols.remove('ACTION')
-      cols.remove('SYSTIME')
-      cols.remove('COMMIT')
-      cols.remove(geomCol["GEOCOL"][0].upper())
-
-      cols.insert(0, cols.pop(-1))
-      cols.insert(0, cols.pop(-1))
-      cols.insert(0, cols.pop(-1))
-
-      resultArray = []
-      resultArray.append(result)
-      resultArray.append(cols)
-
-      myDb.close()
-      return resultArray
+      
+      try:
+          cols.remove('action')
+          cols.remove('systime')
+          cols.remove('commit')
+          cols.remove(geomCol)
+    
+          cols.insert(0, cols.pop(-1))
+          cols.insert(0, cols.pop(-1))
+          cols.insert(0, cols.pop(-1))
+    
+          resultArray = []
+          resultArray.append(result)
+          resultArray.append(cols)
+    
+          myDb.close()
+          return resultArray
+      except:
+          return None
 
 
 
@@ -423,7 +414,11 @@ class PgVersionTools:
             result = myDb.read('select pgvsrevision from versions.pgvsrevision()')
             if self.pgvsRevision != result["PGVSREVISION"][0]:
                 self.vsCheck = DbVersionCheckDialog(myDb,  result["PGVSREVISION"][0])              
-                revisionMessage =QCoreApplication.translate('PgVersionTools', 'The Plugin expects pgvs revision ')+self.pgvsRevision+QCoreApplication.translate('PgVersionTools', ' but DB-functions revision ')+result["PGVSREVISION"][0]+QCoreApplication.translate('PgVersionTools', ' are installed.\n\nPlease contact your DB-administrator to update the DB-functions from the file:\n\n<Plugin-Directory>/pgversion/tools/updateFunctions.sql\n\nIf you have appropriate DB permissions you can update the DB directly with click on DB-Update.')
+                revisionMessage =QCoreApplication.translate('PgVersionTools', 'The Plugin expects pgvs revision %s but DB-functions revision %s are installed.\n\n \
+Please contact your DB-administrator to update the DB-functions from the file:\n\n \
+<Plugin-Directory>/pgversion/docs/create_versions_schema.sql\n\n \
+If you have appropriate DB permissions you can update the DB directly with click on DB-Update.' % (self.pgvsRevision,  result["PGVSREVISION"][0]))
+                
                 self.vsCheck.messageTextEdit.setText(revisionMessage)
                 self.vsCheck.show()
                 return False
@@ -465,3 +460,36 @@ class PgVersionTools:
 
     return myFields
 
+  def layerGeomCol(self,  layer):
+      return QgsDataSourceURI(self.layerUri(layer)).geometryColumn()
+      
+  def layerSchema(self,  layer):
+      mySchema = QgsDataSourceURI(self.layerUri(layer)).schema()
+      if len(mySchema) == 0:
+          mySchema = 'public'
+      return mySchema
+      
+  def layerTable(self,  layer):  
+      return QgsDataSourceURI(self.layerUri(layer)).table()
+
+  def layerUniqueCol(self,  layer):
+      return QgsDataSourceURI(self.layerUri(layer)).keyColumn()
+      
+  def layerUri(self,  layer):
+      provider = layer.dataProvider()
+      return provider.dataSourceUri()
+      
+  def layerGeometryType(self,  layer):
+      return layer.geometryType()      
+      
+  def layerHost(self,  layer):
+      return QgsDataSourceURI(self.layerUri(layer)).host()
+      
+  def layerPassword(self,  layer):
+      return QgsDataSourceURI(self.layerUri(layer)).password()
+      
+  def layerPort(self,  layer):
+      return QgsDataSourceURI(self.layerUri(layer)).port()
+      
+  def layerUsername(self,  layer):
+      return QgsDataSourceURI(self.layerUri(layer)).username()      

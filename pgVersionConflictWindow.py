@@ -14,6 +14,7 @@ class ConflictWindow(QMainWindow):
   def __init__(self, iface,  layer,  type='conflict',  parent=None):
     QMainWindow.__init__(self)
 
+    self.iface = iface
     self.tools = PgVersionTools(iface)    
     self.layer = layer
     self.parent = parent
@@ -94,9 +95,6 @@ class ConflictWindow(QMainWindow):
       self.toolbar.addWidget(self.btnMerge)
       self.manageConflicts()
       self.btnMerge.clicked.connect(self.runMerge) 
-      
-    elif type=='diff':
-      self.loadLayer(self.layer)
 
     self.tabView.itemSelectionChanged.connect(self.showConfObject)    
     self.rBand = QgsRubberBand(self.canvas, False)
@@ -171,14 +169,16 @@ class ConflictWindow(QMainWindow):
       vLayerList = [vLayer,  self.layer]
       QgsMapLayerRegistry.instance().addMapLayers(vLayerList,  False)
       self.vLayerId = vLayer.id()
-#      self.canvas.setLayerSet( []  )
-#      self.canvas.setLayerSet( [QgsMapCanvasLayer(vLayer,  True) , QgsMapCanvasLayer(self.layer,  True)  ]  )
       self.canvas.setExtent(vLayer.extent())
       self.canvas.refresh()
     
       tabData = self.tools.tableRecords(self.layer)
-
-      self.tools.createGridView(self.tabView, tabData[0], tabData[1], 100, 10)
+      
+      if tabData <> None:
+          self.tools.createGridView(self.tabView, tabData[0], tabData[1], 100, 10)
+      else:
+          self.mergeCompleted.emit()
+          
       QApplication.restoreOverrideCursor()
 
 
@@ -191,58 +191,56 @@ class ConflictWindow(QMainWindow):
             QMessageBox.information(None, '', QCoreApplication.translate('ManagerWindow','Please select a versioned layer for committing'))
             return
         else:
-            provider = currentLayer.dataProvider()
-            uri = provider.dataSourceUri()    
             myDb = self.tools.layerDB('Merge', currentLayer)
-            mySchema = QgsDataSourceURI(uri).schema()
-            if len(mySchema) == 0:
-                mySchema = 'public'
-            myTable = QgsDataSourceURI(uri).table().replace("_version", "")     
+            mySchema = self.tools.layerSchema(currentLayer)
+            myTable = self.tools.layerTable(currentLayer).replace("_version", "")     
       
         objectArray = object.split(" - ")
         if len(objectArray)==1:
             return
-        objId = objectArray[0]
-        projectName = objectArray[1].strip()
-        
-        
-        sql ="select versions.pgvsmerge('"+mySchema+"."+myTable.replace("_version", "")+"',"+str(objId)+",'"+projectName+"')"
-        
-        myDb.run(sql)
-#        QgsMapLayerRegistry.instance().removeMapLayer(currentLayer.id())
+        elif 'Commit all' in objectArray[0]:
+            projectName = objectArray[1].strip()
+            sql = "select objectkey from versions.pgvscheck('%s.%s') \
+             where myuser = '%s' or conflict_user = '%s' \
+             order by objectkey" % (mySchema, myTable,  projectName,  projectName)
+             
+            result = myDb.read(sql)
+            for i in range(len(result['OBJECTKEY'])):
+                sql ="select versions.pgvsmerge('%s.%s',%s,'%s')" % (mySchema,  myTable,  result['OBJECTKEY'][i],  projectName)
+                myDb.run(sql)
+        else:    
+            projectName = objectArray[1].strip()
+            sql ="select versions.pgvsmerge('%s.%s',%s,'%s')" % (mySchema,  myTable,  objectArray[0],  projectName)
+            myDb.run(sql)
+            
         self.canvas.refresh()
-        
         self.cmbMerge.clear()
-        
         QApplication.restoreOverrideCursor()
         
         if self.tools.confRecords(self.layer) == None:
             self.tabView.clear()
             self.tools.setModified(self.layer)
-#            self.parent.doCommit()
             self.close()
             
         else:
             self.cmbMerge.addItems(self.tools.confRecords(self.layer))
             tabData = self.tools.tableRecords(self.layer)
             self.tools.createGridView(self.tabView, tabData[0], tabData[1], 100, 10)
-            self.manageConflicts()
+        self.manageConflicts()
 
 
   def loadLayer(self, layer):
       provider = layer.dataProvider()
       uri = provider.dataSourceUri()    
-      mySchema = QgsDataSourceURI(uri).schema()
-      myHost = QgsDataSourceURI(uri).host()
-      myDatabase = QgsDataSourceURI(uri).database()
-      myPassword = QgsDataSourceURI(uri).password()
-      myPort = QgsDataSourceURI(uri).port()
-      myUsername = QgsDataSourceURI(uri).username()
-      myGeometryColumn = QgsDataSourceURI(uri).geometryColumn()
-      
-      if len(mySchema) == 0:
-          mySchema = 'public'
-      myTable = QgsDataSourceURI(uri).table().replace("_version", "")     
+      mySchema = self.tools.layerSchema(layer)
+      myHost = self.tools.layerHost(layer)
+      myDatabase = self.tools.layerDB(layer)
+      myPassword = self.tools.layerPassword(layer)
+      myPort = self.tools.layerPort(layer)
+      myUsername = self.tools.layerUsername(layer)
+      myGeometryColumn = self.tools.layerGeomCol(layer)
+
+      myTable = myTable.replace("_version", "")     
       
       myUri = QgsDataSourceURI()
       myUri.setConnection(myHost, myPort, myDatabase, myUsername, myPassword)

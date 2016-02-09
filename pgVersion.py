@@ -97,14 +97,14 @@ class PgVersion:
     self.actionHelp = QAction(QIcon(""), QCoreApplication.translate("PgVersion","Help"), self.iface.mainWindow())       
     self.actionAbout = QAction(QIcon(""), QCoreApplication.translate("PgVersion","About"), self.iface.mainWindow())       
 
-#    self.actionList =  [ self.actionInit,self.actionLoad, self.actionCommit, self.actionDiff, self.actionRevert, self.actionLogView, self.actionDrop, self.actionLogView,  self.actionHelp]         
-    self.actionList =  [ self.actionInit,self.actionLoad,self.actionCommit,self.actionRevert, self.actionLogView, self.actionDrop, self.actionLogView,  self.actionHelp,  self.actionAbout]         
+    self.actionList =  [ self.actionInit,self.actionLoad, self.actionCommit, self.actionDiff, self.actionRevert, self.actionLogView, self.actionDrop, self.actionLogView,  self.actionHelp,  self.actionAbout]         
+#    self.actionList =  [ self.actionInit,self.actionLoad,self.actionCommit,self.actionRevert, self.actionLogView, self.actionDrop, self.actionLogView,  self.actionHelp,  self.actionAbout]         
 
     self.toolBar.addAction(self.actionInit)
     self.toolBar.addAction(self.actionLoad)
     self.toolBar.addAction(self.actionCommit)
     self.toolBar.addAction(self.actionRevert)
-#    self.toolBar.addAction(self.actionDiff)
+    self.toolBar.addAction(self.actionDiff)
     self.toolBar.addAction(self.actionLogView)
 
  # Add the Menubar into the new Database Main Menue starting with QGIS1.7
@@ -165,6 +165,9 @@ class PgVersion:
     if currentLayer == None:
       QMessageBox.information(None, '', QCoreApplication.translate('PgVersion','Please select a layer for versioning'))
       return    
+    elif self.tools.hasVersion(currentLayer):
+      QMessageBox.warning(None,   QCoreApplication.translate('PgVersion','Warning'),   QCoreApplication.translate('PgVersion','The selected layer is already under versioning!'))
+      return
     else:
       provider = currentLayer.dataProvider()
       uri = provider.dataSourceUri()    
@@ -259,24 +262,19 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
 
   def doCommit(self):
       canvas = self.iface.mapCanvas()
+      
       if canvas.currentLayer() == None:
           self.iface.messageBar().pushMessage('Error', QCoreApplication.translate('PgVersion','Please select a versioned layer for committing'), level=QgsMessageBar.CRITICAL, duration=3)
           return
 
       canvas = self.iface.mapCanvas()
       theLayer = canvas.currentLayer()
-      provider = theLayer.dataProvider()
-      uri = provider.dataSourceUri()    
-      myDb = self.tools.layerDB('commit',  theLayer)
-      mySchema = QgsDataSourceURI(uri).schema()
-      if len(mySchema) == 0:
-         mySchema = 'public'
-      myTable = QgsDataSourceURI(uri).table()    
+      mySchema = self.tools.layerSchema(theLayer)
+      myTable = self.tools.layerTable(theLayer).replace('_version', '')
 
       if not self.tools.hasVersion(theLayer):
           QMessageBox.warning(None,   QCoreApplication.translate('PgVersion','Warning'),   QCoreApplication.translate('PgVersion','Please select a versioned layer!'))
       else:
-    
           if self.tools.isModified(theLayer):
               confRecords = self.tools.confRecords(theLayer)            
               if  confRecords == None:
@@ -286,8 +284,10 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
     
                   if result == QDialog.Accepted:
                         QApplication.setOverrideCursor(Qt.WaitCursor)                    
-                        sql = "select * from versions.pgvscommit('"+mySchema+"."+myTable.replace('_version', '')+"','"+self.dlgCommitMessage.textEdit.toPlainText()+"')"
-                        myDb.run(sql)
+                        sql = "select * from versions.pgvscommit('%s.%s','%s')" % (mySchema,  myTable,  self.dlgCommitMessage.textEdit.toPlainText())
+                        myDB = self.tools.layerDB('commit',  theLayer)
+                        myDB.run(sql)
+                        myDB.close()
                         canvas.refresh()
                         self.iface.messageBar().pushMessage("Info", QCoreApplication.translate('PgVersion','Commit of your changes was successful'), level=QgsMessageBar.INFO, duration=3)            
                         self.tools.setModified(None,  True)
@@ -299,7 +299,6 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
                 self.w.mergeCompleted.connect(self.doCommit)
                 self.w.show()
     
-              myDb.close()
               self.tools.setModified(None,  True)
           else:
               self.iface.messageBar().pushMessage('INFO', QCoreApplication.translate('PgVersion','No layer changes for committing, everything is OK'), level=QgsMessageBar.INFO, duration=3)
@@ -442,15 +441,11 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
         if answer == 0:
 
             QApplication.setOverrideCursor(Qt.WaitCursor)
-            provider = currentLayer.dataProvider()
-            uri = provider.dataSourceUri()    
-            uniqueCol = QgsDataSourceURI(uri).keyColumn()
-            
-            geomCol = QgsDataSourceURI(uri).geometryColumn()
-            geometryType = currentLayer.geometryType()
-
-            mySchema = QgsDataSourceURI(uri).schema()
-            myTable = QgsDataSourceURI(uri).table()
+            uniqueCol = self.tools.layerUniqueCol(currentLayer)
+            geomCol = self.tools.layerGeomCol(currentLayer)
+            geometryType = self.tools.layerGeometryType(currentLayer)
+            mySchema = self.tools.layerSchema(currentLayer)
+            myTable = self.tools.layerTable(currentLayer)
 
             if len(mySchema) == 0:
                 mySchema = 'public'
@@ -484,7 +479,7 @@ from versions.pgvscheckout('"+mySchema+"."+myTable.replace('_version', '')+"', (
 where c.log_id = v."+uniqueCol+" and c.systime = v.systime) as foo1) as foo "
 
 #            QMessageBox.information(None, '',  sql)
-            myUri = QgsDataSourceURI(uri)
+            myUri = QgsDataSourceURI(self.tools.layerUri(currentLayer))
             myUri.setDataSource("", u"(%s\n)" % sql, geomCol, "", "rownum")
 
             layer = QgsVectorLayer(myUri.uri(), myTable+" (Diff to HEAD Revision)", "postgres")         

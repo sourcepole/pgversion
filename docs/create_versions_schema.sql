@@ -3,8 +3,8 @@
 --
 
 -- Dumped from database version 9.3.10
--- Dumped by pg_dump version 9.3.10
--- Started on 2016-02-08 16:17:45 CET
+-- Dumped by pg_dump version 9.4.5
+-- Started on 2016-02-08 08:41:34 CET
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -24,7 +24,7 @@ CREATE SCHEMA versions;
 SET search_path = versions, pg_catalog;
 
 --
--- TOC entry 1713 (class 1247 OID 86575)
+-- TOC entry 1727 (class 1247 OID 86575)
 -- Name: checkout; Type: TYPE; Schema: versions; Owner: -
 --
 
@@ -37,7 +37,7 @@ CREATE TYPE checkout AS (
 
 
 --
--- TOC entry 1682 (class 1247 OID 89357)
+-- TOC entry 1696 (class 1247 OID 89357)
 -- Name: conflicts; Type: TYPE; Schema: versions; Owner: -
 --
 
@@ -53,7 +53,7 @@ CREATE TYPE conflicts AS (
 
 
 --
--- TOC entry 1718 (class 1247 OID 86581)
+-- TOC entry 1732 (class 1247 OID 86581)
 -- Name: logview; Type: TYPE; Schema: versions; Owner: -
 --
 
@@ -66,7 +66,7 @@ CREATE TYPE logview AS (
 
 
 --
--- TOC entry 1325 (class 1255 OID 89358)
+-- TOC entry 1339 (class 1255 OID 89358)
 -- Name: pgvscheck(character varying); Type: FUNCTION; Schema: versions; Owner: -
 --
 
@@ -174,11 +174,11 @@ $_$;
 
 
 --
--- TOC entry 1331 (class 1255 OID 170631)
--- Name: pgvscheckout(character varying, bigint); Type: FUNCTION; Schema: versions; Owner: -
+-- TOC entry 1345 (class 1255 OID 169832)
+-- Name: pgvscheckout(character varying, integer); Type: FUNCTION; Schema: versions; Owner: -
 --
 
-CREATE FUNCTION pgvscheckout(intable character varying, revision bigint) RETURNS TABLE(log_id bigint, systime bigint)
+CREATE FUNCTION pgvscheckout(intable character varying, revision integer) RETURNS TABLE(log_id bigint, systime bigint)
     LANGUAGE plpgsql
     AS $$
   DECLARE
@@ -269,7 +269,7 @@ $$;
 
 
 --
--- TOC entry 1324 (class 1255 OID 89359)
+-- TOC entry 1338 (class 1255 OID 89359)
 -- Name: pgvscommit(character varying, text); Type: FUNCTION; Schema: versions; Owner: -
 --
 
@@ -375,7 +375,10 @@ with a listing of the conflicting objects.
               LOOP
                 
                 if attributes.column_name <> 'OID' 
-                  and attributes.column_name <> 'versionarchive' then
+                  and attributes.column_name <> 'versionarchive' 
+                  and attributes.column_name <> 'new_date' 
+                  and  attributes.column_name <> 'archive_date' 
+                  and  attributes.column_name <> 'archive' then
                     fields := fields||',log."'||attributes.column_name||'"';
                     insFields := insFields||',"'||attributes.column_name||'"';
                 END IF;
@@ -455,7 +458,7 @@ $_$;
 
 
 --
--- TOC entry 1326 (class 1255 OID 86587)
+-- TOC entry 1340 (class 1255 OID 86587)
 -- Name: pgvsdrop(character varying); Type: FUNCTION; Schema: versions; Owner: -
 --
 
@@ -590,7 +593,7 @@ $_$;
 
 
 --
--- TOC entry 1319 (class 1255 OID 86588)
+-- TOC entry 1333 (class 1255 OID 86588)
 -- Name: pgvsinit(character varying); Type: FUNCTION; Schema: versions; Owner: -
 --
 
@@ -653,6 +656,7 @@ CREATE FUNCTION pgvsinit(character varying) RETURNS boolean
     versionTable := '"'||mySchema||'"."'||myTable||'_version_t"';
     versionView := '"'||mySchema||'"."'||myTable||'_version"';
     versionLogTable := 'versions."'||mySchema||'_'||myTable||'_version_log"';
+    versionLogTableType := 'versions."'||mySchema||'_'||myTable||'_version_log_type"';
     versionLogTableSeq := 'versions."'||mySchema||'_'||myTable||'_version_log_version_log_id_seq"';
     versionLogTableTmp := 'versions."'||mySchema||'_'||myTable||'_version_log_tmp"';
 
@@ -808,9 +812,12 @@ CREATE FUNCTION pgvsinit(character varying) RETURNS boolean
 
 -- Das erste Komma  aus dem String entfernen
         fields := substring(fields,2);
+        type_fields := substring(type_fields,2);
         newFields := substring(newFields,2);
         oldFields := substring(oldFields,2);
         updateFields := substring(updateFields,2);
+
+        execute 'create type '||versionLogTableType||' as ('||type_fields||')';
         
         IF length(mySequence)=0 THEN
           RAISE EXCEPTION 'No Sequence defined for Table %.%', mySchema,myTable;
@@ -880,7 +887,7 @@ $_$;
 
 
 --
--- TOC entry 1320 (class 1255 OID 86591)
+-- TOC entry 1334 (class 1255 OID 86591)
 -- Name: pgvslogview(character varying); Type: FUNCTION; Schema: versions; Owner: -
 --
 
@@ -932,7 +939,7 @@ $_$;
 
 
 --
--- TOC entry 1327 (class 1255 OID 89337)
+-- TOC entry 1341 (class 1255 OID 89337)
 -- Name: pgvsmerge(character varying, integer, character varying); Type: FUNCTION; Schema: versions; Owner: -
 --
 
@@ -1079,7 +1086,7 @@ myDebug := 'select a.'||myPkey||' as objectkey,
 
 
 --
--- TOC entry 1321 (class 1255 OID 86593)
+-- TOC entry 1335 (class 1255 OID 86593)
 -- Name: pgvsrevert(character varying); Type: FUNCTION; Schema: versions; Owner: -
 --
 
@@ -1159,7 +1166,7 @@ $_$;
 
 
 --
--- TOC entry 1322 (class 1255 OID 86594)
+-- TOC entry 1336 (class 1255 OID 86594)
 -- Name: pgvsrevision(); Type: FUNCTION; Schema: versions; Owner: -
 --
 
@@ -1177,7 +1184,7 @@ $$;
 
 
 --
--- TOC entry 1328 (class 1255 OID 86595)
+-- TOC entry 1342 (class 1255 OID 86595)
 -- Name: pgvsrollback(character varying, integer); Type: FUNCTION; Schema: versions; Owner: -
 --
 
@@ -1313,7 +1320,7 @@ $_$;
 
 
 --
--- TOC entry 1323 (class 1255 OID 86596)
+-- TOC entry 1337 (class 1255 OID 86596)
 -- Name: pgvsupdatecheck(character varying); Type: FUNCTION; Schema: versions; Owner: -
 --
 
@@ -1352,10 +1359,6 @@ SET default_tablespace = '';
 
 SET default_with_oids = false;
 
---
--- TOC entry 233 (class 1259 OID 86597)
--- Name: version_tables; Type: TABLE; Schema: versions; Owner: -; Tablespace: 
---
 
 CREATE TABLE version_tables (
     version_table_id bigint NOT NULL,
@@ -1397,7 +1400,7 @@ CREATE SEQUENCE version_tables_logmsg_id_seq
 
 
 --
--- TOC entry 3318 (class 0 OID 0)
+-- TOC entry 3410 (class 0 OID 0)
 -- Dependencies: 235
 -- Name: version_tables_logmsg_id_seq; Type: SEQUENCE OWNED BY; Schema: versions; Owner: -
 --
@@ -1419,16 +1422,15 @@ CREATE SEQUENCE version_tables_version_table_id_seq
 
 
 --
--- TOC entry 3320 (class 0 OID 0)
+-- TOC entry 3412 (class 0 OID 0)
 -- Dependencies: 236
 -- Name: version_tables_version_table_id_seq; Type: SEQUENCE OWNED BY; Schema: versions; Owner: -
 --
 
 ALTER SEQUENCE version_tables_version_table_id_seq OWNED BY version_tables.version_table_id;
 
-
 --
--- TOC entry 3177 (class 2604 OID 86615)
+-- TOC entry 3221 (class 2604 OID 86615)
 -- Name: version_table_id; Type: DEFAULT; Schema: versions; Owner: -
 --
 
@@ -1436,15 +1438,16 @@ ALTER TABLE ONLY version_tables ALTER COLUMN version_table_id SET DEFAULT nextva
 
 
 --
--- TOC entry 3180 (class 2604 OID 86616)
+-- TOC entry 3224 (class 2604 OID 86616)
 -- Name: id; Type: DEFAULT; Schema: versions; Owner: -
 --
 
 ALTER TABLE ONLY version_tables_logmsg ALTER COLUMN id SET DEFAULT nextval('version_tables_logmsg_id_seq'::regclass);
 
 
+
 --
--- TOC entry 3182 (class 2606 OID 86618)
+-- TOC entry 3238 (class 2606 OID 86618)
 -- Name: version_table_pkey; Type: CONSTRAINT; Schema: versions; Owner: -; Tablespace: 
 --
 
@@ -1453,7 +1456,7 @@ ALTER TABLE ONLY version_tables
 
 
 --
--- TOC entry 3185 (class 2606 OID 86620)
+-- TOC entry 3241 (class 2606 OID 86620)
 -- Name: version_tables_logmsg_pkey; Type: CONSTRAINT; Schema: versions; Owner: -; Tablespace: 
 --
 
@@ -1462,7 +1465,16 @@ ALTER TABLE ONLY version_tables_logmsg
 
 
 --
--- TOC entry 3183 (class 1259 OID 86621)
+-- TOC entry 3248 (class 2606 OID 165048)
+-- Name: zonenplan_pkey; Type: CONSTRAINT; Schema: versions; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY public_zonenplan_version_log
+    ADD CONSTRAINT zonenplan_pkey PRIMARY KEY (id, project, systime, action);
+
+
+--
+-- TOC entry 3239 (class 1259 OID 86621)
 -- Name: fki_version_tables_fkey; Type: INDEX; Schema: versions; Owner: -; Tablespace: 
 --
 
@@ -1470,7 +1482,7 @@ CREATE INDEX fki_version_tables_fkey ON version_tables_logmsg USING btree (versi
 
 
 --
--- TOC entry 3186 (class 2606 OID 86622)
+-- TOC entry 3254 (class 2606 OID 86622)
 -- Name: version_tables_fkey; Type: FK CONSTRAINT; Schema: versions; Owner: -
 --
 
@@ -1479,7 +1491,7 @@ ALTER TABLE ONLY version_tables_logmsg
 
 
 --
--- TOC entry 3305 (class 0 OID 0)
+-- TOC entry 3385 (class 0 OID 0)
 -- Dependencies: 12
 -- Name: versions; Type: ACL; Schema: -; Owner: -
 --
@@ -1492,8 +1504,8 @@ GRANT ALL ON SCHEMA versions TO version;
 
 
 --
--- TOC entry 3306 (class 0 OID 0)
--- Dependencies: 1325
+-- TOC entry 3386 (class 0 OID 0)
+-- Dependencies: 1339
 -- Name: pgvscheck(character varying); Type: ACL; Schema: versions; Owner: -
 --
 
@@ -1505,8 +1517,8 @@ GRANT ALL ON FUNCTION pgvscheck(character varying) TO version;
 
 
 --
--- TOC entry 3307 (class 0 OID 0)
--- Dependencies: 1324
+-- TOC entry 3387 (class 0 OID 0)
+-- Dependencies: 1338
 -- Name: pgvscommit(character varying, text); Type: ACL; Schema: versions; Owner: -
 --
 
@@ -1518,8 +1530,8 @@ GRANT ALL ON FUNCTION pgvscommit(character varying, text) TO version;
 
 
 --
--- TOC entry 3308 (class 0 OID 0)
--- Dependencies: 1326
+-- TOC entry 3388 (class 0 OID 0)
+-- Dependencies: 1340
 -- Name: pgvsdrop(character varying); Type: ACL; Schema: versions; Owner: -
 --
 
@@ -1531,8 +1543,8 @@ GRANT ALL ON FUNCTION pgvsdrop(character varying) TO version;
 
 
 --
--- TOC entry 3309 (class 0 OID 0)
--- Dependencies: 1319
+-- TOC entry 3389 (class 0 OID 0)
+-- Dependencies: 1333
 -- Name: pgvsinit(character varying); Type: ACL; Schema: versions; Owner: -
 --
 
@@ -1544,8 +1556,8 @@ GRANT ALL ON FUNCTION pgvsinit(character varying) TO version;
 
 
 --
--- TOC entry 3310 (class 0 OID 0)
--- Dependencies: 1320
+-- TOC entry 3390 (class 0 OID 0)
+-- Dependencies: 1334
 -- Name: pgvslogview(character varying); Type: ACL; Schema: versions; Owner: -
 --
 
@@ -1557,8 +1569,8 @@ GRANT ALL ON FUNCTION pgvslogview(character varying) TO version;
 
 
 --
--- TOC entry 3311 (class 0 OID 0)
--- Dependencies: 1327
+-- TOC entry 3391 (class 0 OID 0)
+-- Dependencies: 1341
 -- Name: pgvsmerge(character varying, integer, character varying); Type: ACL; Schema: versions; Owner: -
 --
 
@@ -1570,8 +1582,8 @@ GRANT ALL ON FUNCTION pgvsmerge("inTable" character varying, "targetGid" integer
 
 
 --
--- TOC entry 3312 (class 0 OID 0)
--- Dependencies: 1321
+-- TOC entry 3392 (class 0 OID 0)
+-- Dependencies: 1335
 -- Name: pgvsrevert(character varying); Type: ACL; Schema: versions; Owner: -
 --
 
@@ -1583,8 +1595,8 @@ GRANT ALL ON FUNCTION pgvsrevert(character varying) TO version;
 
 
 --
--- TOC entry 3313 (class 0 OID 0)
--- Dependencies: 1322
+-- TOC entry 3393 (class 0 OID 0)
+-- Dependencies: 1336
 -- Name: pgvsrevision(); Type: ACL; Schema: versions; Owner: -
 --
 
@@ -1596,8 +1608,8 @@ GRANT ALL ON FUNCTION pgvsrevision() TO version;
 
 
 --
--- TOC entry 3314 (class 0 OID 0)
--- Dependencies: 1328
+-- TOC entry 3394 (class 0 OID 0)
+-- Dependencies: 1342
 -- Name: pgvsrollback(character varying, integer); Type: ACL; Schema: versions; Owner: -
 --
 
@@ -1609,8 +1621,8 @@ GRANT ALL ON FUNCTION pgvsrollback(character varying, integer) TO version;
 
 
 --
--- TOC entry 3315 (class 0 OID 0)
--- Dependencies: 1323
+-- TOC entry 3395 (class 0 OID 0)
+-- Dependencies: 1337
 -- Name: pgvsupdatecheck(character varying); Type: ACL; Schema: versions; Owner: -
 --
 
@@ -1621,8 +1633,9 @@ GRANT ALL ON FUNCTION pgvsupdatecheck(character varying) TO PUBLIC;
 GRANT ALL ON FUNCTION pgvsupdatecheck(character varying) TO version;
 
 
+
 --
--- TOC entry 3316 (class 0 OID 0)
+-- TOC entry 3408 (class 0 OID 0)
 -- Dependencies: 233
 -- Name: version_tables; Type: ACL; Schema: versions; Owner: -
 --
@@ -1635,7 +1648,7 @@ GRANT ALL ON TABLE version_tables TO version;
 
 
 --
--- TOC entry 3317 (class 0 OID 0)
+-- TOC entry 3409 (class 0 OID 0)
 -- Dependencies: 234
 -- Name: version_tables_logmsg; Type: ACL; Schema: versions; Owner: -
 --
@@ -1648,7 +1661,7 @@ GRANT ALL ON TABLE version_tables_logmsg TO version;
 
 
 --
--- TOC entry 3319 (class 0 OID 0)
+-- TOC entry 3411 (class 0 OID 0)
 -- Dependencies: 235
 -- Name: version_tables_logmsg_id_seq; Type: ACL; Schema: versions; Owner: -
 --
@@ -1661,7 +1674,7 @@ GRANT ALL ON SEQUENCE version_tables_logmsg_id_seq TO version;
 
 
 --
--- TOC entry 3321 (class 0 OID 0)
+-- TOC entry 3413 (class 0 OID 0)
 -- Dependencies: 236
 -- Name: version_tables_version_table_id_seq; Type: ACL; Schema: versions; Owner: -
 --
@@ -1673,7 +1686,7 @@ GRANT ALL ON SEQUENCE version_tables_version_table_id_seq TO PUBLIC;
 GRANT ALL ON SEQUENCE version_tables_version_table_id_seq TO version;
 
 
--- Completed on 2016-02-08 16:17:47 CET
+-- Completed on 2016-02-08 08:41:52 CET
 
 --
 -- PostgreSQL database dump complete
