@@ -33,7 +33,6 @@ import resources_rc,  traceback
 # Import the code for the dialog
 
 from forms.Ui_pgLoadVersion import PgVersionLoadDialog
-#from pgVersionInit import PgVersionInit
 from forms.Ui_help import HelpDialog
 from forms.Ui_LogView import LogView
 from pgVersionTools import PgVersionTools
