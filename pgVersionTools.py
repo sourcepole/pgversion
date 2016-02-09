@@ -31,9 +31,10 @@ import apicompat
 class PgVersionTools:
 
 # Konstruktor 
-  def __init__(self,  iface):
+  def __init__(self,  iface,  parent=None):
       self.pgvsRevision = '2.0.0'
       self.iface = iface
+      self.parent = parent
       pass
 
 

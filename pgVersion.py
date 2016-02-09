@@ -141,7 +141,6 @@ class PgVersion:
       for l in layerList:
 
           if l.type() == QgsMapLayer.VectorLayer and l.providerType() == 'postgres':
-#              self.tools.setModified(l)
               l.editingStopped.connect(self.tools.setModified)
 
 
@@ -168,38 +167,21 @@ class PgVersion:
       QMessageBox.warning(None,   QCoreApplication.translate('PgVersion','Warning'),   QCoreApplication.translate('PgVersion','The selected layer is already under versioning!'))
       return
     else:
-      provider = currentLayer.dataProvider()
-      uri = provider.dataSourceUri()    
+      mySchema = self.tools.layerSchema(currentLayer)
+      myTable = self.tools.layerTable(currentLayer)
       myDb = self.tools.layerDB('doInit',currentLayer)
       if not self.tools.checkPGVSRevision(myDb):
         return
-      mySchema = QgsDataSourceURI(uri).schema()
 
-      if len(mySchema) == 0:
-        mySchema = 'public'
-      myTable = QgsDataSourceURI(uri).table()
       if not self.tools.versionExists(currentLayer):
-        myExtent = canvas.extent()
         answer = QMessageBox.question(None, '', QCoreApplication.translate('PgVersion','Do you want to create the version environment for the table {0}').format(mySchema+'.'+myTable), QCoreApplication.translate('PgVersion','Yes'), QCoreApplication.translate('PgVersion','No'))
-
         QApplication.setOverrideCursor(Qt.WaitCursor)
 
         if answer == 0:
-          sql = "select * from versions.pgvsinit('"+mySchema+"."+myTable+"')"
-          result = myDb.runError(sql)              
-          myDb.close()
-
           QMessageBox. information(None, 'Init', QCoreApplication.translate('PgVersion', 'Init was successful!\n\n\
 Please set the user permissions for table {0} and reload it via Database -> PG Version!').format(myTable))
 
-#          vUri = QgsDataSourceURI(provider.dataSourceUri() )
-#          vUri.setDataSource(mySchema, myTable+'_version', QgsDataSourceURI(uri).geometryColumn())
-#
-#          vLayer = QgsVectorLayer(vUri.uri(),  myTable+'_version',  'postgres')
           QgsMapLayerRegistry.instance().removeMapLayer(currentLayer.id())          
-#          QgsMapLayerRegistry.instance().addMapLayer(vLayer)
-#          canvas.setExtent(myExtent)
-#          canvas.zoomToPreviousExtent()
 
           QApplication.restoreOverrideCursor()
       else:

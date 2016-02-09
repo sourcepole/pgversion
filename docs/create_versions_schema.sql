@@ -4,7 +4,7 @@
 
 -- Dumped from database version 9.3.10
 -- Dumped by pg_dump version 9.3.10
--- Started on 2016-02-09 14:54:12 CET
+-- Started on 2016-02-09 16:09:51 CET
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -829,7 +829,7 @@ CREATE FUNCTION pgvsinit(character varying) RETURNS boolean
                     SELECT v_1.'||myPkey||'
                     FROM '||versionLogTable||' v_1,
                      ( SELECT v_2.'||myPkey||',
-                              max(v_2.version_log_id) AS version_log_id
+                              max(v_2.version_log_id) AS version_log_id, min(action) as action
                        FROM '||versionLogTable||' v_2
                        WHERE NOT v_2.commit AND v_2.project::name = "current_user"()
                        GROUP BY v_2.'||myPkey||') foo_1
@@ -839,11 +839,11 @@ CREATE FUNCTION pgvsinit(character varying) RETURNS boolean
                 SELECT v.'||myPkey||','||fields||'
                 FROM '||versionLogTable||' v,
                  ( SELECT v_1.'||myPkey||',
-                          max(v_1.version_log_id) AS version_log_id
+                          max(v_1.version_log_id) AS version_log_id, min(action) as action
                    FROM '||versionLogTable||' v_1
-                   WHERE NOT v_1.commit AND v_1.action::text <> ''delete''::text AND v_1.project::name = "current_user"()
+                   WHERE NOT v_1.commit AND v_1.project::name = "current_user"()
                    GROUP BY v_1.'||myPkey||') foo
-                WHERE v.version_log_id = foo.version_log_id';
+                WHERE v.version_log_id = foo.version_log_id and foo.action <> ''delete''';
 
 
     execute 'CREATE OR REPLACE RULE delete AS
@@ -1673,7 +1673,7 @@ GRANT ALL ON SEQUENCE version_tables_version_table_id_seq TO PUBLIC;
 GRANT ALL ON SEQUENCE version_tables_version_table_id_seq TO version;
 
 
--- Completed on 2016-02-09 14:54:14 CET
+-- Completed on 2016-02-09 16:09:53 CET
 
 --
 -- PostgreSQL database dump complete
