@@ -149,7 +149,7 @@ class PgVersionLoadDialog(QDialog, Ui_pgLoadVersion):
         myDb = DbObj(pluginname=connectionName,typ=DBTYPE,hostname=DBHOST,port=DBPORT,dbname=DBNAME,username=DBUSER, passwort=DBPASSWD)
 
         sql =   "select * from versions.version_tables \
-        where version_table_schema = '"+schema+"' and version_table_name = '"+table+"'"
+        where version_table_schema = '%s' and version_table_name = '%s'" % (schema,  table)
         layer = myDb.read(sql)    
     
         uri = QgsDataSourceURI()

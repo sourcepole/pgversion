@@ -401,12 +401,14 @@ class PgVersionTools:
 
 # Check the revision of the DB-Functions
   def checkPGVSRevision(self,  myDb):      
-#      try:
+      try:
           check = pystring(myDb.runError('select pgvsrevision from versions.pgvsrevision()'))
-          print "Check: "+str(check)+"  len "+ str(len(check))
           if len(check) > 1:
                 self.vsCheck = DbVersionCheckDialog(myDb,  '0.0.0')
-                revisionMessage =QCoreApplication.translate('PgVersionTools', 'pgvs is not installed in the selected DB.\n\nPlease contact your DB-administrator to install the DB-functions from the file:\n\n<Plugin-Directory>/pgversion/tools/createFunctions.sql\n\nIf you have appropriate DB permissions you can install the DB functions directly with click on Install pgvs.')
+                revisionMessage =QCoreApplication.translate('PgVersionTools', 'pgvs is not installed in the selected DB.\n\n\
+Please contact your DB-administrator to install the DB-functions from the \
+file:\n\n<Plugin-Directory>/pgversion/docs/create_versions_schema.sql\n\n\
+If you have appropriate DB permissions you can install the DB functions directly with click on Install pgvs.')
                 self.vsCheck.messageTextEdit.setText(revisionMessage)
                 self.vsCheck.btnUpdate.setText('Install pgvs')
                 self.vsCheck.show()
@@ -425,12 +427,14 @@ If you have appropriate DB permissions you can update the DB directly with click
                 return False
             else:
               return True
-#      except:
-#          self.vsCheck = DbVersionCheckDialog(myDb,  '0.0.0')
-#          revisionMessage = QCoreApplication.translate('PgVersionTools','Please upgrade the DB-functions from the file:\n\n<Plugin-Directory>/pgversion/tools/updateFunctions.sql\n\nIf you have appropriate DB permissions you can update the DB directly with click on DB-Update.')
-#          self.vsCheck.messageTextEdit.setText(revisionMessage)
-#          self.vsCheck.show()          
-#          return False    
+      except:
+          self.vsCheck = DbVersionCheckDialog(myDb,  '0.0.0')
+          revisionMessage = QCoreApplication.translate('PgVersionTools','Please upgrade the DB-functions from the file:\n\n\
+<Plugin-Directory>/pgversion/docs/create_versions_schema.sql\n\n \
+If you have appropriate DB permissions you can update the DB directly with click on DB-Update.')
+          self.vsCheck.messageTextEdit.setText(revisionMessage)
+          self.vsCheck.show()          
+          return False    
 
 
 #Get the Fieldnames of a Vector Layer

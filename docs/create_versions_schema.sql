@@ -3,8 +3,8 @@
 --
 
 -- Dumped from database version 9.3.10
--- Dumped by pg_dump version 9.3.10
--- Started on 2016-02-09 16:09:51 CET
+-- Dumped by pg_dump version 9.4.5
+-- Started on 2016-02-09 17:13:42 CET
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -13,8 +13,35 @@ SET standard_conforming_strings = on;
 SET check_function_bodies = false;
 SET client_min_messages = warning;
 
+SET search_path = versions, pg_catalog;
+
+ALTER TABLE ONLY versions.version_tables_logmsg DROP CONSTRAINT version_tables_fkey;
+DROP INDEX versions.fki_version_tables_fkey;
+ALTER TABLE ONLY versions.version_tables_logmsg DROP CONSTRAINT version_tables_logmsg_pkey;
+ALTER TABLE ONLY versions.version_tables DROP CONSTRAINT version_table_pkey;
+ALTER TABLE versions.version_tables_logmsg ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE versions.version_tables ALTER COLUMN version_table_id DROP DEFAULT;
+DROP SEQUENCE versions.version_tables_version_table_id_seq;
+DROP SEQUENCE versions.version_tables_logmsg_id_seq;
+DROP TABLE versions.version_tables_logmsg;
+DROP TABLE versions.version_tables;
+DROP FUNCTION versions.pgvsupdatecheck(character varying);
+DROP FUNCTION versions.pgvsrollback(character varying, integer);
+DROP FUNCTION versions.pgvsrevision();
+DROP FUNCTION versions.pgvsrevert(character varying);
+DROP FUNCTION versions.pgvsmerge("inTable" character varying, "targetGid" integer, "targetProject" character varying);
+DROP FUNCTION versions.pgvslogview(character varying);
+DROP FUNCTION versions.pgvsinit(character varying);
+DROP FUNCTION versions.pgvsdrop(character varying);
+DROP FUNCTION versions.pgvscommit(character varying, text);
+DROP FUNCTION versions.pgvscheckout(intable character varying, revision bigint);
+DROP FUNCTION versions.pgvscheck(character varying);
+DROP TYPE versions.logview;
+DROP TYPE versions.conflicts;
+DROP TYPE versions.checkout;
+DROP SCHEMA versions;
 --
--- TOC entry 12 (class 2615 OID 86572)
+-- TOC entry 54 (class 2615 OID 171084)
 -- Name: versions; Type: SCHEMA; Schema: -; Owner: -
 --
 
@@ -24,7 +51,7 @@ CREATE SCHEMA versions;
 SET search_path = versions, pg_catalog;
 
 --
--- TOC entry 1713 (class 1247 OID 86575)
+-- TOC entry 1721 (class 1247 OID 171087)
 -- Name: checkout; Type: TYPE; Schema: versions; Owner: -
 --
 
@@ -37,7 +64,7 @@ CREATE TYPE checkout AS (
 
 
 --
--- TOC entry 1682 (class 1247 OID 89357)
+-- TOC entry 1724 (class 1247 OID 171090)
 -- Name: conflicts; Type: TYPE; Schema: versions; Owner: -
 --
 
@@ -53,7 +80,7 @@ CREATE TYPE conflicts AS (
 
 
 --
--- TOC entry 1718 (class 1247 OID 86581)
+-- TOC entry 1727 (class 1247 OID 171093)
 -- Name: logview; Type: TYPE; Schema: versions; Owner: -
 --
 
@@ -66,7 +93,7 @@ CREATE TYPE logview AS (
 
 
 --
--- TOC entry 1325 (class 1255 OID 89358)
+-- TOC entry 1326 (class 1255 OID 171094)
 -- Name: pgvscheck(character varying); Type: FUNCTION; Schema: versions; Owner: -
 --
 
@@ -174,7 +201,7 @@ $_$;
 
 
 --
--- TOC entry 1331 (class 1255 OID 170631)
+-- TOC entry 1327 (class 1255 OID 171095)
 -- Name: pgvscheckout(character varying, bigint); Type: FUNCTION; Schema: versions; Owner: -
 --
 
@@ -269,7 +296,7 @@ $$;
 
 
 --
--- TOC entry 1324 (class 1255 OID 89359)
+-- TOC entry 1328 (class 1255 OID 171096)
 -- Name: pgvscommit(character varying, text); Type: FUNCTION; Schema: versions; Owner: -
 --
 
@@ -455,7 +482,7 @@ $_$;
 
 
 --
--- TOC entry 1326 (class 1255 OID 86587)
+-- TOC entry 1319 (class 1255 OID 171098)
 -- Name: pgvsdrop(character varying); Type: FUNCTION; Schema: versions; Owner: -
 --
 
@@ -590,7 +617,7 @@ $_$;
 
 
 --
--- TOC entry 1319 (class 1255 OID 86588)
+-- TOC entry 1320 (class 1255 OID 171099)
 -- Name: pgvsinit(character varying); Type: FUNCTION; Schema: versions; Owner: -
 --
 
@@ -880,7 +907,7 @@ $_$;
 
 
 --
--- TOC entry 1320 (class 1255 OID 86591)
+-- TOC entry 1323 (class 1255 OID 171101)
 -- Name: pgvslogview(character varying); Type: FUNCTION; Schema: versions; Owner: -
 --
 
@@ -932,7 +959,7 @@ $_$;
 
 
 --
--- TOC entry 1327 (class 1255 OID 89337)
+-- TOC entry 1329 (class 1255 OID 171102)
 -- Name: pgvsmerge(character varying, integer, character varying); Type: FUNCTION; Schema: versions; Owner: -
 --
 
@@ -1079,7 +1106,7 @@ myDebug := 'select a.'||myPkey||' as objectkey,
 
 
 --
--- TOC entry 1321 (class 1255 OID 86593)
+-- TOC entry 1324 (class 1255 OID 171103)
 -- Name: pgvsrevert(character varying); Type: FUNCTION; Schema: versions; Owner: -
 --
 
@@ -1159,7 +1186,7 @@ $_$;
 
 
 --
--- TOC entry 1322 (class 1255 OID 86594)
+-- TOC entry 1325 (class 1255 OID 171104)
 -- Name: pgvsrevision(); Type: FUNCTION; Schema: versions; Owner: -
 --
 
@@ -1177,7 +1204,7 @@ $$;
 
 
 --
--- TOC entry 1328 (class 1255 OID 86595)
+-- TOC entry 1331 (class 1255 OID 171105)
 -- Name: pgvsrollback(character varying, integer); Type: FUNCTION; Schema: versions; Owner: -
 --
 
@@ -1299,12 +1326,9 @@ rollbackQry := 'insert into '||versionLogTable||' ('||myInsertFields||', action)
                 group by v.'||myPkey||') as foo
               where v.version_log_id = foo.version_log_id';
 
-  
- -- RAISE EXCEPTION '%', rollbackQry;
-
+ 
       execute rollbackQry;
               
---      execute 'select * from versions.pgvscommit('''||mySchema||'.'||myTable||''',''Rollback to Revision '||myRevision||''')';
 
   RETURN true ;                             
 
@@ -1313,7 +1337,7 @@ $_$;
 
 
 --
--- TOC entry 1323 (class 1255 OID 86596)
+-- TOC entry 1330 (class 1255 OID 171106)
 -- Name: pgvsupdatecheck(character varying); Type: FUNCTION; Schema: versions; Owner: -
 --
 
@@ -1353,7 +1377,7 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- TOC entry 233 (class 1259 OID 86597)
+-- TOC entry 249 (class 1259 OID 171107)
 -- Name: version_tables; Type: TABLE; Schema: versions; Owner: -; Tablespace: 
 --
 
@@ -1369,7 +1393,7 @@ CREATE TABLE version_tables (
 
 
 --
--- TOC entry 234 (class 1259 OID 86603)
+-- TOC entry 250 (class 1259 OID 171113)
 -- Name: version_tables_logmsg; Type: TABLE; Schema: versions; Owner: -; Tablespace: 
 --
 
@@ -1384,7 +1408,7 @@ CREATE TABLE version_tables_logmsg (
 
 
 --
--- TOC entry 235 (class 1259 OID 86611)
+-- TOC entry 251 (class 1259 OID 171121)
 -- Name: version_tables_logmsg_id_seq; Type: SEQUENCE; Schema: versions; Owner: -
 --
 
@@ -1398,7 +1422,7 @@ CREATE SEQUENCE version_tables_logmsg_id_seq
 
 --
 -- TOC entry 3318 (class 0 OID 0)
--- Dependencies: 235
+-- Dependencies: 251
 -- Name: version_tables_logmsg_id_seq; Type: SEQUENCE OWNED BY; Schema: versions; Owner: -
 --
 
@@ -1406,7 +1430,7 @@ ALTER SEQUENCE version_tables_logmsg_id_seq OWNED BY version_tables_logmsg.id;
 
 
 --
--- TOC entry 236 (class 1259 OID 86613)
+-- TOC entry 252 (class 1259 OID 171123)
 -- Name: version_tables_version_table_id_seq; Type: SEQUENCE; Schema: versions; Owner: -
 --
 
@@ -1420,7 +1444,7 @@ CREATE SEQUENCE version_tables_version_table_id_seq
 
 --
 -- TOC entry 3320 (class 0 OID 0)
--- Dependencies: 236
+-- Dependencies: 252
 -- Name: version_tables_version_table_id_seq; Type: SEQUENCE OWNED BY; Schema: versions; Owner: -
 --
 
@@ -1428,7 +1452,7 @@ ALTER SEQUENCE version_tables_version_table_id_seq OWNED BY version_tables.versi
 
 
 --
--- TOC entry 3177 (class 2604 OID 86615)
+-- TOC entry 3177 (class 2604 OID 171125)
 -- Name: version_table_id; Type: DEFAULT; Schema: versions; Owner: -
 --
 
@@ -1436,7 +1460,7 @@ ALTER TABLE ONLY version_tables ALTER COLUMN version_table_id SET DEFAULT nextva
 
 
 --
--- TOC entry 3180 (class 2604 OID 86616)
+-- TOC entry 3180 (class 2604 OID 171126)
 -- Name: id; Type: DEFAULT; Schema: versions; Owner: -
 --
 
@@ -1444,7 +1468,7 @@ ALTER TABLE ONLY version_tables_logmsg ALTER COLUMN id SET DEFAULT nextval('vers
 
 
 --
--- TOC entry 3182 (class 2606 OID 86618)
+-- TOC entry 3182 (class 2606 OID 171128)
 -- Name: version_table_pkey; Type: CONSTRAINT; Schema: versions; Owner: -; Tablespace: 
 --
 
@@ -1453,7 +1477,7 @@ ALTER TABLE ONLY version_tables
 
 
 --
--- TOC entry 3185 (class 2606 OID 86620)
+-- TOC entry 3185 (class 2606 OID 171130)
 -- Name: version_tables_logmsg_pkey; Type: CONSTRAINT; Schema: versions; Owner: -; Tablespace: 
 --
 
@@ -1462,7 +1486,7 @@ ALTER TABLE ONLY version_tables_logmsg
 
 
 --
--- TOC entry 3183 (class 1259 OID 86621)
+-- TOC entry 3183 (class 1259 OID 171131)
 -- Name: fki_version_tables_fkey; Type: INDEX; Schema: versions; Owner: -; Tablespace: 
 --
 
@@ -1470,7 +1494,7 @@ CREATE INDEX fki_version_tables_fkey ON version_tables_logmsg USING btree (versi
 
 
 --
--- TOC entry 3186 (class 2606 OID 86622)
+-- TOC entry 3186 (class 2606 OID 171132)
 -- Name: version_tables_fkey; Type: FK CONSTRAINT; Schema: versions; Owner: -
 --
 
@@ -1480,12 +1504,13 @@ ALTER TABLE ONLY version_tables_logmsg
 
 --
 -- TOC entry 3305 (class 0 OID 0)
--- Dependencies: 12
+-- Dependencies: 54
 -- Name: versions; Type: ACL; Schema: -; Owner: -
 --
 
 REVOKE ALL ON SCHEMA versions FROM PUBLIC;
-REVOKE ALL ON SCHEMA versions FROM postgres;
+REVOKE ALL ON SCHEMA versions FROM hdus;
+GRANT ALL ON SCHEMA versions TO hdus;
 GRANT ALL ON SCHEMA versions TO postgres;
 GRANT ALL ON SCHEMA versions TO PUBLIC;
 GRANT ALL ON SCHEMA versions TO version;
@@ -1493,12 +1518,13 @@ GRANT ALL ON SCHEMA versions TO version;
 
 --
 -- TOC entry 3306 (class 0 OID 0)
--- Dependencies: 1325
+-- Dependencies: 1326
 -- Name: pgvscheck(character varying); Type: ACL; Schema: versions; Owner: -
 --
 
 REVOKE ALL ON FUNCTION pgvscheck(character varying) FROM PUBLIC;
-REVOKE ALL ON FUNCTION pgvscheck(character varying) FROM postgres;
+REVOKE ALL ON FUNCTION pgvscheck(character varying) FROM hdus;
+GRANT ALL ON FUNCTION pgvscheck(character varying) TO hdus;
 GRANT ALL ON FUNCTION pgvscheck(character varying) TO postgres;
 GRANT ALL ON FUNCTION pgvscheck(character varying) TO PUBLIC;
 GRANT ALL ON FUNCTION pgvscheck(character varying) TO version;
@@ -1506,12 +1532,13 @@ GRANT ALL ON FUNCTION pgvscheck(character varying) TO version;
 
 --
 -- TOC entry 3307 (class 0 OID 0)
--- Dependencies: 1324
+-- Dependencies: 1328
 -- Name: pgvscommit(character varying, text); Type: ACL; Schema: versions; Owner: -
 --
 
 REVOKE ALL ON FUNCTION pgvscommit(character varying, text) FROM PUBLIC;
-REVOKE ALL ON FUNCTION pgvscommit(character varying, text) FROM postgres;
+REVOKE ALL ON FUNCTION pgvscommit(character varying, text) FROM hdus;
+GRANT ALL ON FUNCTION pgvscommit(character varying, text) TO hdus;
 GRANT ALL ON FUNCTION pgvscommit(character varying, text) TO postgres;
 GRANT ALL ON FUNCTION pgvscommit(character varying, text) TO PUBLIC;
 GRANT ALL ON FUNCTION pgvscommit(character varying, text) TO version;
@@ -1519,12 +1546,13 @@ GRANT ALL ON FUNCTION pgvscommit(character varying, text) TO version;
 
 --
 -- TOC entry 3308 (class 0 OID 0)
--- Dependencies: 1326
+-- Dependencies: 1319
 -- Name: pgvsdrop(character varying); Type: ACL; Schema: versions; Owner: -
 --
 
 REVOKE ALL ON FUNCTION pgvsdrop(character varying) FROM PUBLIC;
-REVOKE ALL ON FUNCTION pgvsdrop(character varying) FROM postgres;
+REVOKE ALL ON FUNCTION pgvsdrop(character varying) FROM hdus;
+GRANT ALL ON FUNCTION pgvsdrop(character varying) TO hdus;
 GRANT ALL ON FUNCTION pgvsdrop(character varying) TO postgres;
 GRANT ALL ON FUNCTION pgvsdrop(character varying) TO PUBLIC;
 GRANT ALL ON FUNCTION pgvsdrop(character varying) TO version;
@@ -1532,12 +1560,13 @@ GRANT ALL ON FUNCTION pgvsdrop(character varying) TO version;
 
 --
 -- TOC entry 3309 (class 0 OID 0)
--- Dependencies: 1319
+-- Dependencies: 1320
 -- Name: pgvsinit(character varying); Type: ACL; Schema: versions; Owner: -
 --
 
 REVOKE ALL ON FUNCTION pgvsinit(character varying) FROM PUBLIC;
-REVOKE ALL ON FUNCTION pgvsinit(character varying) FROM postgres;
+REVOKE ALL ON FUNCTION pgvsinit(character varying) FROM hdus;
+GRANT ALL ON FUNCTION pgvsinit(character varying) TO hdus;
 GRANT ALL ON FUNCTION pgvsinit(character varying) TO postgres;
 GRANT ALL ON FUNCTION pgvsinit(character varying) TO PUBLIC;
 GRANT ALL ON FUNCTION pgvsinit(character varying) TO version;
@@ -1545,12 +1574,13 @@ GRANT ALL ON FUNCTION pgvsinit(character varying) TO version;
 
 --
 -- TOC entry 3310 (class 0 OID 0)
--- Dependencies: 1320
+-- Dependencies: 1323
 -- Name: pgvslogview(character varying); Type: ACL; Schema: versions; Owner: -
 --
 
 REVOKE ALL ON FUNCTION pgvslogview(character varying) FROM PUBLIC;
-REVOKE ALL ON FUNCTION pgvslogview(character varying) FROM postgres;
+REVOKE ALL ON FUNCTION pgvslogview(character varying) FROM hdus;
+GRANT ALL ON FUNCTION pgvslogview(character varying) TO hdus;
 GRANT ALL ON FUNCTION pgvslogview(character varying) TO postgres;
 GRANT ALL ON FUNCTION pgvslogview(character varying) TO PUBLIC;
 GRANT ALL ON FUNCTION pgvslogview(character varying) TO version;
@@ -1558,12 +1588,13 @@ GRANT ALL ON FUNCTION pgvslogview(character varying) TO version;
 
 --
 -- TOC entry 3311 (class 0 OID 0)
--- Dependencies: 1327
+-- Dependencies: 1329
 -- Name: pgvsmerge(character varying, integer, character varying); Type: ACL; Schema: versions; Owner: -
 --
 
 REVOKE ALL ON FUNCTION pgvsmerge("inTable" character varying, "targetGid" integer, "targetProject" character varying) FROM PUBLIC;
-REVOKE ALL ON FUNCTION pgvsmerge("inTable" character varying, "targetGid" integer, "targetProject" character varying) FROM postgres;
+REVOKE ALL ON FUNCTION pgvsmerge("inTable" character varying, "targetGid" integer, "targetProject" character varying) FROM hdus;
+GRANT ALL ON FUNCTION pgvsmerge("inTable" character varying, "targetGid" integer, "targetProject" character varying) TO hdus;
 GRANT ALL ON FUNCTION pgvsmerge("inTable" character varying, "targetGid" integer, "targetProject" character varying) TO postgres;
 GRANT ALL ON FUNCTION pgvsmerge("inTable" character varying, "targetGid" integer, "targetProject" character varying) TO PUBLIC;
 GRANT ALL ON FUNCTION pgvsmerge("inTable" character varying, "targetGid" integer, "targetProject" character varying) TO version;
@@ -1571,12 +1602,13 @@ GRANT ALL ON FUNCTION pgvsmerge("inTable" character varying, "targetGid" integer
 
 --
 -- TOC entry 3312 (class 0 OID 0)
--- Dependencies: 1321
+-- Dependencies: 1324
 -- Name: pgvsrevert(character varying); Type: ACL; Schema: versions; Owner: -
 --
 
 REVOKE ALL ON FUNCTION pgvsrevert(character varying) FROM PUBLIC;
-REVOKE ALL ON FUNCTION pgvsrevert(character varying) FROM postgres;
+REVOKE ALL ON FUNCTION pgvsrevert(character varying) FROM hdus;
+GRANT ALL ON FUNCTION pgvsrevert(character varying) TO hdus;
 GRANT ALL ON FUNCTION pgvsrevert(character varying) TO postgres;
 GRANT ALL ON FUNCTION pgvsrevert(character varying) TO PUBLIC;
 GRANT ALL ON FUNCTION pgvsrevert(character varying) TO version;
@@ -1584,12 +1616,13 @@ GRANT ALL ON FUNCTION pgvsrevert(character varying) TO version;
 
 --
 -- TOC entry 3313 (class 0 OID 0)
--- Dependencies: 1322
+-- Dependencies: 1325
 -- Name: pgvsrevision(); Type: ACL; Schema: versions; Owner: -
 --
 
 REVOKE ALL ON FUNCTION pgvsrevision() FROM PUBLIC;
-REVOKE ALL ON FUNCTION pgvsrevision() FROM postgres;
+REVOKE ALL ON FUNCTION pgvsrevision() FROM hdus;
+GRANT ALL ON FUNCTION pgvsrevision() TO hdus;
 GRANT ALL ON FUNCTION pgvsrevision() TO postgres;
 GRANT ALL ON FUNCTION pgvsrevision() TO PUBLIC;
 GRANT ALL ON FUNCTION pgvsrevision() TO version;
@@ -1597,12 +1630,13 @@ GRANT ALL ON FUNCTION pgvsrevision() TO version;
 
 --
 -- TOC entry 3314 (class 0 OID 0)
--- Dependencies: 1328
+-- Dependencies: 1331
 -- Name: pgvsrollback(character varying, integer); Type: ACL; Schema: versions; Owner: -
 --
 
 REVOKE ALL ON FUNCTION pgvsrollback(character varying, integer) FROM PUBLIC;
-REVOKE ALL ON FUNCTION pgvsrollback(character varying, integer) FROM postgres;
+REVOKE ALL ON FUNCTION pgvsrollback(character varying, integer) FROM hdus;
+GRANT ALL ON FUNCTION pgvsrollback(character varying, integer) TO hdus;
 GRANT ALL ON FUNCTION pgvsrollback(character varying, integer) TO postgres;
 GRANT ALL ON FUNCTION pgvsrollback(character varying, integer) TO PUBLIC;
 GRANT ALL ON FUNCTION pgvsrollback(character varying, integer) TO version;
@@ -1610,12 +1644,13 @@ GRANT ALL ON FUNCTION pgvsrollback(character varying, integer) TO version;
 
 --
 -- TOC entry 3315 (class 0 OID 0)
--- Dependencies: 1323
+-- Dependencies: 1330
 -- Name: pgvsupdatecheck(character varying); Type: ACL; Schema: versions; Owner: -
 --
 
 REVOKE ALL ON FUNCTION pgvsupdatecheck(character varying) FROM PUBLIC;
-REVOKE ALL ON FUNCTION pgvsupdatecheck(character varying) FROM postgres;
+REVOKE ALL ON FUNCTION pgvsupdatecheck(character varying) FROM hdus;
+GRANT ALL ON FUNCTION pgvsupdatecheck(character varying) TO hdus;
 GRANT ALL ON FUNCTION pgvsupdatecheck(character varying) TO postgres;
 GRANT ALL ON FUNCTION pgvsupdatecheck(character varying) TO PUBLIC;
 GRANT ALL ON FUNCTION pgvsupdatecheck(character varying) TO version;
@@ -1623,12 +1658,13 @@ GRANT ALL ON FUNCTION pgvsupdatecheck(character varying) TO version;
 
 --
 -- TOC entry 3316 (class 0 OID 0)
--- Dependencies: 233
+-- Dependencies: 249
 -- Name: version_tables; Type: ACL; Schema: versions; Owner: -
 --
 
 REVOKE ALL ON TABLE version_tables FROM PUBLIC;
-REVOKE ALL ON TABLE version_tables FROM postgres;
+REVOKE ALL ON TABLE version_tables FROM hdus;
+GRANT ALL ON TABLE version_tables TO hdus;
 GRANT ALL ON TABLE version_tables TO postgres;
 GRANT ALL ON TABLE version_tables TO PUBLIC;
 GRANT ALL ON TABLE version_tables TO version;
@@ -1636,12 +1672,13 @@ GRANT ALL ON TABLE version_tables TO version;
 
 --
 -- TOC entry 3317 (class 0 OID 0)
--- Dependencies: 234
+-- Dependencies: 250
 -- Name: version_tables_logmsg; Type: ACL; Schema: versions; Owner: -
 --
 
 REVOKE ALL ON TABLE version_tables_logmsg FROM PUBLIC;
-REVOKE ALL ON TABLE version_tables_logmsg FROM postgres;
+REVOKE ALL ON TABLE version_tables_logmsg FROM hdus;
+GRANT ALL ON TABLE version_tables_logmsg TO hdus;
 GRANT ALL ON TABLE version_tables_logmsg TO postgres;
 GRANT ALL ON TABLE version_tables_logmsg TO PUBLIC;
 GRANT ALL ON TABLE version_tables_logmsg TO version;
@@ -1649,12 +1686,13 @@ GRANT ALL ON TABLE version_tables_logmsg TO version;
 
 --
 -- TOC entry 3319 (class 0 OID 0)
--- Dependencies: 235
+-- Dependencies: 251
 -- Name: version_tables_logmsg_id_seq; Type: ACL; Schema: versions; Owner: -
 --
 
 REVOKE ALL ON SEQUENCE version_tables_logmsg_id_seq FROM PUBLIC;
-REVOKE ALL ON SEQUENCE version_tables_logmsg_id_seq FROM postgres;
+REVOKE ALL ON SEQUENCE version_tables_logmsg_id_seq FROM hdus;
+GRANT ALL ON SEQUENCE version_tables_logmsg_id_seq TO hdus;
 GRANT ALL ON SEQUENCE version_tables_logmsg_id_seq TO postgres;
 GRANT ALL ON SEQUENCE version_tables_logmsg_id_seq TO PUBLIC;
 GRANT ALL ON SEQUENCE version_tables_logmsg_id_seq TO version;
@@ -1662,18 +1700,19 @@ GRANT ALL ON SEQUENCE version_tables_logmsg_id_seq TO version;
 
 --
 -- TOC entry 3321 (class 0 OID 0)
--- Dependencies: 236
+-- Dependencies: 252
 -- Name: version_tables_version_table_id_seq; Type: ACL; Schema: versions; Owner: -
 --
 
 REVOKE ALL ON SEQUENCE version_tables_version_table_id_seq FROM PUBLIC;
-REVOKE ALL ON SEQUENCE version_tables_version_table_id_seq FROM postgres;
+REVOKE ALL ON SEQUENCE version_tables_version_table_id_seq FROM hdus;
+GRANT ALL ON SEQUENCE version_tables_version_table_id_seq TO hdus;
 GRANT ALL ON SEQUENCE version_tables_version_table_id_seq TO postgres;
 GRANT ALL ON SEQUENCE version_tables_version_table_id_seq TO PUBLIC;
 GRANT ALL ON SEQUENCE version_tables_version_table_id_seq TO version;
 
 
--- Completed on 2016-02-09 16:09:53 CET
+-- Completed on 2016-02-09 17:13:56 CET
 
 --
 -- PostgreSQL database dump complete

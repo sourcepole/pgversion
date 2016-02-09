@@ -176,8 +176,9 @@ class PgVersion:
       if not self.tools.versionExists(currentLayer):
         answer = QMessageBox.question(None, '', QCoreApplication.translate('PgVersion','Do you want to create the version environment for the table {0}').format(mySchema+'.'+myTable), QCoreApplication.translate('PgVersion','Yes'), QCoreApplication.translate('PgVersion','No'))
         QApplication.setOverrideCursor(Qt.WaitCursor)
-
-        if answer == 0:
+        sql = "select * from versions.pgvsinit('%s.%s')" % (mySchema,  myTable)
+        result = myDb.runError(sql)
+        if result == ' ':
           QMessageBox. information(None, 'Init', QCoreApplication.translate('PgVersion', 'Init was successful!\n\n\
 Please set the user permissions for table {0} and reload it via Database -> PG Version!').format(myTable))
 
