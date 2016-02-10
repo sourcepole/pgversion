@@ -187,7 +187,7 @@ class PgVersionTools:
       except:
             QMessageBox.information(None, '', \
             QCoreApplication.translate('PgVersionTools',\
-            'pgvs is not installed in your database \n\n Please download the pgvs functions from \n\n {createVersionPath}\n\n and install them as mentioned in help') .format(createVersionPath=self.createVersionPath))
+            'pgvs is not installed in your database. \n\n Please install the pgvs functions from file \n\n {createVersionPath}\n\n as mentioned in help') .format(createVersionPath=self.createVersionPath))
             return True
 
   def createGridView(self, tabView, tabData, headerText, colWidth, rowHeight):
@@ -456,12 +456,6 @@ DB-Update." % (self.createVersionPath))
 #Return: QGsFieldMap
   def getFieldList(self, vlayer):
     fProvider = vlayer.dataProvider()
-
-#    feat = QgsFeature()
-    allAttrs = fProvider.attributeIndexes()
-
-# start data retrieval: all attributes for each feature
-#    fProvider.select(allAttrs, QgsRectangle(), False)
 
 # retrieve every feature with its attributes
     myFields = fProvider.fields().toList()
