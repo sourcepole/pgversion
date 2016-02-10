@@ -423,7 +423,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
         if answer == 0:
 
             QApplication.setOverrideCursor(Qt.WaitCursor)
-            uniqueCol = self.tools.layerUniqueCol(currentLayer)
+            uniqueCol = self.tools.layerKeyCol(currentLayer)
             geomCol = self.tools.layerGeomCol(currentLayer)
             geometryType = self.tools.layerGeometryType(currentLayer)
             mySchema = self.tools.layerSchema(currentLayer)
@@ -506,17 +506,16 @@ where c.log_id = v."+uniqueCol+" and c.systime = v.systime) as foo1) as foo "
         answer = QMessageBox.question(None, '', QCoreApplication.translate('PgVersion','are you sure to to drop pgvs from the table {0}?').format(mySchema+"."+myTable.replace('_version', '')), QCoreApplication.translate('PgVersion','Yes'),  QCoreApplication.translate('PgVersion','No'))
 
         if answer == 0:
-            myDb = self.tools.layerDB('doDrop',theLayer)
-            sql = "select * from versions.pgvsdrop('"+mySchema+"."+myTable.replace('_version', '')+"')"
-            result = myDb.read(sql)
-            myDb.close()
-            QgsMapLayerRegistry.instance().removeMapLayer(theLayer.id())      
-
-
-#      except:
-#          QMessageBox.information(None, QCoreApplication.translate('PgVersion','Error'), QCoreApplication.translate('PgVersion','Please select a versionied layer for dropping'))
-        else:
-            QMessageBox.information(None, '',  'hallo')
+            if self.tools.isModified(theLayer):
+                QMessageBox.warning(None, QCoreApplication.translate('PgVersion','Warning'), \
+                    QCoreApplication.translate('PgVersion','Layer %s has uncommited changes, please commit them or revert to HEAD revision' % (theLayer.name())))
+            else:
+                myDb = self.tools.layerDB('doDrop',theLayer)
+                sql = "select versions.pgvsdrop('"+mySchema+"."+myTable.replace('_version', '')+"')"
+                result = myDb.read(sql)                
+                myDb.close()
+                QgsMapLayerRegistry.instance().removeMapLayer(theLayer.id())      
+                self.iface.messageBar().pushMessage('INFO', QCoreApplication.translate('PgVersion','Versioning for layer {0} dropped!').format(theLayer.name()), level=QgsMessageBar.INFO, duration=3)
 
 
 

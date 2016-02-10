@@ -15,31 +15,7 @@ SET client_min_messages = warning;
 
 SET search_path = versions, pg_catalog;
 
-ALTER TABLE ONLY versions.version_tables_logmsg DROP CONSTRAINT version_tables_fkey;
-DROP INDEX versions.fki_version_tables_fkey;
-ALTER TABLE ONLY versions.version_tables_logmsg DROP CONSTRAINT version_tables_logmsg_pkey;
-ALTER TABLE ONLY versions.version_tables DROP CONSTRAINT version_table_pkey;
-ALTER TABLE versions.version_tables_logmsg ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE versions.version_tables ALTER COLUMN version_table_id DROP DEFAULT;
-DROP SEQUENCE versions.version_tables_version_table_id_seq;
-DROP SEQUENCE versions.version_tables_logmsg_id_seq;
-DROP TABLE versions.version_tables_logmsg;
-DROP TABLE versions.version_tables;
-DROP FUNCTION versions.pgvsupdatecheck(character varying);
-DROP FUNCTION versions.pgvsrollback(character varying, integer);
-DROP FUNCTION versions.pgvsrevision();
-DROP FUNCTION versions.pgvsrevert(character varying);
-DROP FUNCTION versions.pgvsmerge("inTable" character varying, "targetGid" integer, "targetProject" character varying);
-DROP FUNCTION versions.pgvslogview(character varying);
-DROP FUNCTION versions.pgvsinit(character varying);
-DROP FUNCTION versions.pgvsdrop(character varying);
-DROP FUNCTION versions.pgvscommit(character varying, text);
-DROP FUNCTION versions.pgvscheckout(intable character varying, revision bigint);
-DROP FUNCTION versions.pgvscheck(character varying);
-DROP TYPE versions.logview;
-DROP TYPE versions.conflicts;
-DROP TYPE versions.checkout;
-DROP SCHEMA versions;
+DROP SCHEMA versions cascade;
 --
 -- TOC entry 54 (class 2615 OID 171084)
 -- Name: versions; Type: SCHEMA; Schema: -; Owner: -
@@ -1509,8 +1485,6 @@ ALTER TABLE ONLY version_tables_logmsg
 --
 
 REVOKE ALL ON SCHEMA versions FROM PUBLIC;
-REVOKE ALL ON SCHEMA versions FROM hdus;
-GRANT ALL ON SCHEMA versions TO hdus;
 GRANT ALL ON SCHEMA versions TO postgres;
 GRANT ALL ON SCHEMA versions TO PUBLIC;
 GRANT ALL ON SCHEMA versions TO version;
@@ -1523,8 +1497,6 @@ GRANT ALL ON SCHEMA versions TO version;
 --
 
 REVOKE ALL ON FUNCTION pgvscheck(character varying) FROM PUBLIC;
-REVOKE ALL ON FUNCTION pgvscheck(character varying) FROM hdus;
-GRANT ALL ON FUNCTION pgvscheck(character varying) TO hdus;
 GRANT ALL ON FUNCTION pgvscheck(character varying) TO postgres;
 GRANT ALL ON FUNCTION pgvscheck(character varying) TO PUBLIC;
 GRANT ALL ON FUNCTION pgvscheck(character varying) TO version;
@@ -1537,8 +1509,6 @@ GRANT ALL ON FUNCTION pgvscheck(character varying) TO version;
 --
 
 REVOKE ALL ON FUNCTION pgvscommit(character varying, text) FROM PUBLIC;
-REVOKE ALL ON FUNCTION pgvscommit(character varying, text) FROM hdus;
-GRANT ALL ON FUNCTION pgvscommit(character varying, text) TO hdus;
 GRANT ALL ON FUNCTION pgvscommit(character varying, text) TO postgres;
 GRANT ALL ON FUNCTION pgvscommit(character varying, text) TO PUBLIC;
 GRANT ALL ON FUNCTION pgvscommit(character varying, text) TO version;
@@ -1551,8 +1521,6 @@ GRANT ALL ON FUNCTION pgvscommit(character varying, text) TO version;
 --
 
 REVOKE ALL ON FUNCTION pgvsdrop(character varying) FROM PUBLIC;
-REVOKE ALL ON FUNCTION pgvsdrop(character varying) FROM hdus;
-GRANT ALL ON FUNCTION pgvsdrop(character varying) TO hdus;
 GRANT ALL ON FUNCTION pgvsdrop(character varying) TO postgres;
 GRANT ALL ON FUNCTION pgvsdrop(character varying) TO PUBLIC;
 GRANT ALL ON FUNCTION pgvsdrop(character varying) TO version;
@@ -1565,8 +1533,6 @@ GRANT ALL ON FUNCTION pgvsdrop(character varying) TO version;
 --
 
 REVOKE ALL ON FUNCTION pgvsinit(character varying) FROM PUBLIC;
-REVOKE ALL ON FUNCTION pgvsinit(character varying) FROM hdus;
-GRANT ALL ON FUNCTION pgvsinit(character varying) TO hdus;
 GRANT ALL ON FUNCTION pgvsinit(character varying) TO postgres;
 GRANT ALL ON FUNCTION pgvsinit(character varying) TO PUBLIC;
 GRANT ALL ON FUNCTION pgvsinit(character varying) TO version;
@@ -1579,8 +1545,7 @@ GRANT ALL ON FUNCTION pgvsinit(character varying) TO version;
 --
 
 REVOKE ALL ON FUNCTION pgvslogview(character varying) FROM PUBLIC;
-REVOKE ALL ON FUNCTION pgvslogview(character varying) FROM hdus;
-GRANT ALL ON FUNCTION pgvslogview(character varying) TO hdus;
+
 GRANT ALL ON FUNCTION pgvslogview(character varying) TO postgres;
 GRANT ALL ON FUNCTION pgvslogview(character varying) TO PUBLIC;
 GRANT ALL ON FUNCTION pgvslogview(character varying) TO version;
@@ -1593,8 +1558,6 @@ GRANT ALL ON FUNCTION pgvslogview(character varying) TO version;
 --
 
 REVOKE ALL ON FUNCTION pgvsmerge("inTable" character varying, "targetGid" integer, "targetProject" character varying) FROM PUBLIC;
-REVOKE ALL ON FUNCTION pgvsmerge("inTable" character varying, "targetGid" integer, "targetProject" character varying) FROM hdus;
-GRANT ALL ON FUNCTION pgvsmerge("inTable" character varying, "targetGid" integer, "targetProject" character varying) TO hdus;
 GRANT ALL ON FUNCTION pgvsmerge("inTable" character varying, "targetGid" integer, "targetProject" character varying) TO postgres;
 GRANT ALL ON FUNCTION pgvsmerge("inTable" character varying, "targetGid" integer, "targetProject" character varying) TO PUBLIC;
 GRANT ALL ON FUNCTION pgvsmerge("inTable" character varying, "targetGid" integer, "targetProject" character varying) TO version;
@@ -1607,8 +1570,6 @@ GRANT ALL ON FUNCTION pgvsmerge("inTable" character varying, "targetGid" integer
 --
 
 REVOKE ALL ON FUNCTION pgvsrevert(character varying) FROM PUBLIC;
-REVOKE ALL ON FUNCTION pgvsrevert(character varying) FROM hdus;
-GRANT ALL ON FUNCTION pgvsrevert(character varying) TO hdus;
 GRANT ALL ON FUNCTION pgvsrevert(character varying) TO postgres;
 GRANT ALL ON FUNCTION pgvsrevert(character varying) TO PUBLIC;
 GRANT ALL ON FUNCTION pgvsrevert(character varying) TO version;
@@ -1621,8 +1582,6 @@ GRANT ALL ON FUNCTION pgvsrevert(character varying) TO version;
 --
 
 REVOKE ALL ON FUNCTION pgvsrevision() FROM PUBLIC;
-REVOKE ALL ON FUNCTION pgvsrevision() FROM hdus;
-GRANT ALL ON FUNCTION pgvsrevision() TO hdus;
 GRANT ALL ON FUNCTION pgvsrevision() TO postgres;
 GRANT ALL ON FUNCTION pgvsrevision() TO PUBLIC;
 GRANT ALL ON FUNCTION pgvsrevision() TO version;
@@ -1635,8 +1594,6 @@ GRANT ALL ON FUNCTION pgvsrevision() TO version;
 --
 
 REVOKE ALL ON FUNCTION pgvsrollback(character varying, integer) FROM PUBLIC;
-REVOKE ALL ON FUNCTION pgvsrollback(character varying, integer) FROM hdus;
-GRANT ALL ON FUNCTION pgvsrollback(character varying, integer) TO hdus;
 GRANT ALL ON FUNCTION pgvsrollback(character varying, integer) TO postgres;
 GRANT ALL ON FUNCTION pgvsrollback(character varying, integer) TO PUBLIC;
 GRANT ALL ON FUNCTION pgvsrollback(character varying, integer) TO version;
@@ -1649,8 +1606,6 @@ GRANT ALL ON FUNCTION pgvsrollback(character varying, integer) TO version;
 --
 
 REVOKE ALL ON FUNCTION pgvsupdatecheck(character varying) FROM PUBLIC;
-REVOKE ALL ON FUNCTION pgvsupdatecheck(character varying) FROM hdus;
-GRANT ALL ON FUNCTION pgvsupdatecheck(character varying) TO hdus;
 GRANT ALL ON FUNCTION pgvsupdatecheck(character varying) TO postgres;
 GRANT ALL ON FUNCTION pgvsupdatecheck(character varying) TO PUBLIC;
 GRANT ALL ON FUNCTION pgvsupdatecheck(character varying) TO version;
@@ -1663,8 +1618,6 @@ GRANT ALL ON FUNCTION pgvsupdatecheck(character varying) TO version;
 --
 
 REVOKE ALL ON TABLE version_tables FROM PUBLIC;
-REVOKE ALL ON TABLE version_tables FROM hdus;
-GRANT ALL ON TABLE version_tables TO hdus;
 GRANT ALL ON TABLE version_tables TO postgres;
 GRANT ALL ON TABLE version_tables TO PUBLIC;
 GRANT ALL ON TABLE version_tables TO version;
@@ -1677,8 +1630,6 @@ GRANT ALL ON TABLE version_tables TO version;
 --
 
 REVOKE ALL ON TABLE version_tables_logmsg FROM PUBLIC;
-REVOKE ALL ON TABLE version_tables_logmsg FROM hdus;
-GRANT ALL ON TABLE version_tables_logmsg TO hdus;
 GRANT ALL ON TABLE version_tables_logmsg TO postgres;
 GRANT ALL ON TABLE version_tables_logmsg TO PUBLIC;
 GRANT ALL ON TABLE version_tables_logmsg TO version;
@@ -1691,8 +1642,6 @@ GRANT ALL ON TABLE version_tables_logmsg TO version;
 --
 
 REVOKE ALL ON SEQUENCE version_tables_logmsg_id_seq FROM PUBLIC;
-REVOKE ALL ON SEQUENCE version_tables_logmsg_id_seq FROM hdus;
-GRANT ALL ON SEQUENCE version_tables_logmsg_id_seq TO hdus;
 GRANT ALL ON SEQUENCE version_tables_logmsg_id_seq TO postgres;
 GRANT ALL ON SEQUENCE version_tables_logmsg_id_seq TO PUBLIC;
 GRANT ALL ON SEQUENCE version_tables_logmsg_id_seq TO version;
@@ -1705,8 +1654,6 @@ GRANT ALL ON SEQUENCE version_tables_logmsg_id_seq TO version;
 --
 
 REVOKE ALL ON SEQUENCE version_tables_version_table_id_seq FROM PUBLIC;
-REVOKE ALL ON SEQUENCE version_tables_version_table_id_seq FROM hdus;
-GRANT ALL ON SEQUENCE version_tables_version_table_id_seq TO hdus;
 GRANT ALL ON SEQUENCE version_tables_version_table_id_seq TO postgres;
 GRANT ALL ON SEQUENCE version_tables_version_table_id_seq TO PUBLIC;
 GRANT ALL ON SEQUENCE version_tables_version_table_id_seq TO version;

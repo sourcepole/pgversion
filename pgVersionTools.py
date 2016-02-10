@@ -476,8 +476,11 @@ If you have appropriate DB permissions you can update the DB directly with click
       
   def layerTable(self,  layer):  
       return QgsDataSourceURI(self.layerUri(layer)).table()
+      
+  def layerName(self,  layer):  
+      return QgsDataSourceURI(layer.name())
 
-  def layerUniqueCol(self,  layer):
+  def layerKeyCol(self,  layer):
       return QgsDataSourceURI(self.layerUri(layer)).keyColumn()
       
   def layerUri(self,  layer):
