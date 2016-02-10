@@ -525,11 +525,6 @@ where c.log_id = v.{uniqueCol} and c.systime = v.systime) as foo1) as foo ").for
       pass  
 
 
-
-  def doMessage(self):
-      QMessageBox.information(None, '', 'Hallo')    
-
-
   def doAbout(self):
       self.about = DlgAbout(self.plugin_dir)
       self.about.show()
