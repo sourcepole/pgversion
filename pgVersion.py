@@ -436,31 +436,29 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
             cols = myDb.cols(sql)
             myCols = ', '.join(cols)
 
-            sql = "select row_number() OVER () AS rownum, * \
+            sql = ("select row_number() OVER () AS rownum, * \
 from (select *, 'delete'::varchar as action, head.head as revision \
-from (select max(revision) as head from versions."+mySchema+"_"+myTable+"_log) as head, \
-( \
-(select v."+myCols+" \
-from versions.pgvscheckout('"+mySchema+"."+myTable.replace('_version', '')+"', (select max(revision) as head from versions."+mySchema+"_"+myTable+"_log)) as c,  \
-     versions."+mySchema+"_"+myTable+"_log as v \
-where c.log_id = v."+uniqueCol+"  \
-  and c.systime = v.systime \
+from (select max(revision) as head from versions.{schema}_{table}_log) as head, \
+((select v.{cols} \
+from versions.pgvscheckout('{schema}.{origin}', (select max(revision) as head from versions.{schema}_{table}_log)) as c,  \
+versions.{schema}_{table}_log as v \
+where c.log_id = v.{uniqueCol}  \
+and c.systime = v.systime \
 except \
-select v."+myCols+"  \
-from "+mySchema+"."+myTable+" as v)) as foo \
+select v.{cols}  \
+from {schema}.{table} as v)) as foo \
 union \
 select *, 'insert'::varchar as action, head.head as revision \
-from (select max(revision) as head from versions."+mySchema+"_"+myTable+"_log) as head, \
-(\
-select v."+myCols+" \
-from "+mySchema+"."+myTable+" as v \
+from (select max(revision) as head from versions.{schema}_{table}_log) as head, \
+(select v.{cols} \
+from {schema}.{table} as v \
 except \
-select v."+myCols+" \
-from versions.pgvscheckout('"+mySchema+"."+myTable.replace('_version', '')+"', (select max(revision) as head from versions."+mySchema+"_"+myTable+"_log)) as c, \
-     versions."+mySchema+"_"+myTable+"_log as v \
-where c.log_id = v."+uniqueCol+" and c.systime = v.systime) as foo1) as foo "
+select v.{cols} \
+from versions.pgvscheckout('{schema}.{origin}', (select max(revision) as head from versions.{schema}_{table}_log)) as c, \
+versions.{schema}_{table}_log as v \
+where c.log_id = v.{uniqueCol} and c.systime = v.systime) as foo1) as foo ").format(schema = mySchema,  table=myTable,  origin=myTable.replace('_version', ''), cols = myCols,  uniqueCol = uniqueCol )
 
-#            QMessageBox.information(None, '',  sql)
+            QMessageBox.information(None, '',  sql)
             myUri = QgsDataSourceURI(self.tools.layerUri(currentLayer))
             myUri.setDataSource("", u"(%s\n)" % sql, geomCol, "", "rownum")
 
