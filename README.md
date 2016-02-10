@@ -10,7 +10,7 @@
 <BODY>
 
 <DIV CLASS="header" ID="header">
-<H1>PostGIS Versioning - pgVersion 2.0</H1>
+<H1>PostGIS Versioning - pgVersion 2.1</H1>
 <H3>Dr. Horst Duester, 2015, horst.duester@sourcepole.ch</H3>
 </DIV>
 
@@ -59,7 +59,7 @@
 <H1>2. TODO</H1>
 
 <UL>
-<LI>Version Diffs
+<LI><strike>Version Diffs</strike>
 <LI>Tagged versions
 <LI>Branches 
 <LI>Merging of branches
