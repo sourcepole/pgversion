@@ -15,7 +15,7 @@ SET client_min_messages = warning;
 
 SET search_path = versions, pg_catalog;
 
-DROP SCHEMA versions cascade;
+DROP SCHEMA if exists versions cascade;
 --
 -- TOC entry 54 (class 2615 OID 171084)
 -- Name: versions; Type: SCHEMA; Schema: -; Owner: -
@@ -776,7 +776,7 @@ CREATE FUNCTION pgvsinit(character varying) RETURNS boolean
              alter table '||versionLogTable||' add constraint '||myTable||'_pkey primary key ('||myPkey||',project,systime,action);
 
              CREATE INDEX '||mySchema||'_'||myTable||'_version_log_id_idx ON '||versionLogTable||' USING btree (version_log_id);
-             
+             CREATE INDEX '||mySchema||'_'||myTable||'_version_'||trim(both '"' from myPkey)||'_idx ON '||versionLogTable||' USING btree ('||myPkey||');
              create index '||myTable||'_version_geo_idx on '||versionLogTable||' USING GIST ('||geomCol||');     
              insert into versions.version_tables (version_table_schema,version_table_name,version_view_schema,version_view_name,version_view_pkey,version_view_geometry_column) 
                  values('''||mySchema||''','''||myTable||''','''||mySchema||''','''||myTable||'_version'','''||testPKey.column_name||''','''||geomCol||''');
@@ -870,10 +870,6 @@ CREATE FUNCTION pgvsinit(character varying) RETURNS boolean
                 version_table_id, revision, logmsg) 
               SELECT version_table_id, 0 as revision, ''initial commit revision 0'' as logmsg FROM versions.version_tables where version_table_schema = '''||mySchema||''' and version_table_name = '''|| myTable||''''; 
 
-    execute 'GRANT ALL ON TABLE '||versionLogTable||' TO version';
-    execute 'GRANT ALL ON TABLE '||versionLogTableSeq||' TO version';
-    execute 'GRANT ALL ON TABLE '||versionView||' TO version';
-    execute 'GRANT ALL ON sequence versions."'||mySchema||'_'||myTable||'_revision_seq" to version'; 
     
                 
   RETURN true ;                             
@@ -1477,191 +1473,4 @@ CREATE INDEX fki_version_tables_fkey ON version_tables_logmsg USING btree (versi
 ALTER TABLE ONLY version_tables_logmsg
     ADD CONSTRAINT version_tables_fkey FOREIGN KEY (version_table_id) REFERENCES version_tables(version_table_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
-
---
--- TOC entry 3305 (class 0 OID 0)
--- Dependencies: 54
--- Name: versions; Type: ACL; Schema: -; Owner: -
---
-
-REVOKE ALL ON SCHEMA versions FROM PUBLIC;
-GRANT ALL ON SCHEMA versions TO postgres;
-GRANT ALL ON SCHEMA versions TO PUBLIC;
-GRANT ALL ON SCHEMA versions TO version;
-
-
---
--- TOC entry 3306 (class 0 OID 0)
--- Dependencies: 1326
--- Name: pgvscheck(character varying); Type: ACL; Schema: versions; Owner: -
---
-
-REVOKE ALL ON FUNCTION pgvscheck(character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION pgvscheck(character varying) TO postgres;
-GRANT ALL ON FUNCTION pgvscheck(character varying) TO PUBLIC;
-GRANT ALL ON FUNCTION pgvscheck(character varying) TO version;
-
-
---
--- TOC entry 3307 (class 0 OID 0)
--- Dependencies: 1328
--- Name: pgvscommit(character varying, text); Type: ACL; Schema: versions; Owner: -
---
-
-REVOKE ALL ON FUNCTION pgvscommit(character varying, text) FROM PUBLIC;
-GRANT ALL ON FUNCTION pgvscommit(character varying, text) TO postgres;
-GRANT ALL ON FUNCTION pgvscommit(character varying, text) TO PUBLIC;
-GRANT ALL ON FUNCTION pgvscommit(character varying, text) TO version;
-
-
---
--- TOC entry 3308 (class 0 OID 0)
--- Dependencies: 1319
--- Name: pgvsdrop(character varying); Type: ACL; Schema: versions; Owner: -
---
-
-REVOKE ALL ON FUNCTION pgvsdrop(character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION pgvsdrop(character varying) TO postgres;
-GRANT ALL ON FUNCTION pgvsdrop(character varying) TO PUBLIC;
-GRANT ALL ON FUNCTION pgvsdrop(character varying) TO version;
-
-
---
--- TOC entry 3309 (class 0 OID 0)
--- Dependencies: 1320
--- Name: pgvsinit(character varying); Type: ACL; Schema: versions; Owner: -
---
-
-REVOKE ALL ON FUNCTION pgvsinit(character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION pgvsinit(character varying) TO postgres;
-GRANT ALL ON FUNCTION pgvsinit(character varying) TO PUBLIC;
-GRANT ALL ON FUNCTION pgvsinit(character varying) TO version;
-
-
---
--- TOC entry 3310 (class 0 OID 0)
--- Dependencies: 1323
--- Name: pgvslogview(character varying); Type: ACL; Schema: versions; Owner: -
---
-
-REVOKE ALL ON FUNCTION pgvslogview(character varying) FROM PUBLIC;
-
-GRANT ALL ON FUNCTION pgvslogview(character varying) TO postgres;
-GRANT ALL ON FUNCTION pgvslogview(character varying) TO PUBLIC;
-GRANT ALL ON FUNCTION pgvslogview(character varying) TO version;
-
-
---
--- TOC entry 3311 (class 0 OID 0)
--- Dependencies: 1329
--- Name: pgvsmerge(character varying, integer, character varying); Type: ACL; Schema: versions; Owner: -
---
-
-REVOKE ALL ON FUNCTION pgvsmerge("inTable" character varying, "targetGid" integer, "targetProject" character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION pgvsmerge("inTable" character varying, "targetGid" integer, "targetProject" character varying) TO postgres;
-GRANT ALL ON FUNCTION pgvsmerge("inTable" character varying, "targetGid" integer, "targetProject" character varying) TO PUBLIC;
-GRANT ALL ON FUNCTION pgvsmerge("inTable" character varying, "targetGid" integer, "targetProject" character varying) TO version;
-
-
---
--- TOC entry 3312 (class 0 OID 0)
--- Dependencies: 1324
--- Name: pgvsrevert(character varying); Type: ACL; Schema: versions; Owner: -
---
-
-REVOKE ALL ON FUNCTION pgvsrevert(character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION pgvsrevert(character varying) TO postgres;
-GRANT ALL ON FUNCTION pgvsrevert(character varying) TO PUBLIC;
-GRANT ALL ON FUNCTION pgvsrevert(character varying) TO version;
-
-
---
--- TOC entry 3313 (class 0 OID 0)
--- Dependencies: 1325
--- Name: pgvsrevision(); Type: ACL; Schema: versions; Owner: -
---
-
-REVOKE ALL ON FUNCTION pgvsrevision() FROM PUBLIC;
-GRANT ALL ON FUNCTION pgvsrevision() TO postgres;
-GRANT ALL ON FUNCTION pgvsrevision() TO PUBLIC;
-GRANT ALL ON FUNCTION pgvsrevision() TO version;
-
-
---
--- TOC entry 3314 (class 0 OID 0)
--- Dependencies: 1331
--- Name: pgvsrollback(character varying, integer); Type: ACL; Schema: versions; Owner: -
---
-
-REVOKE ALL ON FUNCTION pgvsrollback(character varying, integer) FROM PUBLIC;
-GRANT ALL ON FUNCTION pgvsrollback(character varying, integer) TO postgres;
-GRANT ALL ON FUNCTION pgvsrollback(character varying, integer) TO PUBLIC;
-GRANT ALL ON FUNCTION pgvsrollback(character varying, integer) TO version;
-
-
---
--- TOC entry 3315 (class 0 OID 0)
--- Dependencies: 1330
--- Name: pgvsupdatecheck(character varying); Type: ACL; Schema: versions; Owner: -
---
-
-REVOKE ALL ON FUNCTION pgvsupdatecheck(character varying) FROM PUBLIC;
-GRANT ALL ON FUNCTION pgvsupdatecheck(character varying) TO postgres;
-GRANT ALL ON FUNCTION pgvsupdatecheck(character varying) TO PUBLIC;
-GRANT ALL ON FUNCTION pgvsupdatecheck(character varying) TO version;
-
-
---
--- TOC entry 3316 (class 0 OID 0)
--- Dependencies: 249
--- Name: version_tables; Type: ACL; Schema: versions; Owner: -
---
-
-REVOKE ALL ON TABLE version_tables FROM PUBLIC;
-GRANT ALL ON TABLE version_tables TO postgres;
-GRANT ALL ON TABLE version_tables TO PUBLIC;
-GRANT ALL ON TABLE version_tables TO version;
-
-
---
--- TOC entry 3317 (class 0 OID 0)
--- Dependencies: 250
--- Name: version_tables_logmsg; Type: ACL; Schema: versions; Owner: -
---
-
-REVOKE ALL ON TABLE version_tables_logmsg FROM PUBLIC;
-GRANT ALL ON TABLE version_tables_logmsg TO postgres;
-GRANT ALL ON TABLE version_tables_logmsg TO PUBLIC;
-GRANT ALL ON TABLE version_tables_logmsg TO version;
-
-
---
--- TOC entry 3319 (class 0 OID 0)
--- Dependencies: 251
--- Name: version_tables_logmsg_id_seq; Type: ACL; Schema: versions; Owner: -
---
-
-REVOKE ALL ON SEQUENCE version_tables_logmsg_id_seq FROM PUBLIC;
-GRANT ALL ON SEQUENCE version_tables_logmsg_id_seq TO postgres;
-GRANT ALL ON SEQUENCE version_tables_logmsg_id_seq TO PUBLIC;
-GRANT ALL ON SEQUENCE version_tables_logmsg_id_seq TO version;
-
-
---
--- TOC entry 3321 (class 0 OID 0)
--- Dependencies: 252
--- Name: version_tables_version_table_id_seq; Type: ACL; Schema: versions; Owner: -
---
-
-REVOKE ALL ON SEQUENCE version_tables_version_table_id_seq FROM PUBLIC;
-GRANT ALL ON SEQUENCE version_tables_version_table_id_seq TO postgres;
-GRANT ALL ON SEQUENCE version_tables_version_table_id_seq TO PUBLIC;
-GRANT ALL ON SEQUENCE version_tables_version_table_id_seq TO version;
-
-
--- Completed on 2016-02-09 17:13:56 CET
-
---
--- PostgreSQL database dump complete
---
 
