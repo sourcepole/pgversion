@@ -458,7 +458,6 @@ from versions.pgvscheckout('{schema}.{origin}', (select max(revision) as head fr
 versions.{schema}_{table}_log as v \
 where c.log_id = v.{uniqueCol} and c.systime = v.systime) as foo1) as foo ").format(schema = mySchema,  table=myTable,  origin=myTable.replace('_version', ''), cols = myCols,  uniqueCol = uniqueCol )
 
-#            QMessageBox.information(None, '',  sql)
             myUri = QgsDataSourceURI(self.tools.layerUri(currentLayer))
             myUri.setDataSource("", u"(%s\n)" % sql, geomCol, "", "rownum")
 
