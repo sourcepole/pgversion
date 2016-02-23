@@ -436,10 +436,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
             sql = u"select * from %s.%s limit 0"  % (mySchema,  myTable)
             cols = myDb.cols(sql)
             myCols = ', '.join(cols)+', st_asewkb("'+geomCol+'")'
-#            myCols = string.replace(', '.join(cols),'"'+geomCol+'"',  'st_astext("'+geomCol+'")')
-#            QMessageBox.information(None, '',  myCols)
             
-
             sql = ("select row_number() OVER () AS rownum, * \
 from (select *, 'delete'::varchar as action, head.head as revision \
 from (select max(revision) as head from versions.{schema}_{table}_log) as head, \
