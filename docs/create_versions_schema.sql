@@ -838,7 +838,7 @@ CREATE FUNCTION pgvsinit(character varying) RETURNS boolean
                        GROUP BY v_2.'||myPkey||') foo_1
                     WHERE v_1.version_log_id = foo_1.version_log_id) foo
                 WHERE v.'||myPkey||' = foo.'||myPkey||'
-                UNION
+                UNION ALL
                 SELECT v.'||myPkey||','||fields||'
                 FROM '||versionLogTable||' v,
                  ( SELECT v_1.'||myPkey||',
@@ -1276,7 +1276,7 @@ rollbackQry := 'insert into '||versionLogTable||' ('||myInsertFields||', action)
                group by v.'||myPkey||') as foo
               where v.version_log_id = foo.version_log_id
 
-              union
+              UNION ALL
 
                 select '||fields||', v.action 
                 from '||versionLogTable||' as v, 
