@@ -419,7 +419,8 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
         QMessageBox.information(None, '', QCoreApplication.translate('PgVersion','Please select a versioned layer'))
         return    
       else:
-        answer = QMessageBox.question(None, '', QCoreApplication.translate('PgVersion','Are you sure to checkout diffs to HEAD revision?'), QCoreApplication.translate('PgVersion','Yes'),  QCoreApplication.translate('PgVersion','No'))
+#        answer = QMessageBox.question(None, '', QCoreApplication.translate('PgVersion','Are you sure to checkout diffs to HEAD revision?'), QCoreApplication.translate('PgVersion','Yes'),  QCoreApplication.translate('PgVersion','No'))
+        answer = 0
         if answer == 0:
 
             QApplication.setOverrideCursor(Qt.WaitCursor)
@@ -434,7 +435,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
 
             sql = u"select * from %s.%s limit 0"  % (mySchema,  myTable)
             cols = myDb.cols(sql)
-            myCols = ', '.join(cols)+', st_astext("'+geomCol+'")'
+            myCols = ', '.join(cols)+', st_asewkb("'+geomCol+'")'
 #            myCols = string.replace(', '.join(cols),'"'+geomCol+'"',  'st_astext("'+geomCol+'")')
 #            QMessageBox.information(None, '',  myCols)
             
@@ -450,7 +451,7 @@ and c.systime = v.systime \
 except \
 select v.{cols}  \
 from {schema}.{table} as v)) as foo \
-union \
+union all \
 select *, 'insert'::varchar as action, head.head as revision \
 from (select max(revision) as head from versions.{schema}_{table}_log) as head, \
 (select v.{cols} \
