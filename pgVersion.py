@@ -29,7 +29,7 @@ from forms.Ui_diff import DiffDlg
 from pgVersionConflictWindow import ConflictWindow
 
 # Initialize Qt resources from file resources.py
-import resources_rc,  traceback
+import resources_rc,  traceback,  string
 # Import the code for the dialog
 
 from forms.Ui_pgLoadVersion import PgVersionLoadDialog
@@ -434,7 +434,10 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
 
             sql = u"select * from %s.%s limit 0"  % (mySchema,  myTable)
             cols = myDb.cols(sql)
-            myCols = ', '.join(cols)
+            myCols = ', '.join(cols)+', st_astext("'+geomCol+'")'
+#            myCols = string.replace(', '.join(cols),'"'+geomCol+'"',  'st_astext("'+geomCol+'")')
+#            QMessageBox.information(None, '',  myCols)
+            
 
             sql = ("select row_number() OVER () AS rownum, * \
 from (select *, 'delete'::varchar as action, head.head as revision \
@@ -458,6 +461,7 @@ from versions.pgvscheckout('{schema}.{origin}', (select max(revision) as head fr
 versions.{schema}_{table}_log as v \
 where c.log_id = v.{uniqueCol} and c.systime = v.systime) as foo1) as foo ").format(schema = mySchema,  table=myTable,  origin=myTable.replace('_version', ''), cols = myCols,  uniqueCol = uniqueCol )
 
+#            QMessageBox.information(None, '', sql)
             myUri = QgsDataSourceURI(self.tools.layerUri(currentLayer))
             myUri.setDataSource("", u"(%s\n)" % sql, geomCol, "", "rownum")
 
