@@ -83,14 +83,14 @@ You have to install Qt4SQL  and the Qt4SQL PostgreSQL driver with:
 
 <P>
 Versioning of Postgis-Layers will become essential, when more than one person edits the same layer concurrently. To manage concurrencing editing of a single Postgis Layer the pgVersion management system supports your work. The idea is to create a versioning system for editing PostGIS-Layers similar to source code versioning systems like CVS or Subversion.
-A <A HREF="tutorial">http://www.portailsig.org/content/pgversion-le-plugin-de-versionnement-pour-postgis-qgis french</A> was created by Nicolas Rochard. 
+A <A HREF="http://www.portailsig.org/content/pgversion-le-plugin-de-versionnement-pour-postgis-qgis">french tutorial</A> was created by Nicolas Rochard. 
 </P>
 
 <A NAME="toc6"></A>
 <H1>5. Download:</H1>
 
 <P>
-Download the createFunctions.sql from <A HREF="https://github.com/sourcepole/pgversion/blob/master/docs/extension/pgversion--2.0.0.sql">https://github.com/sourcepole/pgversion/blob/master/docs/extension/pgversion--2.0.0.sql</A>
+Download <A HREF="https://github.com/sourcepole/pgversion/blob/master/docs/extension/pgversion--2.0.0.sql">createFunctions.sql</A>
 </P>
 
 <A NAME="toc7"></A>
