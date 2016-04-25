@@ -3,7 +3,7 @@
 CAUTION: Do not modify this file unless you know what you are doing.
          Unexpected results may occur if the code is changed deliberately.
 -->
-<dbmodel pgmodeler-ver="0.8.1-alpha" last-position="0,0" last-zoom="1"
+<dbmodel pgmodeler-ver="0.8.2-beta" last-position="0,0" last-zoom="1"
 	 default-schema="public" default-owner="postgres">
 <role name="hdus"
       superuser="true"
@@ -94,9 +94,9 @@ CAUTION: Do not modify this file unless you know what you are doing.
 		row-amount="1000">
 	<schema name="versions"/>
 	<role name="hdus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
-	<type name="versions.conflicts"/>
+	<type name="versions.conflicts" precision="32616"/>
 	</return-type>
 	<parameter name="_param1">
 		<type name="character varying"/>
@@ -207,9 +207,9 @@ with a listing of the conflicting objects.
 		row-amount="1000">
 	<schema name="versions"/>
 	<role name="hdus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
-	<type name="versions.conflicts"/>
+	<type name="versions.conflicts" precision="0"/>
 	</return-type>
 	<parameter name="_param1">
 		<type name="character varying"/>
@@ -422,7 +422,7 @@ with a listing of the conflicting objects.
 		row-amount="1000">
 	<schema name="versions"/>
 	<role name="hdus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
 	<type name="record"/>
 	</return-type>
@@ -551,7 +551,7 @@ RAISE EXCEPTION '%', diffQry;
 		row-amount="0">
 	<schema name="versions"/>
 	<role name="hdus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
 	<type name="boolean"/>
 	</return-type>
@@ -696,7 +696,7 @@ RAISE EXCEPTION '%', diffQry;
 		row-amount="0">
 	<schema name="versions"/>
 	<role name="hdus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
 	<type name="boolean"/>
 	</return-type>
@@ -985,9 +985,9 @@ RAISE EXCEPTION '%', diffQry;
 		row-amount="1000">
 	<schema name="versions"/>
 	<role name="hdus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
-	<type name="versions.logview"/>
+	<type name="versions.logview" precision="0"/>
 	</return-type>
 	<parameter name="_param1">
 		<type name="character varying"/>
@@ -1047,7 +1047,7 @@ RAISE EXCEPTION '%', diffQry;
 		row-amount="0">
 	<schema name="versions"/>
 	<role name="hdus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
 	<type name="boolean"/>
 	</return-type>
@@ -1158,7 +1158,7 @@ myDebug := 'select a.'||myPkey||' as objectkey, b.systime, b.project as myuser
 		row-amount="0">
 	<schema name="versions"/>
 	<role name="hdus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
 	<type name="integer"/>
 	</return-type>
@@ -1248,7 +1248,7 @@ myDebug := 'select a.'||myPkey||' as objectkey, b.systime, b.project as myuser
 		row-amount="0">
 	<schema name="versions"/>
 	<role name="hdus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
 	<type name="text"/>
 	</return-type>
@@ -1273,7 +1273,7 @@ DECLARE
 		row-amount="0">
 	<schema name="versions"/>
 	<role name="hdus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
 	<type name="boolean"/>
 	</return-type>
@@ -1422,7 +1422,7 @@ rollbackQry := 'insert into '||versionLogTable||' ('||myInsertFields||', action)
 		row-amount="0">
 	<schema name="versions"/>
 	<role name="hdus"/>
-	<language name="plpgsql" protected="true" sql-disabled="true"/>
+	<language name="plpgsql" sql-disabled="true"/>
 	<return-type>
 	<type name="boolean"/>
 	</return-type>
@@ -1568,6 +1568,27 @@ DECLARE
 		<position x="-33.771" y="3.78934"/>
 	</label>
 </relationship>
+
+<table name="version_tags">
+	<schema name="versions"/>
+	<role name="postgres"/>
+	<position x="225.219" y="249.2"/>
+	<column name="tags_id">
+		<type name="bigserial"/>
+	</column>
+	<column name="tag_text">
+		<type name="varchar"/>
+	</column>
+</table>
+
+<relationship name="version_tables_has_many_version_tags" type="rel1n"
+	 src-col-pattern="{sc}"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_fk"
+	 custom-color="#bbb825"
+	 src-table="versions.version_tables"
+	 dst-table="versions.version_tags"
+	 src-required="false" dst-required="false"/>
 
 <constraint name="version_tables_fkey" type="fk-constr" comparison-type="MATCH SIMPLE"
 	 upd-action="CASCADE" del-action="CASCADE" ref-table="versions.version_tables" table="versions.version_tables_logmsg">

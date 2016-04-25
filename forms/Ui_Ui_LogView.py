@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/home/hdus/dev/qgis/pgversion-plugin/pgversion/forms/Ui_LogView.ui'
 #
-# Created: Mon Feb  8 13:28:04 2016
+# Created: Mon Feb 29 17:00:53 2016
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -27,7 +27,7 @@ class Ui_LogView(object):
     def setupUi(self, LogView):
         LogView.setObjectName(_fromUtf8("LogView"))
         LogView.setWindowModality(QtCore.Qt.ApplicationModal)
-        LogView.resize(722, 582)
+        LogView.resize(722, 562)
         self.gridLayout = QtGui.QGridLayout(LogView)
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
         self.treeWidget = QtGui.QTreeWidget(LogView)
@@ -58,6 +58,10 @@ class Ui_LogView(object):
         self.btnClose.setStandardButtons(QtGui.QDialogButtonBox.Close)
         self.btnClose.setObjectName(_fromUtf8("btnClose"))
         self.gridLayout.addWidget(self.btnClose, 7, 3, 1, 1)
+        self.cmbTags = QtGui.QComboBox(LogView)
+        self.cmbTags.setObjectName(_fromUtf8("cmbTags"))
+        self.cmbTags.addItem(_fromUtf8(""))
+        self.gridLayout.addWidget(self.cmbTags, 7, 2, 1, 1)
 
         self.retranslateUi(LogView)
         QtCore.QMetaObject.connectSlotsByName(LogView)
@@ -71,6 +75,7 @@ class Ui_LogView(object):
         self.btnRollback.setText(_translate("LogView", "rollback to selected revision", None))
         self.btnDiff.setText(_translate("LogView", "diff to HEAD revision", None))
         self.btnCheckout.setText(_translate("LogView", "checkout selected revision", None))
+        self.cmbTags.setItemText(0, _translate("LogView", "-- checkout Tag --", None))
 
 
 if __name__ == "__main__":

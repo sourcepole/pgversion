@@ -79,7 +79,7 @@ class PgVersion:
   def initGui(self):  
 
     self.helpDialog = HelpDialog()
-    self.LogViewDialog = LogView()
+    self.LogViewDialog = LogView(self.iface)
 
     self.toolBar = self.iface.addToolBar("PG Version")
     self.toolBar.setObjectName("PG Version")

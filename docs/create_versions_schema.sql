@@ -67,15 +67,14 @@ CREATE TYPE logview AS (
 	logmsg text
 );
 
-
 --
 -- TOC entry 1326 (class 1255 OID 171094)
 -- Name: pgvscheck(character varying); Type: FUNCTION; Schema: versions; Owner: -
 --
 
-CREATE FUNCTION pgvscheck(character varying) RETURNS SETOF conflicts
-    LANGUAGE plpgsql
-    AS $_$
+CREATE OR REPLACE FUNCTION versions.pgvscheck(character varying)
+  RETURNS SETOF versions.conflicts AS
+$$
 
   DECLARE
     inTable ALIAS FOR $1;
@@ -131,29 +130,33 @@ with a listing of the conflicting objects.
 
     message := '';                                  
        
-    myDebug := 'select a.'||myPkey||' as objectkey, 
+    myDebug := 'with 
+                  foo as (select '||myPkey||', max(systime) as systime, max(version_log_id)
+                          from '||versionLogTable||'
+                          where commit
+                            and project <> current_user
+                          group by '||myPkey||'),
+                                           
+                  a as (select '||myPkey||', max(systime) as systime, max(version_log_id), project 
+                        from '||versionLogTable||'
+                        where project = current_user
+                          and not commit
+                        group by '||myPkey||', project),
+                        
+                  b as (select foo.*, v.project, v.action 
+                        from '||versionLogTable||' as v, foo
+                        where v.version_log_id = foo.max)
+                                        
+                select a.'||myPkey||' as objectkey, 
                    a.systime as mysystime, 
                    a.project as myuser,
                    a.max as myversion_log_id,
                    b.systime as conflict_systime, 
                    b.project as conflict_user,
                    b.max as conflict_version_log_id
-                                  from (select '||myPkey||', max(systime) as systime, max(version_log_id), project 
-                                        from '||versionLogTable||'
-                                        where project = current_user
-                                              and not commit
-                                        group by '||myPkey||', project) as a,
-                                       (select foo.*, v.project 
-                                        from '||versionLogTable||' as v,  
-                                         (
-                                           select '||myPkey||', max(systime) as systime, max(version_log_id)
-                                           from '||versionLogTable||'
-                                           where commit
-                                             and project <> current_user
-                                           group by '||myPkey||') as foo
-                                         where v.version_log_id = foo.max
-                                        ) as b
+                                  from a, b
                                   where a.systime < b.systime
+                                    and b.action <> ''delete''
                                     and a.'||myPkey||' = b.'||myPkey;
 
 --RAISE EXCEPTION '%',myDebug;           
@@ -173,7 +176,7 @@ with a listing of the conflicting objects.
   END;
 
 
-$_$;
+$$
 
 
 --
@@ -358,7 +361,7 @@ with a listing of the conflicting objects.
        RAISE NOTICE '%', message;
     ELSE    
     
-         execute 'create temp table tmp_tab as 
+       execute 'create temp table tmp_tab as 
        select project
        from '||versionLogTable||'
        where not commit ';
@@ -584,7 +587,6 @@ CREATE FUNCTION pgvsdrop(character varying) RETURNS boolean
 
     execute 'delete from versions.version_tables_logmsg 
                where version_table_id = '''||versionTableRec.vtid||''';';
-
 
   RETURN true ;                             
 
@@ -1363,6 +1365,18 @@ CREATE TABLE version_tables (
     version_view_geometry_column character varying
 );
 
+CREATE TABLE versions.version_tags(
+	tags_id bigserial NOT NULL,
+	version_table_id bigint,
+	revision bigint,
+	tag_text varchar,
+	CONSTRAINT version_tags_pkey PRIMARY KEY (tags_id)
+
+);
+
+ALTER TABLE versions.version_tags ADD CONSTRAINT version_tables_fk FOREIGN KEY (version_table_id)
+REFERENCES versions.version_tables (version_table_id) MATCH FULL
+ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- TOC entry 250 (class 1259 OID 171113)
