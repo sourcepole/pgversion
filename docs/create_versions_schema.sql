@@ -1,4 +1,4 @@
---
+﻿--
 -- PostgreSQL database dump
 --
 
@@ -14,6 +14,31 @@ SET check_function_bodies = false;
 SET client_min_messages = warning;
 
 SET search_path = versions, pg_catalog;
+
+do 
+$body$
+declare 
+  num_roles integer;
+begin
+   SELECT count(*) 
+     into num_roles
+   FROM pg_roles
+   WHERE rolname = 'versions';
+
+   IF num_roles = 0 THEN
+     CREATE ROLE versions NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;   
+   END IF;
+
+   SELECT count(*) 
+     into num_roles
+   FROM pg_roles
+   WHERE rolname = 'versions_admin';
+
+   IF num_roles = 0 THEN
+     CREATE ROLE versions_admin NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;   
+   END IF;   
+end
+$body$;
 
 DROP SCHEMA if exists versions cascade;
 --
@@ -73,7 +98,7 @@ CREATE TYPE logview AS (
 --
 
 CREATE OR REPLACE FUNCTION versions.pgvscheck(character varying)
-  RETURNS SETOF versions.conflicts AS
+  RETURNS SETOF versions.conflicts LANGUAGE plpgsql AS
 $$
 
   DECLARE
@@ -176,7 +201,7 @@ with a listing of the conflicting objects.
   END;
 
 
-$$
+$$;
 
 
 --
@@ -588,6 +613,9 @@ CREATE FUNCTION pgvsdrop(character varying) RETURNS boolean
     execute 'delete from versions.version_tables_logmsg 
                where version_table_id = '''||versionTableRec.vtid||''';';
 
+    execute 'delete from versions.version_tags 
+               where version_table_id = '''||versionTableRec.vtid||''';';
+
   RETURN true ;                             
 
   END;
@@ -778,7 +806,7 @@ CREATE FUNCTION pgvsinit(character varying) RETURNS boolean
              alter table '||versionLogTable||' add constraint '||myTable||'_pkey primary key ('||myPkey||',project,systime,action);
 
              CREATE INDEX '||mySchema||'_'||myTable||'_version_log_id_idx ON '||versionLogTable||' USING btree (version_log_id);
-             CREATE INDEX '||mySchema||'_'||myTable||'_version_'||trim(both '"' from myPkey)||'_idx ON '||versionLogTable||' USING btree ('||myPkey||');
+             
              create index '||myTable||'_version_geo_idx on '||versionLogTable||' USING GIST ('||geomCol||');     
              insert into versions.version_tables (version_table_schema,version_table_name,version_view_schema,version_view_name,version_view_pkey,version_view_geometry_column) 
                  values('''||mySchema||''','''||myTable||''','''||mySchema||''','''||myTable||'_version'','''||testPKey.column_name||''','''||geomCol||''');
@@ -840,7 +868,7 @@ CREATE FUNCTION pgvsinit(character varying) RETURNS boolean
                        GROUP BY v_2.'||myPkey||') foo_1
                     WHERE v_1.version_log_id = foo_1.version_log_id) foo
                 WHERE v.'||myPkey||' = foo.'||myPkey||'
-                UNION ALL
+                UNION
                 SELECT v.'||myPkey||','||fields||'
                 FROM '||versionLogTable||' v,
                  ( SELECT v_1.'||myPkey||',
@@ -872,6 +900,14 @@ CREATE FUNCTION pgvsinit(character varying) RETURNS boolean
                 version_table_id, revision, logmsg) 
               SELECT version_table_id, 0 as revision, ''initial commit revision 0'' as logmsg FROM versions.version_tables where version_table_schema = '''||mySchema||''' and version_table_name = '''|| myTable||''''; 
 
+     execute 'INSERT INTO versions.version_tags(
+                version_table_id, revision, tag_text) 
+              SELECT version_table_id, 0 as revision, ''initial commit revision 0'' as tag_text FROM versions.version_tables where version_table_schema = '''||mySchema||''' and version_table_name = '''|| myTable||''''; 
+
+    execute 'GRANT ALL ON TABLE '||versionLogTable||' TO versions';
+    execute 'GRANT ALL ON TABLE '||versionLogTableSeq||' TO versions';
+    execute 'GRANT ALL ON TABLE '||versionView||' TO versions';
+    execute 'GRANT ALL ON sequence versions."'||mySchema||'_'||myTable||'_revision_seq" to versions'; 
     
                 
   RETURN true ;                             
@@ -1362,21 +1398,22 @@ CREATE TABLE version_tables (
     version_view_schema character varying,
     version_view_name character varying,
     version_view_pkey character varying,
-    version_view_geometry_column character varying
+    version_view_geometry_column character varying,
+    CONSTRAINT version_tables_pkey PRIMARY KEY (version_table_id)
 );
 
-CREATE TABLE versions.version_tags(
-	tags_id bigserial NOT NULL,
-	version_table_id bigint,
-	revision bigint,
-	tag_text varchar,
-	CONSTRAINT version_tags_pkey PRIMARY KEY (tags_id)
-
+CREATE TABLE versions.version_tags
+(
+  tags_id bigserial NOT NULL,
+  version_table_id bigint NOT NULL,
+  revision bigint NOT NULL,
+  tag_text character varying NOT NULL,
+  CONSTRAINT version_tags_pkey PRIMARY KEY (version_table_id, revision, tag_text),
+  CONSTRAINT version_tables_fk FOREIGN KEY (version_table_id)
+      REFERENCES versions.version_tables (version_table_id) MATCH FULL
+      ON UPDATE CASCADE ON DELETE CASCADE
 );
 
-ALTER TABLE versions.version_tags ADD CONSTRAINT version_tables_fk FOREIGN KEY (version_table_id)
-REFERENCES versions.version_tables (version_table_id) MATCH FULL
-ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- TOC entry 250 (class 1259 OID 171113)
@@ -1452,14 +1489,6 @@ ALTER TABLE ONLY version_tables ALTER COLUMN version_table_id SET DEFAULT nextva
 
 ALTER TABLE ONLY version_tables_logmsg ALTER COLUMN id SET DEFAULT nextval('version_tables_logmsg_id_seq'::regclass);
 
-
---
--- TOC entry 3182 (class 2606 OID 171128)
--- Name: version_table_pkey; Type: CONSTRAINT; Schema: versions; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY version_tables
-    ADD CONSTRAINT version_table_pkey PRIMARY KEY (version_table_id);
 
 
 --

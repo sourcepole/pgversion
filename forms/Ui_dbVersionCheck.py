@@ -44,9 +44,12 @@ class DbVersionCheckDialog(QDialog, Ui_DbVersionCheck):
 #          else:
 #              self.functionsPath = systemPluginPath+"/tools/updateFunctions.sql"
         
-        sqlFile = QFile(self.functionsPath)
-        sqlFile.open(QIODevice.ReadOnly)
-        data = sqlFile.read(QFileInfo(sqlFile).size())
+        fp = open(self.functionsPath)
+        s = fp.read()
+        data = s.decode("utf-8-sig")
+#        sqlFile = QFile(self.functionsPath)
+#        sqlFile.open(QIODevice.ReadOnly)
+#        data = sqlFile.read(QFileInfo(sqlFile).size())
         result = self.myDb.runError(data)
 #        result = self.myDb.runError("select versions.pgvsupdatecheck('"+self.pgvsRevision+"')")
         

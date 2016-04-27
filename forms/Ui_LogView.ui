@@ -10,14 +10,23 @@
     <x>0</x>
     <y>0</y>
     <width>722</width>
-    <height>562</height>
+    <height>464</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>PG-Version LogView</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="4" column="0" colspan="4">
+   <item row="0" column="3">
+    <widget class="QComboBox" name="cmbTags">
+     <item>
+      <property name="text">
+       <string>-- checkout Tag --</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="1" column="0" rowspan="2" colspan="3">
     <widget class="QTreeWidget" name="treeWidget">
      <column>
       <property name="text">
@@ -41,7 +50,54 @@
      </column>
     </widget>
    </item>
-   <item row="3" column="0" colspan="4">
+   <item row="1" column="3">
+    <widget class="QPushButton" name="btnTag">
+     <property name="text">
+      <string>checkout Tag</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="3">
+    <spacer name="verticalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="3" column="0">
+    <widget class="QPushButton" name="btnCheckout">
+     <property name="text">
+      <string>checkout selected revision</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QPushButton" name="btnDiff">
+     <property name="text">
+      <string>diff to HEAD revision</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="2">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Close</set>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" colspan="3">
     <widget class="QPushButton" name="btnRollback">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -64,42 +120,6 @@
      <property name="text">
       <string>rollback to selected revision</string>
      </property>
-    </widget>
-   </item>
-   <item row="7" column="1">
-    <widget class="QPushButton" name="btnDiff">
-     <property name="text">
-      <string>diff to HEAD revision</string>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="0">
-    <widget class="QPushButton" name="btnCheckout">
-     <property name="text">
-      <string>checkout selected revision</string>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="3">
-    <widget class="QDialogButtonBox" name="btnClose">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Close</set>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="2">
-    <widget class="QComboBox" name="cmbTags">
-     <item>
-      <property name="text">
-       <string>-- checkout Tag --</string>
-      </property>
-     </item>
     </widget>
    </item>
   </layout>

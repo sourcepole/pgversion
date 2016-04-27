@@ -132,6 +132,7 @@ class PgVersion:
     self.LogViewDialog.diffLayer.connect(self.doDiff) 
     self.LogViewDialog.rollbackLayer.connect(self.doRollback) 
     self.LogViewDialog.checkoutLayer.connect(self.doCheckout) 
+    self.LogViewDialog.checkoutTag.connect(self.doCheckout) 
 
 
   def layersInit(self):
@@ -286,12 +287,13 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
               self.iface.messageBar().pushMessage('INFO', QCoreApplication.translate('PgVersion','No layer changes for committing, everything is OK'), level=QgsMessageBar.INFO, duration=3)
 
 
-  def doCheckout(self,  item):
-      if item == None:
+  def doCheckout(self,  revision,  tag=None):
+      print "Revision: %s" % (revision)
+      if revision == None:
         QMessageBox.information(None, QCoreApplication.translate('PgVersion','Error'),  QCoreApplication.translate('PgVersion','Please select a valid revision'))
         return
 
-      revision = item.text(0)
+#      revision = item.text(0)
 
       canvas = self.iface.mapCanvas()
       currentLayer = canvas.currentLayer()
@@ -323,17 +325,25 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
                  versions."+mySchema+"_"+myTable+"_log as v \
             where c.log_id = v."+uniqueCol+"  \
                          and c.systime = v.systime "
-
+            
             myUri = QgsDataSourceURI(uri)
-            myUri.setDataSource("", u"(%s\n)" % sql, geomCol, "", uniqueCol)
+            myUri.setDataSource("", u"(%s\n)" % (sql), geomCol, "", uniqueCol)
 
             layer = None
-            layer = QgsVectorLayer(myUri.uri(), myTable+" (Revision "+revision+")", "postgres")         
-            userPluginPath = QFileInfo(QgsApplication.qgisUserDbFilePath()).path()+"/python/plugins/pgversion"         
+            
+            if tag:
+                table_ext = " (Tag: %s)" % tag
+            else:
+                table_ext = " (Revision: %s)" % revision
+                
+            layer = QgsVectorLayer(myUri.uri(), myTable+table_ext, "postgres")         
 
             QgsMapLayerRegistry.instance().addMapLayer(layer)
             QApplication.restoreOverrideCursor()
-            self.iface.messageBar().pushMessage('INFO', QCoreApplication.translate('PgVersion','Checkout to revision {0} was successful!').format(revision), level=QgsMessageBar.INFO, duration=3)
+            if layer.isValid():
+                self.iface.messageBar().pushMessage('INFO', QCoreApplication.translate('PgVersion','Checkout to revision {0} was successful!').format(revision), level=QgsMessageBar.INFO, duration=3)
+            else:
+                self.iface.messageBar().pushMessage('INFO', QCoreApplication.translate('PgVersion','Something went wrong during checkout to revision {0}!').format(revision), level=QgsMessageBar.INFO, duration=3)
             self.LogViewDialog.close()            
             return
 
@@ -388,7 +398,9 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
             result = myDb.read(sql)
     
             logHTML = "<html><head></head><body><Table>"
-    
+            
+            self.LogViewDialog.setLayer(theLayer)
+            self.LogViewDialog.createTagList()
             self.LogViewDialog.treeWidget.clear()
     
             itemList = []
