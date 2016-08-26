@@ -238,6 +238,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
             myDb.close()
             self.LogViewDialog.close()
             canvas.refresh()
+            currentLayer.triggerRepaint()
             QApplication.restoreOverrideCursor()
             self.tools.setModified(currentLayer)
             self.iface.messageBar().pushMessage('INFO', QCoreApplication.translate('PgVersion','Rollback to revision {0} was successful!').format(revision), level=QgsMessageBar.INFO, duration=3)
@@ -375,6 +376,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
                 self.iface.messageBar().pushMessage("Info", QCoreApplication.translate('PgVersion','All changes are set back to the HEAD revision: {0}').format(str(result["PGVSREVERT"][0])), level=QgsMessageBar.INFO, duration=3)            
             self.tools.setModified(None,  True)
         canvas.refresh()
+        theLayer.triggerRepaint()
         myDb.close()
     pass
 

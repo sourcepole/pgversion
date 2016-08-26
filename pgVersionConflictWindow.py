@@ -171,6 +171,7 @@ class ConflictWindow(QMainWindow):
       self.vLayerId = vLayer.id()
       self.canvas.setExtent(vLayer.extent())
       self.canvas.refresh()
+      vLayer.triggerRepaint()
     
       tabData = self.tools.tableRecords(self.layer)
       
@@ -214,6 +215,7 @@ class ConflictWindow(QMainWindow):
             myDb.run(sql)
             
         self.canvas.refresh()
+        self.layer.triggerRepaint()
         self.cmbMerge.clear()
         QApplication.restoreOverrideCursor()
         
@@ -249,7 +251,7 @@ class ConflictWindow(QMainWindow):
       myLayer = QgsVectorLayer(myUri.uri(), "", "postgres")
       
       QgsMapLayerRegistry.instance().addMapLayer(myLayer, False)
-      self.canvas.setExtent(myLayer.extent())
+#      self.canvas.setExtent(myLayer.extent())
       self.canvas.setLayerSet([QgsMapCanvasLayer(myLayer)])
       self.canvas.refresh()
 
