@@ -1454,7 +1454,7 @@ CREATE SEQUENCE version_tables_logmsg_id_seq
 --
 
 ALTER SEQUENCE version_tables_logmsg_id_seq OWNED BY version_tables_logmsg.id;
-
+GRANT USAGE ON SEQUENCE versions.version_tables_logmsg_id_seq TO versions;
 
 --
 -- TOC entry 252 (class 1259 OID 171123)
@@ -1476,7 +1476,17 @@ CREATE SEQUENCE version_tables_version_table_id_seq
 --
 
 ALTER SEQUENCE version_tables_version_table_id_seq OWNED BY version_tables.version_table_id;
+GRANT USAGE ON SEQUENCE versions.version_table_id_seq TO versions;
 
+CREATE SEQUENCE versions.version_tags_tags_id_seq
+  INCREMENT 1
+  MINVALUE 1
+  MAXVALUE 9223372036854775807
+  START 4
+  CACHE 1;
+
+GRANT ALL ON SEQUENCE versions.version_tags_tags_id_seq TO hdus;
+GRANT USAGE ON SEQUENCE versions.version_tags_tags_id_seq TO versions;
 
 --
 -- TOC entry 3177 (class 2604 OID 171125)
