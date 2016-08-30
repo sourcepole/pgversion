@@ -67,13 +67,17 @@ class LogView(QDialog, Ui_LogView):
             self.tr(""),
             QLineEdit.Normal)
         
-        myDb = self.tools.layerDB('tags',self.theLayer)    
-        sql = "insert into versions.version_tags (version_table_id, revision,  tag_text) \
-          values \
-          (%s, %s, '%s')" % (self.version_table_id,  self.treeWidget.currentItem().text(0),  result)
-        myDb.run(sql)
-        
-        self.createTagList()
+        if ok:
+            try:
+                myDb = self.tools.layerDB('tags',self.theLayer)    
+                sql = "insert into versions.version_tags (version_table_id, revision,  tag_text) \
+                  values \
+                  (%s, %s, '%s')" % (self.version_table_id,  self.treeWidget.currentItem().text(0),  result)
+                myDb.run(sql)
+            except:
+                QMessageBox.information(None,  self.tr('Warning'),  self.tr('This version is already tagged'))
+            
+            self.createTagList()
         
     
     @pyqtSignature("")
