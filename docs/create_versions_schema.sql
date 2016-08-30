@@ -1402,6 +1402,8 @@ CREATE TABLE version_tables (
     CONSTRAINT version_tables_pkey PRIMARY KEY (version_table_id)
 );
 
+GRANT SELECT, UPDATE, INSERT ON TABLE versions.version_tables TO versions;
+
 CREATE TABLE versions.version_tags
 (
   tags_id bigserial NOT NULL,
@@ -1414,6 +1416,7 @@ CREATE TABLE versions.version_tags
       ON UPDATE CASCADE ON DELETE CASCADE
 );
 
+GRANT SELECT, UPDATE, INSERT ON TABLE versions.version_tags TO versions;
 
 --
 -- TOC entry 250 (class 1259 OID 171113)
@@ -1429,6 +1432,7 @@ CREATE TABLE version_tables_logmsg (
     project character varying DEFAULT "current_user"()
 );
 
+GRANT SELECT, UPDATE, INSERT ON TABLE versions.version_tables_logmsg TO versions;
 
 --
 -- TOC entry 251 (class 1259 OID 171121)
