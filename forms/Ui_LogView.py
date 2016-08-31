@@ -68,17 +68,29 @@ class LogView(QDialog, Ui_LogView):
             QLineEdit.Normal)
         
         if ok:
-            try:
+            if self.hasTag():
+                QMessageBox.information(None,  self.tr('Warning'),  self.tr('This version is already tagged'))
+            else:
                 myDb = self.tools.layerDB('tags',self.theLayer)    
                 sql = "insert into versions.version_tags (version_table_id, revision,  tag_text) \
                   values \
                   (%s, %s, '%s')" % (self.version_table_id,  self.treeWidget.currentItem().text(0),  result)
                 myDb.run(sql)
-            except:
-                QMessageBox.information(None,  self.tr('Warning'),  self.tr('This version is already tagged'))
-            
-            self.createTagList()
+                
+                self.createTagList()
         
+    def hasTag(self):
+        sql = "select count(revision) \
+          from versions.version_tags \
+          where version_table_id = %s \
+            and revision = %s " % (self.version_table_id,  self.treeWidget.currentItem().text(0))
+            
+        myDb = self.tools.layerDB('tags',  self.theLayer)
+        result = myDb.read(sql)
+        if result['COUNT'][0] <> '0':
+           return True
+        else:
+           return False
     
     @pyqtSignature("")
     def on_btnRollback_clicked(self):

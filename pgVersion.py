@@ -27,7 +27,7 @@ from dbtools.dbTools import *
 from forms.Ui_CommitMessage import CommitMessageDialog
 from forms.Ui_diff import DiffDlg
 from pgVersionConflictWindow import ConflictWindow
-
+    
 # Initialize Qt resources from file resources.py
 import resources_rc,  traceback,  string
 # Import the code for the dialog
