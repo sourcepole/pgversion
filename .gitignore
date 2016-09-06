@@ -1,0 +1,5 @@
+*.pyc
+*.e4p
+.eric*
+tools
+*~

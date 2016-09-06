@@ -1,0 +1,52 @@
+# This file contains metadata for your plugin. Beginning
+# with version 1.8 this is the preferred way to supply information about a
+# plugin. The current method of embedding metadata in __init__.py will
+# be supported until version 2.0
+
+# This file should be included when you package your plugin.
+
+[general]
+name=PgVersion
+description=Client for the Postgres Versioning System pgvs
+category=Database
+version=2.1.6
+qgisMinimumVersion=2.0
+qgisMaximumVersion=2.99
+class_name=PgVersion
+website=http://www.sourcepole.com
+author=Horst Duester / Sourcepole AG Zürich
+email=horst.duester@sourcepole.ch
+about=Sourcepole AG - Linux & Open Source Solutions, Weberstrasse 5, 8004 Zurich, Switzerland
+
+; Optional items:
+
+changelog=
+    2.1.6
+    - delete version bug fixed
+    2.1.5
+    - lost dialog recreated
+    2.1.4
+    - bugfixing
+    2.1.3
+    - DB init improved
+    2.1.2
+    - tags indtroduced
+    - bug fixes
+    2.1.0
+    - layer checkout introduced
+    - local diff to head introduced
+    - bug fixes
+    2.0.4
+    - some minor fixes
+    2.0.3
+    - Fix of doInit bug
+    2.0.2
+    - Fix of #3837
+    2.0.1
+    - More robust DB Handling
+    2.0.0
+    - First release for QGIS 2 API
+
+homepage=https://github.com/sourcepole/pgversion
+tracker=https://github.com/sourcepole/pgversion/issues
+repository=https://github.com/sourcepole/pgversion.git
