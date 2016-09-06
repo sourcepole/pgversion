@@ -53,12 +53,16 @@ class LogView(QDialog, Ui_LogView):
             and vtab.version_table_id = vtag.version_table_id \
           order by vtag.tags_id desc " % (self.tools.layerSchema(self.theLayer),  self.tools.layerTable(self.theLayer))
         result = myDb.read(sql)       
-        self.version_table_id = result['VERSION_TABLE_ID'][0] 
         
-        self.cmbTags.addItem(' ------ ', -1)
-        
-        for i in range(len(result['TAG_TEXT'])):
-            self.cmbTags.addItem(result['TAG_TEXT'][i],  result['REVISION'][i])
+        try:
+            self.version_table_id = result['VERSION_TABLE_ID'][0] 
+            
+            self.cmbTags.addItem(' ------ ', -1)
+            
+            for i in range(len(result['TAG_TEXT'])):
+                self.cmbTags.addItem(result['TAG_TEXT'][i],  result['REVISION'][i])
+        except:
+            pass
     
     def setTag(self):
         result, ok = QInputDialog.getText(
@@ -68,6 +72,7 @@ class LogView(QDialog, Ui_LogView):
             QLineEdit.Normal)
         
         if ok:
+
             if self.hasTag():
                 QMessageBox.information(None,  self.tr('Warning'),  self.tr('This version is already tagged'))
             else:
@@ -78,19 +83,24 @@ class LogView(QDialog, Ui_LogView):
                 myDb.run(sql)
                 
                 self.createTagList()
+
         
     def hasTag(self):
-        sql = "select count(revision) \
-          from versions.version_tags \
-          where version_table_id = %s \
-            and revision = %s " % (self.version_table_id,  self.treeWidget.currentItem().text(0))
-            
-        myDb = self.tools.layerDB('tags',  self.theLayer)
-        result = myDb.read(sql)
-        if result['COUNT'][0] <> '0':
-           return True
-        else:
-           return False
+        
+        try:
+            sql = "select count(revision) \
+              from versions.version_tags \
+              where version_table_id = %s \
+                and revision = %s " % (self.version_table_id,  self.treeWidget.currentItem().text(0))
+                
+            myDb = self.tools.layerDB('tags',  self.theLayer)
+            result = myDb.read(sql)
+            if result['COUNT'][0] <> '0':
+               return True
+            else:
+               return False
+        except:
+            pass
     
     @pyqtSignature("")
     def on_btnRollback_clicked(self):
