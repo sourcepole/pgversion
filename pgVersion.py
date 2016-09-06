@@ -135,22 +135,17 @@ class PgVersion:
     self.actionDrop.triggered.connect(self.doDrop) 
     self.actionHelp.triggered.connect(self.doHelp) 
     self.actionAbout.triggered.connect(self.doAbout) 
-<<<<<<< HEAD
     self.actionDelete.triggered.connect(self.doDelete) 
-=======
->>>>>>> aec9ceabbdd31bc00b1fde1521ba25a63f85fa2e
 
     self.LogViewDialog.diffLayer.connect(self.doDiff) 
     self.LogViewDialog.rollbackLayer.connect(self.doRollback) 
     self.LogViewDialog.checkoutLayer.connect(self.doCheckout) 
     self.LogViewDialog.checkoutTag.connect(self.doCheckout) 
-<<<<<<< HEAD
     
     for a in self.iface.digitizeToolBar().actions():
         if a.objectName() == 'mActionToggleEditing':
             a.triggered.connect(self.toggleDeleteButton)
-=======
->>>>>>> aec9ceabbdd31bc00b1fde1521ba25a63f85fa2e
+
 
 
   def layersInit(self):
@@ -162,10 +157,6 @@ class PgVersion:
           if l.type() == QgsMapLayer.VectorLayer and l.providerType() == 'postgres':
               l.editingStopped.connect(self.tools.setModified)
 
-<<<<<<< HEAD
-=======
-
->>>>>>> aec9ceabbdd31bc00b1fde1521ba25a63f85fa2e
   def unload(self):
         # remove menubar
       try:
@@ -175,7 +166,6 @@ class PgVersion:
           del self.menuBar
       del self.toolBar
 
-<<<<<<< HEAD
   def toggleDeleteButton(self):
       canvas = self.iface.mapCanvas()
       currentLayer = canvas.currentLayer()      
@@ -216,11 +206,6 @@ class PgVersion:
 #            currentLayer.deselect()
             self.tools.setModified()
         
-        
-=======
-
-
->>>>>>> aec9ceabbdd31bc00b1fde1521ba25a63f85fa2e
 
   def doInit(self):
     canvas = self.iface.mapCanvas()
@@ -448,8 +433,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
   def doLogView(self):
         canvas = self.iface.mapCanvas()
         theLayer = self.iface.activeLayer()
-        
-<<<<<<< HEAD
+
         if theLayer <> None:
             if not self.tools.hasVersion(theLayer):
                 QMessageBox.warning(None,   QCoreApplication.translate('PgVersion','Warning'),   QCoreApplication.translate('PgVersion','Please select a versioned layer!'))
@@ -487,7 +471,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
                 self.LogViewDialog.show()        
                 myDb.close()
                 canvas.refresh()
-=======
+
         if not self.tools.hasVersion(theLayer):
             QMessageBox.warning(None,   QCoreApplication.translate('PgVersion','Warning'),   QCoreApplication.translate('PgVersion','Please select a versioned layer!'))
         else:
@@ -524,7 +508,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
             self.LogViewDialog.show()        
             myDb.close()
             canvas.refresh()
->>>>>>> aec9ceabbdd31bc00b1fde1521ba25a63f85fa2e
+
         pass
 
   def doDiff(self):
@@ -632,14 +616,11 @@ where c.log_id = v.{uniqueCol} and c.systime = v.systime) as foo1) as foo ").for
                 sql = "select versions.pgvsdrop('"+mySchema+"."+myTable.replace('_version', '')+"')"
                 result = myDb.read(sql)                
                 myDb.close()
-<<<<<<< HEAD
+
                 layer_name = theLayer.name()
                 QgsMapLayerRegistry.instance().removeMapLayer(theLayer.id())      
                 self.iface.messageBar().pushMessage('INFO', QCoreApplication.translate('PgVersion','Versioning for layer {0} dropped!').format(layer_name), level=QgsMessageBar.INFO, duration=3)
-=======
-                QgsMapLayerRegistry.instance().removeMapLayer(theLayer.id())      
-                self.iface.messageBar().pushMessage('INFO', QCoreApplication.translate('PgVersion','Versioning for layer {0} dropped!').format(theLayer.name()), level=QgsMessageBar.INFO, duration=3)
->>>>>>> aec9ceabbdd31bc00b1fde1521ba25a63f85fa2e
+
 
 
 
