@@ -2,7 +2,12 @@
 
 # Form implementation generated from reading ui file '/home/hdus/dev/qgis/pgversion-plugin/pgversion/forms/Ui_pgLoadVersion.ui'
 #
+<<<<<<< HEAD
 # Created by: PyQt4 UI code generator 4.11.4
+=======
+# Created: Tue Jun 16 08:06:07 2015
+#      by: PyQt4 UI code generator 4.10.4
+>>>>>>> aec9ceabbdd31bc00b1fde1521ba25a63f85fa2e
 #
 # WARNING! All changes made in this file will be lost!
 
