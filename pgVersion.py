@@ -46,7 +46,6 @@ class PgVersion:
   def __init__(self, iface):
     # Save reference to the QGIS interface
     self.iface = iface
-    self.dlgCommitMessage = CommitMessageDialog()
     self.tools = PgVersionTools(self.iface)
     self.w = None
     self.vsCheck = None
@@ -313,6 +312,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
               confRecords = self.tools.confRecords(theLayer)            
               if  confRecords == None:
               # show the dialog
+                  self.dlgCommitMessage = CommitMessageDialog()
                   self.dlgCommitMessage.show()
                   result = self.dlgCommitMessage.exec_()
     
