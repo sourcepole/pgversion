@@ -38,7 +38,7 @@ from forms.Ui_LogView import LogView
 from pgVersionTools import PgVersionTools
 from about.doAbout import  DlgAbout
 
-import apicompat
+import apicompat,  tempfile
 
 
 class PgVersion: 
@@ -562,27 +562,32 @@ from versions.pgvscheckout('{schema}.{origin}', (select max(revision) as head fr
 versions.{schema}_{table}_log as v \
 where c.log_id = v.{uniqueCol} and c.systime = v.systime) as foo1) as foo ").format(schema = mySchema,  table=myTable,  origin=myTable.replace('_version', ''), cols = myCols,  uniqueCol = uniqueCol )
 
-#            QMessageBox.information(None, '', sql)
             myUri = QgsDataSourceURI(self.tools.layerUri(currentLayer))
             myUri.setDataSource("", u"(%s\n)" % sql, geomCol, "", "rownum")
 
-            layer = QgsVectorLayer(myUri.uri(), myTable+" (Diff to HEAD Revision)", "postgres")         
+#            layer = QgsVectorLayer(myUri.uri(), myTable+" (Diff to HEAD Revision)", "postgres")       
+            defult_tmp_dir = tempfile._get_default_tempdir()
+            temp_name = defult_tmp_dir+"/"+next(tempfile._get_candidate_names())+".shp"
             
-            if not layer.isValid():
+            QgsVectorFileWriter.writeAsVectorFormat(QgsVectorLayer(myUri.uri(), myTable+" (Diff to HEAD Revision)", "postgres") , temp_name, "utf-8", None, "ESRI Shapefile")  
+            layer_shp = QgsVectorLayer(temp_name,  myTable+" (Diff to HEAD Revision)",  "ogr")
+            
+            
+            if not layer_shp.isValid():
                 self.iface.messageBar().pushMessage('WARNING', QCoreApplication.translate('PgVersion','No diffs to HEAD detected! Layer could not be loaded.'), level=QgsMessageBar.INFO, duration=3)
 
             else:                
                 userPluginPath = QFileInfo(QgsApplication.qgisUserDbFilePath()).path()+"/python/plugins/pgversion"  
-                layer.setRendererV2(None)
+                layer_shp.setRendererV2(None)
     
                 if geometryType == 0:
-                    layer.loadNamedStyle(userPluginPath+"/legends/diff_point.qml")             
+                    layer_shp.loadNamedStyle(userPluginPath+"/legends/diff_point.qml")             
                 elif geometryType == 1:
-                    layer.loadNamedStyle(userPluginPath+"/legends/diff_linestring.qml")             
+                    layer_shp.loadNamedStyle(userPluginPath+"/legends/diff_linestring.qml")             
                 elif geometryType == 2:
-                    layer.loadNamedStyle(userPluginPath+"/legends/diff_polygon.qml")             
+                    layer_shp.loadNamedStyle(userPluginPath+"/legends/diff_polygon.qml")             
     
-                QgsMapLayerRegistry.instance().addMapLayer(layer)
+                QgsMapLayerRegistry.instance().addMapLayer(layer_shp)
                 self.iface.messageBar().pushMessage('INFO', QCoreApplication.translate('PgVersion','Diff to HEAD revision was successful!'), level=QgsMessageBar.INFO, duration=3)
                 
             QApplication.restoreOverrideCursor()
