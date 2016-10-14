@@ -94,7 +94,7 @@ class PgVersion:
     self.actionDrop = QAction(QIcon(":/plugins/pgversion/icons/pgversion-drop.png"), QCoreApplication.translate("PgVersion","Drop Versioning from Layer"), self.iface.mainWindow())    
     self.actionHelp = QAction(QIcon(""), QCoreApplication.translate("PgVersion","Help"), self.iface.mainWindow())       
     self.actionAbout = QAction(QIcon(""), QCoreApplication.translate("PgVersion","About"), self.iface.mainWindow())       
-    self.actionDelete = QAction(QIcon(""), QCoreApplication.translate("PgVersion","Delete"), self.iface.mainWindow())       
+    self.actionDelete = QAction(QIcon(":/plugins/pgversion/icons/pgversion-drop.png"), QCoreApplication.translate("PgVersion","Bulk delete directly in the database"), self.iface.mainWindow())       
     self.actionDelete.setEnabled(False)
     
 
@@ -144,8 +144,16 @@ class PgVersion:
     for a in self.iface.digitizeToolBar().actions():
         if a.objectName() == 'mActionToggleEditing':
             a.triggered.connect(self.toggleDeleteButton)
+            
 
-
+  def onSelectionChanged(self):
+      try:
+          if self.iface.activeLayer().selectedFeatureCount() == 0:
+              self.actionDelete.setEnabled(false)
+          else:
+             self.actionDelete.setEnabled(true) 
+      except:
+          pass
 
   def layersInit(self):
       canvas = self.iface.mapCanvas()
@@ -185,6 +193,7 @@ class PgVersion:
              QMessageBox.Yes))
         
         if res == QMessageBox.Yes:
+            QApplication.restoreOverrideCursor()
             canvas = self.iface.mapCanvas()
             currentLayer = canvas.currentLayer()      
             mySchema = self.tools.layerSchema(currentLayer)
@@ -193,17 +202,21 @@ class PgVersion:
             myDb = self.tools.layerDB('doInit',currentLayer)        
             selectedFeatures = currentLayer.selectedFeatures()
             delete_list = "("
-            for feature in selectedFeatures:
-                  delete_list += str(feature.attributes()[0])+", "
             
-            delete_list = delete_list[:-2]
-            delete_list += ")"
-            sql = "delete from %s.%s where %s in %s" % (mySchema,  myTable,  myPkey,  delete_list)
-    #        QMessageBox.information(None, '', sql)
-            myDb.run(sql)
-            currentLayer.triggerRepaint()
-#            currentLayer.deselect()
-            self.tools.setModified()
+            if currentLayer.selectedFeatureCount() > 0:
+                for feature in selectedFeatures:
+                      delete_list += str(feature.attributes()[0])+", "
+                
+                delete_list = delete_list[:-2]
+                delete_list += ")"
+                sql = "delete from %s.%s where %s in %s" % (mySchema,  myTable,  myPkey,  delete_list)
+                QApplication.setOverrideCursor(Qt.WaitCursor)
+                myDb.run(sql)
+                QApplication.restoreOverrideCursor()
+                currentLayer.removeSelection()
+                currentLayer.triggerRepaint()
+                self.tools.setModified()
+#                self.actionDelete.setEnabled(false)
         
 
   def doInit(self):
@@ -241,8 +254,8 @@ Please set the user permissions for table {0} and reload it via Database -> PG V
 
   def doLoad(self): 
 
-    self.dlg = PgVersionLoadDialog(self.iface)
-    self.dlg.show()
+     self.dlg = PgVersionLoadDialog(self.iface)
+     self.dlg.show()
 
   def doRollback(self,  item):
 
@@ -286,7 +299,6 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
             myDb.run(sql)
             myDb.close()
             self.LogViewDialog.close()
-            canvas.refresh()
             currentLayer.triggerRepaint()
             QApplication.restoreOverrideCursor()
             self.tools.setModified(currentLayer)
@@ -393,6 +405,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
             QApplication.restoreOverrideCursor()
             if layer.isValid():
                 self.iface.messageBar().pushMessage('INFO', QCoreApplication.translate('PgVersion','Checkout to revision {0} was successful!').format(revision), level=QgsMessageBar.INFO, duration=3)
+                layer.triggerRepaint()
             else:
                 self.iface.messageBar().pushMessage('INFO', QCoreApplication.translate('PgVersion','Something went wrong during checkout to revision {0}!').format(revision), level=QgsMessageBar.INFO, duration=3)
             self.LogViewDialog.close()            
@@ -425,7 +438,6 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
             else:
                 self.iface.messageBar().pushMessage("Info", QCoreApplication.translate('PgVersion','All changes are set back to the HEAD revision: {0}').format(str(result["PGVSREVERT"][0])), level=QgsMessageBar.INFO, duration=3)            
             self.tools.setModified(None,  True)
-        canvas.refresh()
         theLayer.triggerRepaint()
         myDb.close()
     pass
