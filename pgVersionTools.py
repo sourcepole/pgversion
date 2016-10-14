@@ -107,8 +107,7 @@ class PgVersionTools:
                 return False
         except:
             pass
-
-
+      
   def isModified(self, myLayer=None):
 
         myLayerUri = QgsDataSourceURI(myLayer.source())
