@@ -1,10 +1,12 @@
-﻿--
+--
+-- create_versions_schema.sql revision 2.0   2016.10.13
+--
+--
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.3.10
--- Dumped by pg_dump version 9.4.5
--- Started on 2016-02-09 17:13:42 CET
+-- Dumped from database version 9.3.14
+-- Dumped by pg_dump version 9.5.4
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -12,37 +14,9 @@ SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SET check_function_bodies = false;
 SET client_min_messages = warning;
+SET row_security = off;
 
-SET search_path = versions, pg_catalog;
-
-do 
-$body$
-declare 
-  num_roles integer;
-begin
-   SELECT count(*) 
-     into num_roles
-   FROM pg_roles
-   WHERE rolname = 'versions';
-
-   IF num_roles = 0 THEN
-     CREATE ROLE versions NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;   
-   END IF;
-
-   SELECT count(*) 
-     into num_roles
-   FROM pg_roles
-   WHERE rolname = 'versions_admin';
-
-   IF num_roles = 0 THEN
-     CREATE ROLE versions_admin NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;   
-   END IF;   
-end
-$body$;
-
-DROP SCHEMA if exists versions cascade;
 --
--- TOC entry 54 (class 2615 OID 171084)
 -- Name: versions; Type: SCHEMA; Schema: -; Owner: -
 --
 
@@ -52,7 +26,6 @@ CREATE SCHEMA versions;
 SET search_path = versions, pg_catalog;
 
 --
--- TOC entry 1721 (class 1247 OID 171087)
 -- Name: checkout; Type: TYPE; Schema: versions; Owner: -
 --
 
@@ -65,7 +38,6 @@ CREATE TYPE checkout AS (
 
 
 --
--- TOC entry 1724 (class 1247 OID 171090)
 -- Name: conflicts; Type: TYPE; Schema: versions; Owner: -
 --
 
@@ -81,7 +53,6 @@ CREATE TYPE conflicts AS (
 
 
 --
--- TOC entry 1727 (class 1247 OID 171093)
 -- Name: logview; Type: TYPE; Schema: versions; Owner: -
 --
 
@@ -92,14 +63,57 @@ CREATE TYPE logview AS (
 	logmsg text
 );
 
+
 --
--- TOC entry 1326 (class 1255 OID 171094)
+-- Name: pgvs_version_record(); Type: FUNCTION; Schema: versions; Owner: -
+--
+
+CREATE FUNCTION pgvs_version_record() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $_$
+  DECLARE 
+    pkey_rec record;
+    pkey TEXT;
+    qry TEXT;
+    
+  BEGIN	
+
+-- Get primarykey of relation 
+     select into pkey_rec col.column_name 
+     from information_schema.table_constraints as key,
+         information_schema.key_column_usage as col
+     where key.table_schema = TG_TABLE_SCHEMA::name
+       and key.table_name = TG_TABLE_NAME::name
+       and key.constraint_type='PRIMARY KEY'
+       and key.table_catalog = col.table_catalog
+       and key.table_schema = col.table_schema
+       and key.table_name = col.table_name;
+
+     pkey := pkey_rec.column_name;
+
+     qry := 'insert into versions.'|| quote_ident(TG_TABLE_SCHEMA ||'_'|| TG_TABLE_NAME) ||'_log select $1.*, 
+                nextval(''versions.'|| quote_ident(TG_TABLE_SCHEMA ||'_'|| TG_TABLE_NAME) ||'_log_version_log_id_seq''), 
+                '''||lower(TG_OP)||''', current_user, date_part(''epoch''::text, (now())::timestamp without time zone) * (1000)::double precision, NULL, NULL, false';     
+      
+     if TG_OP = 'INSERT' THEN     
+        execute  qry USING NEW;
+        RETURN NEW;
+     ELSEIF TG_OP = 'UPDATE' OR TG_OP = 'DELETE' THEN
+        execute  qry USING OLD;
+        RETURN OLD;
+     END IF;                         
+  END;
+
+$_$;
+
+
+--
 -- Name: pgvscheck(character varying); Type: FUNCTION; Schema: versions; Owner: -
 --
 
-CREATE OR REPLACE FUNCTION versions.pgvscheck(character varying)
-  RETURNS SETOF versions.conflicts LANGUAGE plpgsql AS
-$$
+CREATE FUNCTION pgvscheck(character varying) RETURNS SETOF conflicts
+    LANGUAGE plpgsql
+    AS $_$
 
   DECLARE
     inTable ALIAS FOR $1;
@@ -201,11 +215,10 @@ with a listing of the conflicting objects.
   END;
 
 
-$$;
+$_$;
 
 
 --
--- TOC entry 1327 (class 1255 OID 171095)
 -- Name: pgvscheckout(character varying, bigint); Type: FUNCTION; Schema: versions; Owner: -
 --
 
@@ -300,7 +313,6 @@ $$;
 
 
 --
--- TOC entry 1328 (class 1255 OID 171096)
 -- Name: pgvscommit(character varying, text); Type: FUNCTION; Schema: versions; Owner: -
 --
 
@@ -386,7 +398,7 @@ with a listing of the conflicting objects.
        RAISE NOTICE '%', message;
     ELSE    
     
-       execute 'create temp table tmp_tab as 
+         execute 'create temp table tmp_tab as 
        select project
        from '||versionLogTable||'
        where not commit ';
@@ -486,7 +498,6 @@ $_$;
 
 
 --
--- TOC entry 1319 (class 1255 OID 171098)
 -- Name: pgvsdrop(character varying); Type: FUNCTION; Schema: versions; Owner: -
 --
 
@@ -614,7 +625,8 @@ CREATE FUNCTION pgvsdrop(character varying) RETURNS boolean
                where version_table_id = '''||versionTableRec.vtid||''';';
 
     execute 'delete from versions.version_tags 
-               where version_table_id = '''||versionTableRec.vtid||''';';
+               where version_table_id = '''||versionTableRec.vtid||''';';               
+
 
   RETURN true ;                             
 
@@ -623,7 +635,6 @@ $_$;
 
 
 --
--- TOC entry 1320 (class 1255 OID 171099)
 -- Name: pgvsinit(character varying); Type: FUNCTION; Schema: versions; Owner: -
 --
 
@@ -879,18 +890,11 @@ CREATE FUNCTION pgvsinit(character varying) RETURNS boolean
                 WHERE v.version_log_id = foo.version_log_id and foo.action <> ''delete''';
 
 
-    execute 'CREATE OR REPLACE RULE delete AS
-                ON DELETE TO '||versionView||' DO INSTEAD  
-                INSERT INTO '||versionLogTable||' ('||myPkey||','||fields||',action) VALUES (old.'||myPkey||','||oldFields||',''delete'')';                
-
-       
-    execute 'CREATE OR REPLACE RULE insert AS
-                ON INSERT TO '||versionView||' DO INSTEAD  
-                INSERT INTO '||versionLogTable||' ('||myPkey||','||fields||',action) VALUES ('||mySequence||','||newFields||',''insert'')';
-          
-     execute 'CREATE OR REPLACE RULE update AS
-                ON UPDATE TO '||versionView||' DO INSTEAD  
-                INSERT INTO '||versionLogTable||' ('||myPkey||','||fields||',action) VALUES (old.'||myPkey||','||newFields||',''update'')'; 
+     execute 'CREATE TRIGGER pgvs_version_record_trigger
+              INSTEAD OF INSERT OR UPDATE OR DELETE
+              ON '||versionView||'
+              FOR EACH ROW
+              EXECUTE PROCEDURE versions.pgvs_version_record();';                
 
      execute 'INSERT INTO '||versionLogTable||' ('||myPkey||','||fields||', action, revision, logmsg, commit ) 
                 select '||myPkey||','||fields||', ''insert'' as action, 0 as revision, ''initial commit revision 0'' as logmsg, ''t'' as commit 
@@ -904,11 +908,12 @@ CREATE FUNCTION pgvsinit(character varying) RETURNS boolean
                 version_table_id, revision, tag_text) 
               SELECT version_table_id, 0 as revision, ''initial commit revision 0'' as tag_text FROM versions.version_tables where version_table_schema = '''||mySchema||''' and version_table_name = '''|| myTable||''''; 
 
-    execute 'GRANT ALL ON TABLE '||versionLogTable||' TO versions';
-    execute 'GRANT ALL ON TABLE '||versionLogTableSeq||' TO versions';
-    execute 'GRANT ALL ON TABLE '||versionView||' TO versions';
-    execute 'GRANT ALL ON sequence versions."'||mySchema||'_'||myTable||'_revision_seq" to versions'; 
-    
+/*
+    execute 'GRANT ALL ON TABLE '||versionLogTable||' TO version';
+    execute 'GRANT ALL ON TABLE '||versionLogTableSeq||' TO version';
+    execute 'GRANT ALL ON TABLE '||versionView||' TO version';
+    execute 'GRANT ALL ON sequence versions."'||mySchema||'_'||myTable||'_revision_seq" to version'; 
+*/    
                 
   RETURN true ;                             
 
@@ -917,7 +922,6 @@ $_$;
 
 
 --
--- TOC entry 1323 (class 1255 OID 171101)
 -- Name: pgvslogview(character varying); Type: FUNCTION; Schema: versions; Owner: -
 --
 
@@ -969,7 +973,6 @@ $_$;
 
 
 --
--- TOC entry 1329 (class 1255 OID 171102)
 -- Name: pgvsmerge(character varying, integer, character varying); Type: FUNCTION; Schema: versions; Owner: -
 --
 
@@ -1116,7 +1119,6 @@ myDebug := 'select a.'||myPkey||' as objectkey,
 
 
 --
--- TOC entry 1324 (class 1255 OID 171103)
 -- Name: pgvsrevert(character varying); Type: FUNCTION; Schema: versions; Owner: -
 --
 
@@ -1196,7 +1198,6 @@ $_$;
 
 
 --
--- TOC entry 1325 (class 1255 OID 171104)
 -- Name: pgvsrevision(); Type: FUNCTION; Schema: versions; Owner: -
 --
 
@@ -1214,7 +1215,6 @@ $$;
 
 
 --
--- TOC entry 1331 (class 1255 OID 171105)
 -- Name: pgvsrollback(character varying, integer); Type: FUNCTION; Schema: versions; Owner: -
 --
 
@@ -1314,7 +1314,7 @@ rollbackQry := 'insert into '||versionLogTable||' ('||myInsertFields||', action)
                group by v.'||myPkey||') as foo
               where v.version_log_id = foo.version_log_id
 
-              UNION ALL
+              union
 
                 select '||fields||', v.action 
                 from '||versionLogTable||' as v, 
@@ -1347,7 +1347,6 @@ $_$;
 
 
 --
--- TOC entry 1330 (class 1255 OID 171106)
 -- Name: pgvsupdatecheck(character varying); Type: FUNCTION; Schema: versions; Owner: -
 --
 
@@ -1387,8 +1386,57 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- TOC entry 249 (class 1259 OID 171107)
--- Name: version_tables; Type: TABLE; Schema: versions; Owner: -; Tablespace: 
+-- Name: public_test_poly_version_log; Type: TABLE; Schema: versions; Owner: -
+--
+
+CREATE TABLE public_test_poly_version_log (
+    id_0 integer NOT NULL,
+    geom public.geometry(MultiPolygon,21781),
+    id character varying(10),
+    name character varying(80),
+    version_log_id bigint NOT NULL,
+    action character varying NOT NULL,
+    project character varying DEFAULT "current_user"() NOT NULL,
+    systime bigint DEFAULT (date_part('epoch'::text, (now())::timestamp without time zone) * (1000)::double precision) NOT NULL,
+    revision bigint,
+    logmsg text,
+    commit boolean DEFAULT false
+);
+
+
+--
+-- Name: public_test_poly_revision_seq; Type: SEQUENCE; Schema: versions; Owner: -
+--
+
+CREATE SEQUENCE public_test_poly_revision_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: public_test_poly_version_log_version_log_id_seq; Type: SEQUENCE; Schema: versions; Owner: -
+--
+
+CREATE SEQUENCE public_test_poly_version_log_version_log_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: public_test_poly_version_log_version_log_id_seq; Type: SEQUENCE OWNED BY; Schema: versions; Owner: -
+--
+
+ALTER SEQUENCE public_test_poly_version_log_version_log_id_seq OWNED BY public_test_poly_version_log.version_log_id;
+
+
+--
+-- Name: version_tables; Type: TABLE; Schema: versions; Owner: -
 --
 
 CREATE TABLE version_tables (
@@ -1398,29 +1446,12 @@ CREATE TABLE version_tables (
     version_view_schema character varying,
     version_view_name character varying,
     version_view_pkey character varying,
-    version_view_geometry_column character varying,
-    CONSTRAINT version_tables_pkey PRIMARY KEY (version_table_id)
+    version_view_geometry_column character varying
 );
 
-GRANT SELECT, UPDATE, INSERT ON TABLE versions.version_tables TO versions;
-
-CREATE TABLE versions.version_tags
-(
-  tags_id bigserial NOT NULL,
-  version_table_id bigint NOT NULL,
-  revision bigint NOT NULL,
-  tag_text character varying NOT NULL,
-  CONSTRAINT version_tags_pkey PRIMARY KEY (version_table_id, revision, tag_text),
-  CONSTRAINT version_tables_fk FOREIGN KEY (version_table_id)
-      REFERENCES versions.version_tables (version_table_id) MATCH FULL
-      ON UPDATE CASCADE ON DELETE CASCADE
-);
-
-GRANT SELECT, UPDATE, INSERT ON TABLE versions.version_tags TO versions;
 
 --
--- TOC entry 250 (class 1259 OID 171113)
--- Name: version_tables_logmsg; Type: TABLE; Schema: versions; Owner: -; Tablespace: 
+-- Name: version_tables_logmsg; Type: TABLE; Schema: versions; Owner: -
 --
 
 CREATE TABLE version_tables_logmsg (
@@ -1432,10 +1463,8 @@ CREATE TABLE version_tables_logmsg (
     project character varying DEFAULT "current_user"()
 );
 
-GRANT SELECT, UPDATE, INSERT ON TABLE versions.version_tables_logmsg TO versions;
 
 --
--- TOC entry 251 (class 1259 OID 171121)
 -- Name: version_tables_logmsg_id_seq; Type: SEQUENCE; Schema: versions; Owner: -
 --
 
@@ -1448,16 +1477,13 @@ CREATE SEQUENCE version_tables_logmsg_id_seq
 
 
 --
--- TOC entry 3318 (class 0 OID 0)
--- Dependencies: 251
 -- Name: version_tables_logmsg_id_seq; Type: SEQUENCE OWNED BY; Schema: versions; Owner: -
 --
 
 ALTER SEQUENCE version_tables_logmsg_id_seq OWNED BY version_tables_logmsg.id;
-GRANT USAGE ON SEQUENCE versions.version_tables_logmsg_id_seq TO versions;
+
 
 --
--- TOC entry 252 (class 1259 OID 171123)
 -- Name: version_tables_version_table_id_seq; Type: SEQUENCE; Schema: versions; Owner: -
 --
 
@@ -1470,26 +1496,51 @@ CREATE SEQUENCE version_tables_version_table_id_seq
 
 
 --
--- TOC entry 3320 (class 0 OID 0)
--- Dependencies: 252
 -- Name: version_tables_version_table_id_seq; Type: SEQUENCE OWNED BY; Schema: versions; Owner: -
 --
 
 ALTER SEQUENCE version_tables_version_table_id_seq OWNED BY version_tables.version_table_id;
-GRANT USAGE ON SEQUENCE versions.version_table_id_seq TO versions;
 
-CREATE SEQUENCE versions.version_tags_tags_id_seq
-  INCREMENT 1
-  MINVALUE 1
-  MAXVALUE 9223372036854775807
-  START 4
-  CACHE 1;
-
-GRANT ALL ON SEQUENCE versions.version_tags_tags_id_seq TO hdus;
-GRANT USAGE ON SEQUENCE versions.version_tags_tags_id_seq TO versions;
 
 --
--- TOC entry 3177 (class 2604 OID 171125)
+-- Name: version_tags; Type: TABLE; Schema: versions; Owner: -
+--
+
+CREATE TABLE version_tags (
+    tags_id bigint NOT NULL,
+    version_table_id bigint NOT NULL,
+    revision bigint NOT NULL,
+    tag_text character varying NOT NULL
+);
+
+
+--
+-- Name: version_tags_tags_id_seq; Type: SEQUENCE; Schema: versions; Owner: -
+--
+
+CREATE SEQUENCE version_tags_tags_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: version_tags_tags_id_seq; Type: SEQUENCE OWNED BY; Schema: versions; Owner: -
+--
+
+ALTER SEQUENCE version_tags_tags_id_seq OWNED BY version_tags.tags_id;
+
+
+--
+-- Name: version_log_id; Type: DEFAULT; Schema: versions; Owner: -
+--
+
+ALTER TABLE ONLY public_test_poly_version_log ALTER COLUMN version_log_id SET DEFAULT nextval('public_test_poly_version_log_version_log_id_seq'::regclass);
+
+
+--
 -- Name: version_table_id; Type: DEFAULT; Schema: versions; Owner: -
 --
 
@@ -1497,17 +1548,37 @@ ALTER TABLE ONLY version_tables ALTER COLUMN version_table_id SET DEFAULT nextva
 
 
 --
--- TOC entry 3180 (class 2604 OID 171126)
 -- Name: id; Type: DEFAULT; Schema: versions; Owner: -
 --
 
 ALTER TABLE ONLY version_tables_logmsg ALTER COLUMN id SET DEFAULT nextval('version_tables_logmsg_id_seq'::regclass);
 
 
+--
+-- Name: tags_id; Type: DEFAULT; Schema: versions; Owner: -
+--
+
+ALTER TABLE ONLY version_tags ALTER COLUMN tags_id SET DEFAULT nextval('version_tags_tags_id_seq'::regclass);
+
 
 --
--- TOC entry 3185 (class 2606 OID 171130)
--- Name: version_tables_logmsg_pkey; Type: CONSTRAINT; Schema: versions; Owner: -; Tablespace: 
+-- Name: test_poly_pkey; Type: CONSTRAINT; Schema: versions; Owner: -
+--
+
+ALTER TABLE ONLY public_test_poly_version_log
+    ADD CONSTRAINT test_poly_pkey PRIMARY KEY (id_0, project, systime, action);
+
+
+--
+-- Name: version_table_pkey; Type: CONSTRAINT; Schema: versions; Owner: -
+--
+
+ALTER TABLE ONLY version_tables
+    ADD CONSTRAINT version_table_pkey PRIMARY KEY (version_table_id);
+
+
+--
+-- Name: version_tables_logmsg_pkey; Type: CONSTRAINT; Schema: versions; Owner: -
 --
 
 ALTER TABLE ONLY version_tables_logmsg
@@ -1515,19 +1586,51 @@ ALTER TABLE ONLY version_tables_logmsg
 
 
 --
--- TOC entry 3183 (class 1259 OID 171131)
--- Name: fki_version_tables_fkey; Type: INDEX; Schema: versions; Owner: -; Tablespace: 
+-- Name: version_tags_pkey; Type: CONSTRAINT; Schema: versions; Owner: -
+--
+
+ALTER TABLE ONLY version_tags
+    ADD CONSTRAINT version_tags_pkey PRIMARY KEY (version_table_id, revision, tag_text);
+
+
+--
+-- Name: fki_version_tables_fkey; Type: INDEX; Schema: versions; Owner: -
 --
 
 CREATE INDEX fki_version_tables_fkey ON version_tables_logmsg USING btree (version_table_id);
 
 
 --
--- TOC entry 3186 (class 2606 OID 171132)
+-- Name: public_test_poly_version_log_id_idx; Type: INDEX; Schema: versions; Owner: -
+--
+
+CREATE INDEX public_test_poly_version_log_id_idx ON public_test_poly_version_log USING btree (version_log_id);
+
+
+--
+-- Name: test_poly_version_geo_idx; Type: INDEX; Schema: versions; Owner: -
+--
+
+CREATE INDEX test_poly_version_geo_idx ON public_test_poly_version_log USING gist (geom);
+
+
+--
+-- Name: version_tables_fk; Type: FK CONSTRAINT; Schema: versions; Owner: -
+--
+
+ALTER TABLE ONLY version_tags
+    ADD CONSTRAINT version_tables_fk FOREIGN KEY (version_table_id) REFERENCES version_tables(version_table_id) MATCH FULL ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
 -- Name: version_tables_fkey; Type: FK CONSTRAINT; Schema: versions; Owner: -
 --
 
 ALTER TABLE ONLY version_tables_logmsg
     ADD CONSTRAINT version_tables_fkey FOREIGN KEY (version_table_id) REFERENCES version_tables(version_table_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
+
+--
+-- PostgreSQL database dump complete
+--
 
