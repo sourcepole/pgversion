@@ -552,54 +552,64 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
             cols = myDb.cols(sql)
             myCols = ', '.join(cols)+', st_asewkb("'+geomCol+'")'
             
-            sql = ("select row_number() OVER () AS rownum, * \
-from (select *, 'delete'::varchar as action, head.head as revision \
-from (select max(revision) as head from versions.{schema}_{table}_log) as head, \
-((select v.{cols} \
-from versions.pgvscheckout('{schema}.{origin}', (select max(revision) as head from versions.{schema}_{table}_log)) as c,  \
-versions.{schema}_{table}_log as v \
-where c.log_id = v.{uniqueCol}  \
-and c.systime = v.systime \
+            extent = self.iface.mapCanvas().extent().toString().replace(':',',')
+            authority,  crs = currentLayer.crs().authid().split(':')
+            geo_idx = '%s && ST_MakeEnvelope(%s,%s)' %  (geomCol,  extent,  crs)
+
+            sql = ("with \
+head as (select max(revision) as head from versions.{schema}_{table}_log), \
+checkout as (select v.{cols} \
+from versions.pgvscheckout('{schema}.{origin}', (select * from head)) as c, versions.{schema}_{table}_log as v \
+where {geo_idx} \
+and c.log_id = v.{uniqueCol}  \
+and c.systime = v.systime), \
+\
+version as (select v.{cols}  \
+from {schema}.{table} as v \
+where {geo_idx}) \
+\
+select row_number() OVER () AS rownum, *  \
+from (select *, 'delete'::varchar as action, head as revision from head, ( \
+(select * from checkout \
 except \
-select v.{cols}  \
-from {schema}.{table} as v)) as foo \
+select * from version) \
+) as foo \
 union all \
 select *, 'insert'::varchar as action, head.head as revision \
-from (select max(revision) as head from versions.{schema}_{table}_log) as head, \
-(select v.{cols} \
-from {schema}.{table} as v \
+from head, ( \
+select * from version \
 except \
-select v.{cols} \
-from versions.pgvscheckout('{schema}.{origin}', (select max(revision) as head from versions.{schema}_{table}_log)) as c, \
-versions.{schema}_{table}_log as v \
-where c.log_id = v.{uniqueCol} and c.systime = v.systime) as foo1) as foo ").format(schema = mySchema,  table=myTable,  origin=myTable.replace('_version', ''), cols = myCols,  uniqueCol = uniqueCol )
+select * from checkout) as foo1 \
+) as foo ").format(schema = mySchema,  table=myTable,  origin=myTable.replace('_version', ''), cols = myCols,  uniqueCol = uniqueCol,  geo_idx = geo_idx )
 
+#            QMessageBox.information(None,'',  sql)
+            
             myUri = QgsDataSourceURI(self.tools.layerUri(currentLayer))
             myUri.setDataSource("", u"(%s\n)" % sql, geomCol, "", "rownum")
-
-#            layer = QgsVectorLayer(myUri.uri(), myTable+" (Diff to HEAD Revision)", "postgres")       
-            defult_tmp_dir = tempfile._get_default_tempdir()
-            temp_name = defult_tmp_dir+"/"+next(tempfile._get_candidate_names())+".shp"
+            layer = QgsVectorLayer(myUri.uri(), myTable+" (Diff to HEAD Revision)", "postgres")       
             
-            QgsVectorFileWriter.writeAsVectorFormat(QgsVectorLayer(myUri.uri(), myTable+" (Diff to HEAD Revision)", "postgres") , temp_name, "utf-8", None, "ESRI Shapefile")  
-            layer_shp = QgsVectorLayer(temp_name,  myTable+" (Diff to HEAD Revision)",  "ogr")
+#            defult_tmp_dir = tempfile._get_default_tempdir()
+#            temp_name = defult_tmp_dir+"/"+next(tempfile._get_candidate_names())+".shp"
+#            
+#            QgsVectorFileWriter.writeAsVectorFormat(QgsVectorLayer(myUri.uri(), myTable+" (Diff to HEAD Revision)", "postgres") , temp_name, "utf-8", None, "ESRI Shapefile")  
+#            layer_ = QgsVectorLayer(temp_name,  myTable+" (Diff to HEAD Revision)",  "ogr")
+#            
             
-            
-            if not layer_shp.isValid():
+            if not layer.isValid():
                 self.iface.messageBar().pushMessage('WARNING', QCoreApplication.translate('PgVersion','No diffs to HEAD detected! Layer could not be loaded.'), level=QgsMessageBar.INFO, duration=3)
 
             else:                
                 userPluginPath = QFileInfo(QgsApplication.qgisUserDbFilePath()).path()+"/python/plugins/pgversion"  
-                layer_shp.setRendererV2(None)
+                layer.setRendererV2(None)
     
                 if geometryType == 0:
-                    layer_shp.loadNamedStyle(userPluginPath+"/legends/diff_point.qml")             
+                    layer.loadNamedStyle(userPluginPath+"/legends/diff_point.qml")             
                 elif geometryType == 1:
-                    layer_shp.loadNamedStyle(userPluginPath+"/legends/diff_linestring.qml")             
+                    layer.loadNamedStyle(userPluginPath+"/legends/diff_linestring.qml")             
                 elif geometryType == 2:
-                    layer_shp.loadNamedStyle(userPluginPath+"/legends/diff_polygon.qml")             
+                    layer.loadNamedStyle(userPluginPath+"/legends/diff_polygon.qml")             
     
-                QgsMapLayerRegistry.instance().addMapLayer(layer_shp)
+                QgsMapLayerRegistry.instance().addMapLayer(layer)
                 self.iface.messageBar().pushMessage('INFO', QCoreApplication.translate('PgVersion','Diff to HEAD revision was successful!'), level=QgsMessageBar.INFO, duration=3)
                 
             QApplication.restoreOverrideCursor()
