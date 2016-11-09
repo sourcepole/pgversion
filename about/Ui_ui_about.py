@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/home/hdus/dev/pythonlibs/about/ui_about.ui'
+# Form implementation generated from reading ui file '/home/hdus/dev/qgis/pgversion-plugin/pgversion/about/ui_about.ui'
 #
-# Created: Wed Mar 12 11:53:44 2014
-#      by: PyQt4 UI code generator 4.9.1
+# Created by: PyQt4 UI code generator 4.11.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -12,7 +11,16 @@ from PyQt4 import QtCore, QtGui
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
 except AttributeError:
-    _fromUtf8 = lambda s: s
+    def _fromUtf8(s):
+        return s
+
+try:
+    _encoding = QtGui.QApplication.UnicodeUTF8
+    def _translate(context, text, disambig):
+        return QtGui.QApplication.translate(context, text, disambig, _encoding)
+except AttributeError:
+    def _translate(context, text, disambig):
+        return QtGui.QApplication.translate(context, text, disambig)
 
 class Ui_dlgAbout(object):
     def setupUi(self, dlgAbout):
@@ -25,7 +33,6 @@ class Ui_dlgAbout(object):
         self.widget.setMaximumSize(QtCore.QSize(180, 16777215))
         self.widget.setObjectName(_fromUtf8("widget"))
         self.verticalLayout = QtGui.QVBoxLayout(self.widget)
-        self.verticalLayout.setMargin(0)
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
         self.lblVersion = QtGui.QLabel(self.widget)
         self.lblVersion.setMaximumSize(QtCore.QSize(16777215, 14))
@@ -76,6 +83,14 @@ class Ui_dlgAbout(object):
         self.memAcknowl.setObjectName(_fromUtf8("memAcknowl"))
         self.gridLayout_4.addWidget(self.memAcknowl, 0, 0, 1, 1)
         self.tabWidget.addTab(self.tab_2, _fromUtf8(""))
+        self.tab_5 = QtGui.QWidget()
+        self.tab_5.setObjectName(_fromUtf8("tab_5"))
+        self.gridLayout_6 = QtGui.QGridLayout(self.tab_5)
+        self.gridLayout_6.setObjectName(_fromUtf8("gridLayout_6"))
+        self.memSponsor = QtGui.QTextEdit(self.tab_5)
+        self.memSponsor.setObjectName(_fromUtf8("memSponsor"))
+        self.gridLayout_6.addWidget(self.memSponsor, 0, 0, 1, 1)
+        self.tabWidget.addTab(self.tab_5, _fromUtf8(""))
         self.tab_4 = QtGui.QWidget()
         self.tab_4.setObjectName(_fromUtf8("tab_4"))
         self.gridLayout_5 = QtGui.QGridLayout(self.tab_4)
@@ -96,12 +111,13 @@ class Ui_dlgAbout(object):
         QtCore.QMetaObject.connectSlotsByName(dlgAbout)
 
     def retranslateUi(self, dlgAbout):
-        dlgAbout.setWindowTitle(QtGui.QApplication.translate("dlgAbout", "About", None, QtGui.QApplication.UnicodeUTF8))
-        self.lblVersion.setText(QtGui.QApplication.translate("dlgAbout", "Version:", None, QtGui.QApplication.UnicodeUTF8))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QtGui.QApplication.translate("dlgAbout", "About ", None, QtGui.QApplication.UnicodeUTF8))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), QtGui.QApplication.translate("dlgAbout", "Contributors", None, QtGui.QApplication.UnicodeUTF8))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), QtGui.QApplication.translate("dlgAbout", "Contact", None, QtGui.QApplication.UnicodeUTF8))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_4), QtGui.QApplication.translate("dlgAbout", "Change Log", None, QtGui.QApplication.UnicodeUTF8))
+        dlgAbout.setWindowTitle(_translate("dlgAbout", "About", None))
+        self.lblVersion.setText(_translate("dlgAbout", "Version:", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("dlgAbout", "About ", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), _translate("dlgAbout", "Contributors", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("dlgAbout", "Contact", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_5), _translate("dlgAbout", "Sponsors", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_4), _translate("dlgAbout", "Change Log", None))
 
 
 if __name__ == "__main__":

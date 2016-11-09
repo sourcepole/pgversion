@@ -38,14 +38,20 @@ class DlgAbout( QDialog, Ui_dlgAbout ):
         self.tabWidget.setTabText(0,  result['name'])
         self.tabWidget.setTabText(1,  self.tr("Author"))
         self.tabWidget.setTabText(2,  self.tr("Contact"))
-        self.tabWidget.setTabText(3,  self.tr("Change Log"))
+        self.tabWidget.setTabText(3,  self.tr("Sponsors"))
+        self.tabWidget.setTabText(4,  self.tr("Change Log"))
     
         # setup texts
         aboutString = pystring( result['description'] )
     
         contribString = self.tr("<p><center><b>Author(s):</b></center></p>") 
-        contribString += self.tr(u"<p>")+result['author']+"<br>" 
+        contribString += self.tr(u"<p>")+result['author']+"<br><br>"
         
+        sponsorString = self.tr(u"<b>The development of PgVersion was funded by:</b><br><br>")  
+        sponsorString += self.tr(u"- Sourcepole AG, Weberstrasse 5, CH-8004 Zurich<br>")        
+        sponsorString += self.tr(u"- Canton of Glarus / Switzerland<br>")
+        sponsorString += self.tr(u"- Lower Saxony Ministry of Food, Agriculture and consumer protection / Germany<br>" )
+         
         licenseString = pystring(self.tr(u"Sourcepole AG - Linux & Open Source Solutions\n"))
         licenseString += self.tr(u"Weberstrasse 5, 8004 Zürich, Switzerland\n")
         
@@ -61,6 +67,7 @@ class DlgAbout( QDialog, Ui_dlgAbout ):
         # write texts
         self.memAbout.setText( aboutString )
         self.memContrib.setText(contribString )
+        self.memSponsor.setText(sponsorString)
         self.memAcknowl.setText( licenseString )
         self.memChangeLog.setText( result['changelog'] )
                 

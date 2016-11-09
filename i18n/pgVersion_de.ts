@@ -126,37 +126,62 @@
         <translation>Kontakt</translation>
     </message>
     <message>
-        <location filename="../about/doAbout.py" line="41"/>
+        <location filename="../about/doAbout.py" line="42"/>
         <source>Change Log</source>
         <translation>Änderungen</translation>
     </message>
     <message>
-        <location filename="../about/doAbout.py" line="46"/>
+        <location filename="../about/doAbout.py" line="47"/>
         <source>&lt;p&gt;&lt;center&gt;&lt;b&gt;Author(s):&lt;/b&gt;&lt;/center&gt;&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;center&gt;&lt;b&gt;Autoren:&lt;/b&gt;&lt;/center&gt;&lt;/p&gt;</translation>
     </message>
     <message>
-        <location filename="../about/doAbout.py" line="47"/>
+        <location filename="../about/doAbout.py" line="48"/>
         <source>&lt;p&gt;</source>
         <translation>&lt;p&gt;</translation>
     </message>
     <message>
-        <location filename="../about/doAbout.py" line="49"/>
+        <location filename="../about/doAbout.py" line="55"/>
         <source>Sourcepole AG - Linux &amp; Open Source Solutions
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../about/doAbout.py" line="50"/>
+        <location filename="../about/doAbout.py" line="56"/>
         <source>Weberstrasse 5, 8004 Zürich, Switzerland
 </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../about/doAbout.py" line="53"/>
+        <location filename="../about/doAbout.py" line="59"/>
         <source>Contact:
 </source>
         <translation>Kontakt:</translation>
+    </message>
+    <message>
+        <location filename="../about/doAbout.py" line="52"/>
+        <source>- Canton of Glarus / Switzerland&lt;br&gt;</source>
+        <translation>- Kanton Glarus / Schweiz&lt;br&gt;</translation>
+    </message>
+    <message>
+        <location filename="../about/doAbout.py" line="53"/>
+        <source>- Lower Saxony Ministry of Food, Agriculture and consumer protection / Germany&lt;br&gt;</source>
+        <translation>- Niedersächsisches Ministerium for Ernährung, Landwirtschaft und Konsumentenschutz / Deutschaland</translation>
+    </message>
+    <message>
+        <location filename="../about/doAbout.py" line="41"/>
+        <source>Sponsors</source>
+        <translation>Sponsoren</translation>
+    </message>
+    <message>
+        <location filename="../about/doAbout.py" line="50"/>
+        <source>&lt;b&gt;The development of PgVersion was funded by:&lt;/b&gt;&lt;br&gt;&lt;br&gt;</source>
+        <translation>&lt;b&gt;Die Entwicklung von PgVersion wurde durch die folgenden Institutionen finanziert:&lt;/b&gt;&lt;br&gt;&lt;br&gt;</translation>
+    </message>
+    <message>
+        <location filename="../about/doAbout.py" line="51"/>
+        <source>- Sourcepole AG, Weberstrasse 5, CH-8004 Zurich&lt;br&gt;</source>
+        <translation>- Sourcepole AG, Weberstrasse 5, CH-8004 Zürich&lt;br&gt;</translation>
     </message>
 </context>
 <context>
@@ -331,37 +356,37 @@
         <translation>Sind sie sicher, dass Sie alle ausgewählten Objekte löschen wollen? Sie können diesen Schritt nicht rückgängig machen!</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="621"/>
+        <location filename="../pgVersion.py" line="632"/>
         <source>Please select a layer for versioning</source>
         <translation>Bitte wählen Sie eine Ebene zur Versionierung aus</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="628"/>
+        <location filename="../pgVersion.py" line="639"/>
         <source>Warning</source>
         <translation>Warnung</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="227"/>
+        <location filename="../pgVersion.py" line="230"/>
         <source>The selected layer is already under versioning!</source>
         <translation>Die ausgewählte Ebene ist bereits versioniert!</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="237"/>
+        <location filename="../pgVersion.py" line="240"/>
         <source>Do you want to create the version environment for the table {0}</source>
         <translation>Wollen Sie die Versionierung für die Tabelle {0} erstellen?</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="624"/>
+        <location filename="../pgVersion.py" line="635"/>
         <source>Yes</source>
         <translation>Ja</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="624"/>
+        <location filename="../pgVersion.py" line="635"/>
         <source>No</source>
         <translation>Nein</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="242"/>
+        <location filename="../pgVersion.py" line="245"/>
         <source>Init was successful!
 
 Please set the user permissions for table {0} and reload it via Database -&gt; PG Version!</source>
@@ -370,107 +395,107 @@ Please set the user permissions for table {0} and reload it via Database -&gt; P
 Bitte setzen Sie die gewünschten Benutzerrechte für die Tabelle {0} laden Sie diese über Database --&gt; Pg Version neu!</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="249"/>
+        <location filename="../pgVersion.py" line="252"/>
         <source>Init Error</source>
         <translation>Initialisierungsfehler</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="249"/>
+        <location filename="../pgVersion.py" line="252"/>
         <source>Versioning envoronment for table {0} already exsists!</source>
         <translation>Die Versionierung für die Tabelle {0} existiert bereits!</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="355"/>
+        <location filename="../pgVersion.py" line="356"/>
         <source>Error</source>
         <translation>Fehler</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="355"/>
+        <location filename="../pgVersion.py" line="356"/>
         <source>Please select a valid revision</source>
         <translation>Bitte wählen Sie eine gültige Revision</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="533"/>
+        <location filename="../pgVersion.py" line="534"/>
         <source>Please select a versioned layer</source>
         <translation>Bitte wählen Sie eine versionierte Ebene aus</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="273"/>
+        <location filename="../pgVersion.py" line="275"/>
         <source>Are you sure to rollback to revision {0}?</source>
         <translation>Sind Sie sicher, dass Sie auf die Revision {0} zurücksetzen wollen?</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="276"/>
+        <location filename="../pgVersion.py" line="278"/>
         <source>Layer {0} has modifications which will be lost after rollback! If you want to keep this modifications please commit them. Are you sure to rollback to revision {1}?</source>
         <translation>Die Ebene {0} enthält Änderungen, die nach dem Zurücksetzen verloren gehen werden! Wenn Sie diese Änderungen behalten möchten pflegen Sie bitte die Änderungen zuerst in die Datenbank ein. Sind Sie sicher, dass Sie auf Revision {1} zurücksetzen wollen?</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="304"/>
+        <location filename="../pgVersion.py" line="305"/>
         <source>Rollback to revision {0} was successful!</source>
         <translation>Zurücksetzen auf Revision {0} war erfolgreich!</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="311"/>
+        <location filename="../pgVersion.py" line="312"/>
         <source>Please select a versioned layer for committing</source>
         <translation>Bitte wählen Sie einen versionierten Layer zum Übergeben aus</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="487"/>
+        <location filename="../pgVersion.py" line="488"/>
         <source>Please select a versioned layer!</source>
         <translation>Bitte wählen Sie eine versionierte Ebene aus</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="337"/>
+        <location filename="../pgVersion.py" line="338"/>
         <source>Commit of your changes was successful</source>
         <translation>Übertragen der Änderungen war erfolgreich!</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="349"/>
+        <location filename="../pgVersion.py" line="350"/>
         <source>No layer changes for committing, everything is OK</source>
         <translation>Keine Änderungen zum Übergeben vorhanden, alles ist OK</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="368"/>
+        <location filename="../pgVersion.py" line="369"/>
         <source>Are you sure to checkout the layer to revision {0}?</source>
         <translation>Sind Sie sicher, dass Sie die Revision {0} auschecken wollen?</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="406"/>
+        <location filename="../pgVersion.py" line="407"/>
         <source>Checkout to revision {0} was successful!</source>
         <translation>Auschecken auf Revision {0} war erfolgreich!</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="408"/>
+        <location filename="../pgVersion.py" line="410"/>
         <source>Something went wrong during checkout to revision {0}!</source>
         <translation>Es ist beim Auschecken auf Revision {0} etwas schief gegangen!</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="428"/>
+        <location filename="../pgVersion.py" line="430"/>
         <source>are you sure to revert to the HEAD revision?</source>
         <translation>Sind Sie sicher, dass Sie auf die HEAD Revision zurücksetzen wollen?</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="437"/>
+        <location filename="../pgVersion.py" line="439"/>
         <source>All changes are set back to the HEAD revision: {0}</source>
         <translation>Alle Änderungen sind auf die HEAD Revision {0} zurückgesetzt worden</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="588"/>
+        <location filename="../pgVersion.py" line="599"/>
         <source>No diffs to HEAD detected! Layer could not be loaded.</source>
         <translation>Es konnten keine Unterschiede zur HEAD Revision gefunden werden! Die Ebene wurde nicht geladen.</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="602"/>
+        <location filename="../pgVersion.py" line="613"/>
         <source>Diff to HEAD revision was successful!</source>
         <translation>Auswerten der Unterschiede zur HEAD Revision war erfolgreich!</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="624"/>
+        <location filename="../pgVersion.py" line="635"/>
         <source>are you sure to to drop pgvs from the table {0}?</source>
         <translation>Sind Sie sicher, dass Sie die Versionierung von der Tabelle {0} löschen wollen?</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="638"/>
+        <location filename="../pgVersion.py" line="649"/>
         <source>Versioning for layer {0} dropped!</source>
         <translation>Versionierung der Ebene {0} gelöscht!</translation>
     </message>
@@ -609,34 +634,39 @@ wie in der Hilfe beschrieben</translation>
 <context>
     <name>dlgAbout</name>
     <message>
-        <location filename="../about/Ui_ui_about.py" line="99"/>
+        <location filename="../about/Ui_ui_about.py" line="114"/>
         <source>About</source>
         <translation>Über</translation>
     </message>
     <message>
-        <location filename="../about/Ui_ui_about.py" line="100"/>
+        <location filename="../about/Ui_ui_about.py" line="115"/>
         <source>Version:</source>
         <translation>Version: </translation>
     </message>
     <message>
-        <location filename="../about/Ui_ui_about.py" line="101"/>
+        <location filename="../about/Ui_ui_about.py" line="116"/>
         <source>About </source>
         <translation>Über </translation>
     </message>
     <message>
-        <location filename="../about/Ui_ui_about.py" line="102"/>
+        <location filename="../about/Ui_ui_about.py" line="117"/>
         <source>Contributors</source>
         <translation>Beitragende</translation>
     </message>
     <message>
-        <location filename="../about/Ui_ui_about.py" line="103"/>
+        <location filename="../about/Ui_ui_about.py" line="118"/>
         <source>Contact</source>
         <translation>Kontakt</translation>
     </message>
     <message>
-        <location filename="../about/Ui_ui_about.py" line="104"/>
+        <location filename="../about/Ui_ui_about.py" line="120"/>
         <source>Change Log</source>
         <translation>Änderungen</translation>
+    </message>
+    <message>
+        <location filename="../about/Ui_ui_about.py" line="119"/>
+        <source>Sponsors</source>
+        <translation>Sponsoren</translation>
     </message>
 </context>
 <context>

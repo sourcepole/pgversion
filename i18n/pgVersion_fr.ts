@@ -29,7 +29,7 @@
     <message>
         <location filename="Ui_Ui_dbVersionCheck.py" line="44"/>
         <source>Ctrl+S</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
