@@ -160,13 +160,13 @@
     </message>
     <message>
         <location filename="../about/doAbout.py" line="52"/>
-        <source>- Canton of Glarus / Switzerland&lt;br&gt;</source>
+        <source>- Kanton Glarus / Switzerland&lt;br&gt;</source>
         <translation>- Kanton Glarus / Schweiz&lt;br&gt;</translation>
     </message>
     <message>
         <location filename="../about/doAbout.py" line="53"/>
         <source>- Lower Saxony Ministry of Food, Agriculture and consumer protection / Germany&lt;br&gt;</source>
-        <translation>- Niedersächsisches Ministerium for Ernährung, Landwirtschaft und Konsumentenschutz / Deutschaland</translation>
+        <translation>- Niedersächsisches Ministerium für Ernährung, Landwirtschaft und Verbraucherschutzschutz / Deutschaland</translation>
     </message>
     <message>
         <location filename="../about/doAbout.py" line="41"/>
@@ -180,8 +180,8 @@
     </message>
     <message>
         <location filename="../about/doAbout.py" line="51"/>
-        <source>- Sourcepole AG, Weberstrasse 5, CH-8004 Zurich&lt;br&gt;</source>
-        <translation>- Sourcepole AG, Weberstrasse 5, CH-8004 Zürich&lt;br&gt;</translation>
+        <source>- Sourcepole AG, Weberstrasse 5, CH-8004 Zürich&lt;br&gt;</source>
+        <translation></translation>
     </message>
 </context>
 <context>
