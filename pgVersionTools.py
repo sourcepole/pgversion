@@ -38,6 +38,9 @@ class PgVersionTools:
       self.createVersionPath = '<Plugin-Directory>/pgversion/docs/create_versions_schema.sql'
       pass
 
+  def layerRepaint(self):
+        for layer in self.iface.mapCanvas().layers():
+            layer.triggerRepaint()
 
   def layerDB(self, connectionName,  layer):
 

@@ -334,7 +334,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
                         myDB = self.tools.layerDB('commit',  theLayer)
                         myDB.run(sql)
                         myDB.close()
-                        canvas.refresh()
+                        self.tools.layerRepaint()
                         self.iface.messageBar().pushMessage("Info", QCoreApplication.translate('PgVersion','Commit of your changes was successful'), level=QgsMessageBar.INFO, duration=3)            
                         self.tools.setModified(None,  True)
                         QApplication.restoreOverrideCursor()
