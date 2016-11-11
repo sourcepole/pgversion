@@ -133,13 +133,13 @@ class PgVersionTools:
         result = myDb.read(sql)
         myDb.close()
 
-#        try:
-        if int(result["COUNT"][0]) == 0:
-          return False
-        else:
-          return True      
-#        except:
-#            pass
+        try:
+          if int(result["COUNT"][0]) == 0:
+            return False
+          else:
+            return True      
+        except:
+            pass
 
   def setModified(self, myLayer=None,  unsetModified=False):
 

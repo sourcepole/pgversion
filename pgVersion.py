@@ -21,6 +21,7 @@ import sys
 # Import the PyQt and QGIS libraries
 from PyQt4.QtCore import * 
 from PyQt4.QtGui import *
+from PyQt4.QtWebKit import QWebView
 from qgis.core import *
 from qgis.gui import *
 from dbtools.dbTools import *
@@ -160,9 +161,9 @@ class PgVersion:
       layerList = canvas.layers()
 
       for l in layerList:
-
-          if l.type() == QgsMapLayer.VectorLayer and l.providerType() == 'postgres':
+          if l.type() == QgsMapLayer.VectorLayer and l.providerType() == 'postgres' and self.tools.isModified(l):
               l.editingStopped.connect(self.tools.setModified)
+              self.tools.setModified(l)
 
   def unload(self):
         # remove menubar
@@ -647,9 +648,7 @@ select * from checkout) as foo1 \
                 layer_name = theLayer.name()
                 QgsMapLayerRegistry.instance().removeMapLayer(theLayer.id())      
                 self.iface.messageBar().pushMessage('INFO', QCoreApplication.translate('PgVersion','Versioning for layer {0} dropped!').format(layer_name), level=QgsMessageBar.INFO, duration=3)
-
-
-
+  
 
   def doHelp(self):
       helpUrl = QUrl()
@@ -662,3 +661,15 @@ select * from checkout) as foo1 \
   def doAbout(self):
       self.about = DlgAbout(self.plugin_dir)
       self.about.show()
+      
+      
+      
+class HelpBrowser(QWebView):
+
+    def __init__(self):
+        QWebView.__init__(self)
+        self.loadFinished.connect(self._result_available)
+
+    def _result_available(self, ok):
+        frame = self.page().mainFrame()
+        print unicode(frame.toHtml()).encode('utf-8')      

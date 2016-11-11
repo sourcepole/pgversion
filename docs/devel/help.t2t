@@ -1,6 +1,6 @@
-PostGIS Versioning - pgVersion 2.0.0
+PostGIS Versioning - pgVersion 2.1.8
 
-Dr. Horst Duester, 2015, horst.duester@sourcepole.ch
+Dr. Horst Duester, 2016, horst.duester@sourcepole.ch
 
 
 %! target       : html
@@ -30,16 +30,6 @@ Dr. Horst Duester, 2015, horst.duester@sourcepole.ch
 
 % End of comments
 % -------------------
-= Change log =
-
-
-= TODO =
-
-- Tagged versions
-- Branches 
-- Merging of branches
-- 
-
 = Prerequisits =
 
 == Ubuntu ==
