@@ -120,7 +120,7 @@ class PgVersionTools:
         if myDb == None:
             return None
 
-        if len(myLayerUri.schema()) == 1:
+        if len(myLayerUri.schema()) == 0:
           schema = 'public'
         else:
           schema = myLayerUri.schema()
