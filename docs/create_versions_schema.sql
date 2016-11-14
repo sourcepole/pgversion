@@ -1,5 +1,5 @@
 --
--- create_versions_schema.sql revision 2.0 2016-11-11 09:27
+-- create_versions_schema.sql revision 2.0 2016-11-14 08:18
 --
 --
 -- PostgreSQL database dump
@@ -105,10 +105,10 @@ CREATE FUNCTION pgvs_version_record() RETURNS trigger
                 nextval(''versions.'|| quote_ident(TG_TABLE_SCHEMA ||'_'|| TG_TABLE_NAME) ||'_log_version_log_id_seq''), 
                 '''||lower(TG_OP)||''', current_user, date_part(''epoch''::text, (now())::timestamp without time zone) * (1000)::double precision, NULL, NULL, false';     
       
-     if TG_OP = 'INSERT' THEN     
+     if TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN     
         execute  qry USING NEW;
         RETURN NEW;
-     ELSEIF TG_OP = 'UPDATE' OR TG_OP = 'DELETE' THEN
+     ELSEIF TG_OP = 'DELETE' THEN
         execute  qry USING OLD;
         RETURN OLD;
      END IF;                         
@@ -908,12 +908,13 @@ CREATE FUNCTION pgvsinit(character varying) RETURNS boolean
              create index '||myTable||'_version_geo_idx on '||versionLogTable||' USING GIST ('||geomCol||');     
              
              insert into versions.version_tables (version_table_schema,version_table_name,version_view_schema,version_view_name,version_view_pkey,version_view_geometry_column) 
-                 values('''||mySchema||''','''||myTable||''','''||mySchema||''','''||myTable||'_version'','''||testPKey.column_name||''','''||geomCol||''');
-             insert into public.geometry_columns (f_table_catalog, f_table_schema,f_table_name,f_geometry_column,coord_dimension,srid,type)
-                 values ('''',''versions'','''||myTable||'_version_log'','''||geomCol||''','||geomDIM||','||geomSRID||','''||geomTYPE||''');
-             insert into public.geometry_columns (f_table_catalog, f_table_schema,f_table_name,f_geometry_column,coord_dimension,srid,type)
-               values ('''','''||mySchema||''','''||myTable||'_version'','''||geomCol||''','||geomDIM||','||geomSRID||','''||geomTYPE||''');';
+                 values('''||mySchema||''','''||myTable||''','''||mySchema||''','''||myTable||'_version'','''||testPKey.column_name||''','''||geomCol||''');';
     
+--             insert into public.geometry_columns (f_table_catalog, f_table_schema,f_table_name,f_geometry_column,coord_dimension,srid,type)
+--                 values ('''',''versions'','''||myTable||'_version_log'','''||geomCol||''','||geomDIM||','||geomSRID||','''||geomTYPE||''');
+--             insert into public.geometry_columns (f_table_catalog, f_table_schema,f_table_name,f_geometry_column,coord_dimension,srid,type)
+--               values ('''','''||mySchema||''','''||myTable||'_version'','''||geomCol||''','||geomDIM||','||geomSRID||','''||geomTYPE||''');';
+                 
     for attributes in select *
                       from  information_schema.columns
                       where table_schema=mySchema::name
@@ -1474,6 +1475,63 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
+-- Name: public_streets_version_log; Type: TABLE; Schema: versions; Owner: -
+--
+
+CREATE TABLE public_streets_version_log (
+    id_0 integer NOT NULL,
+    geom public.geometry(MultiLineString,4326),
+    id integer,
+    type character varying(30),
+    name character varying(190),
+    oneway character varying(9),
+    lanes double precision,
+    trunk_rev_begin integer,
+    trunk_rev_end integer,
+    trunk_parent integer,
+    trunk_child integer,
+    version_log_id bigint NOT NULL,
+    action character varying NOT NULL,
+    project character varying DEFAULT "current_user"() NOT NULL,
+    systime bigint DEFAULT (date_part('epoch'::text, (now())::timestamp without time zone) * (1000)::double precision) NOT NULL,
+    revision bigint,
+    logmsg text,
+    commit boolean DEFAULT false
+);
+
+
+--
+-- Name: public_streets_revision_seq; Type: SEQUENCE; Schema: versions; Owner: -
+--
+
+CREATE SEQUENCE public_streets_revision_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: public_streets_version_log_version_log_id_seq; Type: SEQUENCE; Schema: versions; Owner: -
+--
+
+CREATE SEQUENCE public_streets_version_log_version_log_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: public_streets_version_log_version_log_id_seq; Type: SEQUENCE OWNED BY; Schema: versions; Owner: -
+--
+
+ALTER SEQUENCE public_streets_version_log_version_log_id_seq OWNED BY public_streets_version_log.version_log_id;
+
+
+--
 -- Name: version_tables; Type: TABLE; Schema: versions; Owner: -
 --
 
@@ -1572,6 +1630,13 @@ ALTER SEQUENCE version_tags_tags_id_seq OWNED BY version_tags.tags_id;
 
 
 --
+-- Name: version_log_id; Type: DEFAULT; Schema: versions; Owner: -
+--
+
+ALTER TABLE ONLY public_streets_version_log ALTER COLUMN version_log_id SET DEFAULT nextval('public_streets_version_log_version_log_id_seq'::regclass);
+
+
+--
 -- Name: version_table_id; Type: DEFAULT; Schema: versions; Owner: -
 --
 
@@ -1590,6 +1655,14 @@ ALTER TABLE ONLY version_tables_logmsg ALTER COLUMN id SET DEFAULT nextval('vers
 --
 
 ALTER TABLE ONLY version_tags ALTER COLUMN tags_id SET DEFAULT nextval('version_tags_tags_id_seq'::regclass);
+
+
+--
+-- Name: streets_pkey; Type: CONSTRAINT; Schema: versions; Owner: -
+--
+
+ALTER TABLE ONLY public_streets_version_log
+    ADD CONSTRAINT streets_pkey PRIMARY KEY (id_0, project, systime, action);
 
 
 --
@@ -1621,6 +1694,34 @@ ALTER TABLE ONLY version_tags
 --
 
 CREATE INDEX fki_version_tables_fkey ON version_tables_logmsg USING btree (version_table_id);
+
+
+--
+-- Name: public_streets_project_idx; Type: INDEX; Schema: versions; Owner: -
+--
+
+CREATE INDEX public_streets_project_idx ON public_streets_version_log USING btree (project);
+
+
+--
+-- Name: public_streets_systime_idx; Type: INDEX; Schema: versions; Owner: -
+--
+
+CREATE INDEX public_streets_systime_idx ON public_streets_version_log USING btree (systime);
+
+
+--
+-- Name: public_streets_version_log_id_idx; Type: INDEX; Schema: versions; Owner: -
+--
+
+CREATE INDEX public_streets_version_log_id_idx ON public_streets_version_log USING btree (version_log_id);
+
+
+--
+-- Name: streets_version_geo_idx; Type: INDEX; Schema: versions; Owner: -
+--
+
+CREATE INDEX streets_version_geo_idx ON public_streets_version_log USING gist (geom);
 
 
 --
