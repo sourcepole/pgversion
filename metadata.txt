@@ -14,7 +14,7 @@ qgisMinimumVersion=2.0
 qgisMaximumVersion=2.99
 class_name=PgVersion
 website=http://www.sourcepole.com
-author=Horst Duester / Sourcepole AG Zürich
+author=Horst Duester Sourcepole AG Zürich
 email=horst.duester@sourcepole.ch
 about=Sourcepole AG - Linux & Open Source Solutions, Weberstrasse 5, 8004 Zurich, Switzerland
 
