@@ -549,7 +549,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
             if len(mySchema) == 0:
                 mySchema = 'public'
 
-            sql = u"select * from %s.%s limit 0"  % (mySchema,  myTable)
+            sql = u"select * from \"%s\".\"%s\" limit 0"  % (mySchema,  myTable)
             cols = myDb.cols(sql)
             myCols = ', '.join(cols)+', st_asewkb("'+geomCol+'")'
             
@@ -558,15 +558,15 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
             geo_idx = '%s && ST_MakeEnvelope(%s,%s)' %  (geomCol,  extent,  crs)
 
             sql = ("with \
-head as (select max(revision) as head from versions.{schema}_{table}_log), \
+head as (select max(revision) as head from versions.\"{schema}_{table}_log\"), \
 checkout as (select v.{cols} \
-from versions.pgvscheckout('{schema}.{origin}', (select * from head)) as c, versions.{schema}_{table}_log as v \
+from versions.pgvscheckout('{schema}.{origin}', (select * from head)) as c, versions.\"{schema}_{table}_log\" as v \
 where {geo_idx} \
 and c.log_id = v.{uniqueCol}  \
 and c.systime = v.systime), \
 \
 version as (select v.{cols}  \
-from {schema}.{table} as v \
+from \"{schema}\".\"{table}\" as v \
 where {geo_idx}) \
 \
 select row_number() OVER () AS rownum, *  \
@@ -583,7 +583,7 @@ except \
 select * from checkout) as foo1 \
 ) as foo ").format(schema = mySchema,  table=myTable,  origin=myTable.replace('_version', ''), cols = myCols,  uniqueCol = uniqueCol,  geo_idx = geo_idx )
 
-#            QMessageBox.information(None,'',  sql)
+            print sql
             
             myUri = QgsDataSourceURI(self.tools.layerUri(currentLayer))
             myUri.setDataSource("", u"(%s\n)" % sql, geomCol, "", "rownum")
