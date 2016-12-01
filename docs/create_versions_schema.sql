@@ -1,5 +1,5 @@
 --
--- create_versions_schema.sql revision 2.0 2016-11-14 08:18
+-- create_versions_schema.sql revision 2.0 2016-12-01 18:10
 --
 --
 -- PostgreSQL database dump
@@ -85,6 +85,8 @@ CREATE FUNCTION pgvs_version_record() RETURNS trigger
     pkey_rec record;
     pkey TEXT;
     qry TEXT;
+    pgvslog TEXT;
+    seq TEXT;
     
   BEGIN	
 
@@ -101,8 +103,11 @@ CREATE FUNCTION pgvs_version_record() RETURNS trigger
 
      pkey := pkey_rec.column_name;
 
-     qry := 'insert into versions.'|| quote_ident(TG_TABLE_SCHEMA ||'_'|| TG_TABLE_NAME) ||'_log select $1.*, 
-                nextval(''versions.'|| quote_ident(TG_TABLE_SCHEMA ||'_'|| TG_TABLE_NAME) ||'_log_version_log_id_seq''), 
+     pgvslog := quote_ident(TG_TABLE_SCHEMA ||'_'|| TG_TABLE_NAME ||'_log');
+     seq := quote_ident(TG_TABLE_SCHEMA ||'_'|| TG_TABLE_NAME ||'_log_version_log_id_seq');
+
+     qry := 'insert into versions.'|| pgvslog ||' select $1.*, 
+                nextval(''versions.'|| seq ||'''), 
                 '''||lower(TG_OP)||''', current_user, date_part(''epoch''::text, (now())::timestamp without time zone) * (1000)::double precision, NULL, NULL, false';     
       
      if TG_OP = 'INSERT' OR TG_OP = 'UPDATE' THEN     
@@ -262,7 +267,7 @@ CREATE FUNCTION pgvscheckout(intable character varying, revision bigint) RETURNS
         myTable := substr(inTable,pos);
     END IF;  
     
-    versionLogTable := 'versions.'||mySchema||'_'||myTable||'_version_log';   
+    versionLogTable := 'versions."'||mySchema||'_'||myTable||'_version_log"';   
 
     for attributes in select *
                       from  information_schema.columns
@@ -1475,6 +1480,42 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
+-- Name: public_Kurven_version_log; Type: TABLE; Schema: versions; Owner: -
+--
+
+CREATE TABLE "public_Kurven_version_log" (
+    id bigint NOT NULL,
+    wkb_geometry public.geometry(CompoundCurve,21781),
+    version_log_id bigint NOT NULL,
+    action character varying NOT NULL,
+    project character varying DEFAULT "current_user"() NOT NULL,
+    systime bigint DEFAULT (date_part('epoch'::text, (now())::timestamp without time zone) * (1000)::double precision) NOT NULL,
+    revision bigint,
+    logmsg text,
+    commit boolean DEFAULT false
+);
+
+
+--
+-- Name: public_Test_Poly_version_log; Type: TABLE; Schema: versions; Owner: -
+--
+
+CREATE TABLE "public_Test_Poly_version_log" (
+    id_0 integer NOT NULL,
+    geom public.geometry(MultiPolygon,21781),
+    id character varying(10),
+    name character varying(80),
+    version_log_id bigint NOT NULL,
+    action character varying NOT NULL,
+    project character varying DEFAULT "current_user"() NOT NULL,
+    systime bigint DEFAULT (date_part('epoch'::text, (now())::timestamp without time zone) * (1000)::double precision) NOT NULL,
+    revision bigint,
+    logmsg text,
+    commit boolean DEFAULT false
+);
+
+
+--
 -- Name: public_streets_version_log; Type: TABLE; Schema: versions; Owner: -
 --
 
@@ -1498,6 +1539,68 @@ CREATE TABLE public_streets_version_log (
     logmsg text,
     commit boolean DEFAULT false
 );
+
+
+--
+-- Name: public_Kurven_revision_seq; Type: SEQUENCE; Schema: versions; Owner: -
+--
+
+CREATE SEQUENCE "public_Kurven_revision_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: public_Kurven_version_log_version_log_id_seq; Type: SEQUENCE; Schema: versions; Owner: -
+--
+
+CREATE SEQUENCE "public_Kurven_version_log_version_log_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: public_Kurven_version_log_version_log_id_seq; Type: SEQUENCE OWNED BY; Schema: versions; Owner: -
+--
+
+ALTER SEQUENCE "public_Kurven_version_log_version_log_id_seq" OWNED BY "public_Kurven_version_log".version_log_id;
+
+
+--
+-- Name: public_Test_Poly_revision_seq; Type: SEQUENCE; Schema: versions; Owner: -
+--
+
+CREATE SEQUENCE "public_Test_Poly_revision_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: public_Test_Poly_version_log_version_log_id_seq; Type: SEQUENCE; Schema: versions; Owner: -
+--
+
+CREATE SEQUENCE "public_Test_Poly_version_log_version_log_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: public_Test_Poly_version_log_version_log_id_seq; Type: SEQUENCE OWNED BY; Schema: versions; Owner: -
+--
+
+ALTER SEQUENCE "public_Test_Poly_version_log_version_log_id_seq" OWNED BY "public_Test_Poly_version_log".version_log_id;
 
 
 --
@@ -1633,6 +1736,20 @@ ALTER SEQUENCE version_tags_tags_id_seq OWNED BY version_tags.tags_id;
 -- Name: version_log_id; Type: DEFAULT; Schema: versions; Owner: -
 --
 
+ALTER TABLE ONLY "public_Kurven_version_log" ALTER COLUMN version_log_id SET DEFAULT nextval('"public_Kurven_version_log_version_log_id_seq"'::regclass);
+
+
+--
+-- Name: version_log_id; Type: DEFAULT; Schema: versions; Owner: -
+--
+
+ALTER TABLE ONLY "public_Test_Poly_version_log" ALTER COLUMN version_log_id SET DEFAULT nextval('"public_Test_Poly_version_log_version_log_id_seq"'::regclass);
+
+
+--
+-- Name: version_log_id; Type: DEFAULT; Schema: versions; Owner: -
+--
+
 ALTER TABLE ONLY public_streets_version_log ALTER COLUMN version_log_id SET DEFAULT nextval('public_streets_version_log_version_log_id_seq'::regclass);
 
 
@@ -1658,11 +1775,27 @@ ALTER TABLE ONLY version_tags ALTER COLUMN tags_id SET DEFAULT nextval('version_
 
 
 --
+-- Name: kurven_pkey; Type: CONSTRAINT; Schema: versions; Owner: -
+--
+
+ALTER TABLE ONLY "public_Kurven_version_log"
+    ADD CONSTRAINT kurven_pkey PRIMARY KEY (id, project, systime, action);
+
+
+--
 -- Name: streets_pkey; Type: CONSTRAINT; Schema: versions; Owner: -
 --
 
 ALTER TABLE ONLY public_streets_version_log
     ADD CONSTRAINT streets_pkey PRIMARY KEY (id_0, project, systime, action);
+
+
+--
+-- Name: test_poly_pkey; Type: CONSTRAINT; Schema: versions; Owner: -
+--
+
+ALTER TABLE ONLY "public_Test_Poly_version_log"
+    ADD CONSTRAINT test_poly_pkey PRIMARY KEY (id_0, project, systime, action);
 
 
 --
@@ -1697,6 +1830,34 @@ CREATE INDEX fki_version_tables_fkey ON version_tables_logmsg USING btree (versi
 
 
 --
+-- Name: kurven_version_geo_idx; Type: INDEX; Schema: versions; Owner: -
+--
+
+CREATE INDEX kurven_version_geo_idx ON "public_Kurven_version_log" USING gist (wkb_geometry);
+
+
+--
+-- Name: public_kurven_project_idx; Type: INDEX; Schema: versions; Owner: -
+--
+
+CREATE INDEX public_kurven_project_idx ON "public_Kurven_version_log" USING btree (project);
+
+
+--
+-- Name: public_kurven_systime_idx; Type: INDEX; Schema: versions; Owner: -
+--
+
+CREATE INDEX public_kurven_systime_idx ON "public_Kurven_version_log" USING btree (systime);
+
+
+--
+-- Name: public_kurven_version_log_id_idx; Type: INDEX; Schema: versions; Owner: -
+--
+
+CREATE INDEX public_kurven_version_log_id_idx ON "public_Kurven_version_log" USING btree (version_log_id);
+
+
+--
 -- Name: public_streets_project_idx; Type: INDEX; Schema: versions; Owner: -
 --
 
@@ -1718,10 +1879,38 @@ CREATE INDEX public_streets_version_log_id_idx ON public_streets_version_log USI
 
 
 --
+-- Name: public_test_poly_project_idx; Type: INDEX; Schema: versions; Owner: -
+--
+
+CREATE INDEX public_test_poly_project_idx ON "public_Test_Poly_version_log" USING btree (project);
+
+
+--
+-- Name: public_test_poly_systime_idx; Type: INDEX; Schema: versions; Owner: -
+--
+
+CREATE INDEX public_test_poly_systime_idx ON "public_Test_Poly_version_log" USING btree (systime);
+
+
+--
+-- Name: public_test_poly_version_log_id_idx; Type: INDEX; Schema: versions; Owner: -
+--
+
+CREATE INDEX public_test_poly_version_log_id_idx ON "public_Test_Poly_version_log" USING btree (version_log_id);
+
+
+--
 -- Name: streets_version_geo_idx; Type: INDEX; Schema: versions; Owner: -
 --
 
 CREATE INDEX streets_version_geo_idx ON public_streets_version_log USING gist (geom);
+
+
+--
+-- Name: test_poly_version_geo_idx; Type: INDEX; Schema: versions; Owner: -
+--
+
+CREATE INDEX test_poly_version_geo_idx ON "public_Test_Poly_version_log" USING gist (geom);
 
 
 --
