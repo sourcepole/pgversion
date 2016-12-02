@@ -144,17 +144,23 @@ class PgVersion:
     
     for a in self.iface.digitizeToolBar().actions():
         if a.objectName() == 'mActionToggleEditing':
-            a.triggered.connect(self.toggleDeleteButton)
+            a.triggered.connect(self.onSelectionChanged)
             
+    self.iface.mapCanvas().selectionChanged.connect(self.onSelectionChanged)            
 
   def onSelectionChanged(self):
-      try:
-          if self.iface.activeLayer().selectedFeatureCount() == 0:
-              self.actionDelete.setEnabled(false)
-          else:
-             self.actionDelete.setEnabled(true) 
-      except:
-          pass
+        current_layer = self.iface.mapCanvas().currentLayer()
+        if current_layer.selectedFeatureCount() == 0:
+            self.actionDelete.setEnabled(False)
+        else:
+            if self.tools.hasVersion(current_layer):
+                print current_layer.isEditable()
+                if current_layer.isEditable():
+                    self.actionDelete.setEnabled(True) # true
+                else:
+                    self.actionDelete.setEnabled(False)
+            else:
+                self.actionDelete.setEnabled(False) # true
 
   def layersInit(self):
       canvas = self.iface.mapCanvas()
@@ -173,15 +179,6 @@ class PgVersion:
       except:
           del self.menuBar
       del self.toolBar
-
-  def toggleDeleteButton(self):
-      canvas = self.iface.mapCanvas()
-      currentLayer = canvas.currentLayer()      
-      if self.tools.hasVersion(currentLayer):
-          if currentLayer.isEditable():
-              self.actionDelete.setEnabled(True)
-          else:
-              self.actionDelete.setEnabled(False)
 
   def doDelete(self):
       
