@@ -200,6 +200,7 @@ CREATE OR REPLACE FUNCTION pgvs_version_record() RETURNS trigger
         RETURN NEW;
      ELSEIF TG_OP = 'UPDATE' THEN
         execute qry USING NEW;
+        RETURN NEW;
      ELSEIF TG_OP = 'DELETE' THEN
         execute  qry USING OLD;
         RETURN OLD;
