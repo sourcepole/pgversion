@@ -282,8 +282,10 @@ class PgVersionTools:
       sql =   "select * from versions.version_tables \
           where version_view_schema = '%s' and version_view_name = '%s'" %(mySchema,  myTable)
       layer = myDb.read(sql)              
-
-      sql = "select objectkey, myversion_log_id, conflict_version_log_id from versions.pgvscheck('"+mySchema+"."+myTable.replace("_version", "")+"')"
+            
+      sql = "select objectkey, myversion_log_id, conflict_version_log_id \
+          from versions.pgvscheck('%s.%s')" % (mySchema,  myTable.replace("_version", ""))
+                    
       result = myDb.read(sql)          
       timeListString = ''
       keyString = ''
@@ -295,32 +297,28 @@ class PgVersionTools:
       timeListString = timeListString[0:len(timeListString)-1]
       keyString = keyString[0:len(keyString)-1]
 
-      sql = "select * from versions.%s_%s_log \
+      sql = 'select * from versions."%s_%s_log" \
            where version_log_id in (%s)\
-           order by %s" % (mySchema,  myTable,  timeListString,  layer["VERSION_VIEW_PKEY"][0])
+           order by "%s"' % (mySchema,  myTable,  timeListString,  layer["VERSION_VIEW_PKEY"][0])
+           
+           
       result = myDb.read(sql)
       cols = myDb.cols(sql)
+      cols.remove('action')
+      cols.remove('systime')
+      cols.remove('commit')
+      cols.remove(geomCol)
+
+      cols.insert(0, cols.pop(-1))
+      cols.insert(0, cols.pop(-1))
+      cols.insert(0, cols.pop(-1))
+
+      resultArray = []
+      resultArray.append(result)
+      resultArray.append(cols)
       
-      try:
-          cols.remove('action')
-          cols.remove('systime')
-          cols.remove('commit')
-          cols.remove(geomCol)
-    
-          cols.insert(0, cols.pop(-1))
-          cols.insert(0, cols.pop(-1))
-          cols.insert(0, cols.pop(-1))
-    
-          resultArray = []
-          resultArray.append(result)
-          resultArray.append(cols)
-    
-          myDb.close()
-          return resultArray
-      except:
-          return None
-
-
+      myDb.close()
+      return resultArray
 
   def conflictLayer(self,  theLayer):
         provider = theLayer.dataProvider()

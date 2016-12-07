@@ -149,7 +149,7 @@ class DbObj(QDialog):
     i = 0
     while i < query.record().count():
       
-      result.append('"'+str(query.record().fieldName(i))+'"')
+      result.append(str(query.record().fieldName(i)))
       i = i + 1
     return result
 
