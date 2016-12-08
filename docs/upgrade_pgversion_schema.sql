@@ -1,91 +1,41 @@
---
--- PostgreSQL database dump
---
+-- Database diff generated with pgModeler (PostgreSQL Database Modeler).
+-- pgModeler  version: 0.9.0-alpha1
+-- PostgreSQL version: 9.3
 
--- Dumped from database version 9.3.15
--- Dumped by pg_dump version 9.5.5
+-- [ Diff summary ]
+-- Dropped objects: 3
+-- Created objects: 2
+-- Changed objects: 23
+-- Truncated tables: 0
 
--- Started on 2016-12-07 18:13:51 CET
-
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
 SET check_function_bodies = false;
-SET client_min_messages = warning;
+-- ddl-end --
+
+SET search_path=public,pg_catalog,versions;
+-- ddl-end --
 
 
---
--- TOC entry 24 (class 2615 OID 358832)
--- Name: versions; Type: SCHEMA; Schema: -; Owner: -
---
-
-CREATE SCHEMA versions;
-
-
-SET search_path = versions, pg_catalog;
-
---
--- TOC entry 1796 (class 1247 OID 360231)
--- Name: checkout; Type: TYPE; Schema: versions; Owner: -
---
-
-CREATE TYPE checkout AS (
-	mykey integer,
-	action character varying,
-	revision integer,
-	systime bigint
-);
+-- [ Dropped objects ] --
+DROP SEQUENCE IF EXISTS versions.public_streets_version_log_version_log_id_seq CASCADE;
+-- ddl-end --
+DROP SEQUENCE IF EXISTS versions.public_streets_revision_seq CASCADE;
+-- ddl-end --
+DROP FUNCTION IF EXISTS versions.pgvsdiff(anyelement,integer) CASCADE;
+-- ddl-end --
 
 
---
--- TOC entry 1799 (class 1247 OID 360234)
--- Name: conflicts; Type: TYPE; Schema: versions; Owner: -
---
+-- [ Created objects ] --
+-- object: versions._primarykey | type: FUNCTION --
+-- DROP FUNCTION IF EXISTS versions._primarykey(IN character varying) CASCADE;
+CREATE FUNCTION versions._primarykey (IN intable character varying, OUT pkey_column character varying, OUT success boolean)
+	RETURNS record
+	LANGUAGE plpgsql
+	VOLATILE 
+	CALLED ON NULL INPUT
+	SECURITY INVOKER
+	COST 100
+	AS $$
 
-CREATE TYPE conflicts AS (
-	objectkey bigint,
-	mysystime bigint,
-	myuser text,
-	myversion_log_id bigint,
-	conflict_systime bigint,
-	conflict_user text,
-	conflict_version_log_id bigint
-);
-
-
---
--- TOC entry 1802 (class 1247 OID 360237)
--- Name: logview; Type: TYPE; Schema: versions; Owner: -
---
-
-CREATE TYPE logview AS (
-	revision integer,
-	datum timestamp without time zone,
-	project text,
-	logmsg text
-);
-
-
---
--- TOC entry 1805 (class 1247 OID 360240)
--- Name: pgvs_diff_type; Type: TYPE; Schema: versions; Owner: -
---
-
-CREATE TYPE pgvs_diff_type AS (
-	version_id integer,
-	action character varying
-);
-
-
---
--- TOC entry 1401 (class 1255 OID 361035)
--- Name: _primarykey(character varying); Type: FUNCTION; Schema: versions; Owner: -
---
-
-CREATE OR REPLACE FUNCTION _primarykey(intable character varying, OUT pkey_column character varying, OUT success boolean) RETURNS record
-    LANGUAGE plpgsql
-    AS $$
   DECLARE
     mySchema TEXT;
     myTable TEXT;
@@ -126,17 +76,36 @@ CREATE OR REPLACE FUNCTION _primarykey(intable character varying, OUT pkey_colum
     END IF;    
   END;
 
+
 $$;
+-- ddl-end --
+ALTER FUNCTION versions._primarykey(IN character varying) OWNER TO versions;
+-- ddl-end --
 
 
---
--- TOC entry 1408 (class 1255 OID 360253)
--- Name: pgvs_version_record(); Type: FUNCTION; Schema: versions; Owner: -
---
 
-CREATE OR REPLACE FUNCTION pgvs_version_record() RETURNS trigger
-    LANGUAGE plpgsql
-    AS $_$
+-- [ Changed objects ] --
+ALTER ROLE versions;
+-- ddl-end --
+ALTER SCHEMA versions OWNER TO versions;
+-- ddl-end --
+ALTER TYPE versions.checkout OWNER TO versions;
+-- ddl-end --
+ALTER TYPE versions.conflicts OWNER TO versions;
+-- ddl-end --
+ALTER TYPE versions.logview OWNER TO versions;
+-- ddl-end --
+-- object: versions.pgvs_version_record | type: FUNCTION --
+-- DROP FUNCTION IF EXISTS versions.pgvs_version_record() CASCADE;
+CREATE OR REPLACE FUNCTION versions.pgvs_version_record ()
+	RETURNS trigger
+	LANGUAGE plpgsql
+	VOLATILE 
+	CALLED ON NULL INPUT
+	SECURITY INVOKER
+	COST 100
+	AS $$
+
   DECLARE 
     pkey_rec record;
     pkey TEXT;
@@ -207,17 +176,24 @@ CREATE OR REPLACE FUNCTION pgvs_version_record() RETURNS trigger
      END IF;                         
   END;
 
-$_$;
 
+$$;
+-- ddl-end --
+ALTER FUNCTION versions.pgvs_version_record() OWNER TO versions;
+-- ddl-end --
 
---
--- TOC entry 1402 (class 1255 OID 360254)
--- Name: pgvscheck(character varying); Type: FUNCTION; Schema: versions; Owner: -
---
+-- object: versions.pgvscheck | type: FUNCTION --
+-- DROP FUNCTION IF EXISTS versions.pgvscheck(character varying) CASCADE;
+CREATE OR REPLACE FUNCTION versions.pgvscheck ( _param1 character varying)
+	RETURNS SETOF versions.conflicts
+	LANGUAGE plpgsql
+	VOLATILE 
+	CALLED ON NULL INPUT
+	SECURITY INVOKER
+	COST 100
+	ROWS 1000
+	AS $$
 
-CREATE OR REPLACE FUNCTION pgvscheck(character varying) RETURNS SETOF conflicts
-    LANGUAGE plpgsql
-    AS $_$
 
   DECLARE
     inTable ALIAS FOR $1;
@@ -306,17 +282,24 @@ with a listing of the conflicting objects.
   END;
 
 
-$_$;
 
+$$;
+-- ddl-end --
+ALTER FUNCTION versions.pgvscheck(character varying) OWNER TO versions;
+-- ddl-end --
 
---
--- TOC entry 1403 (class 1255 OID 360255)
--- Name: pgvscheckout(character varying, bigint); Type: FUNCTION; Schema: versions; Owner: -
---
+-- object: versions.pgvscheckout | type: FUNCTION --
+-- DROP FUNCTION IF EXISTS versions.pgvscheckout(IN character varying,IN bigint) CASCADE;
+CREATE OR REPLACE FUNCTION versions.pgvscheckout (IN intable character varying, IN revision bigint)
+	RETURNS TABLE ( log_id bigint,  systime bigint)
+	LANGUAGE plpgsql
+	VOLATILE 
+	CALLED ON NULL INPUT
+	SECURITY INVOKER
+	COST 100
+	ROWS 1000
+	AS $$
 
-CREATE OR REPLACE FUNCTION pgvscheckout(intable character varying, revision bigint) RETURNS TABLE(log_id bigint, systime bigint)
-    LANGUAGE plpgsql
-    AS $$
   DECLARE
     mySchema TEXT;
     myTable TEXT;
@@ -387,17 +370,24 @@ CREATE OR REPLACE FUNCTION pgvscheckout(intable character varying, revision bigi
   END;
 
 
+
 $$;
+-- ddl-end --
+ALTER FUNCTION versions.pgvscheckout(IN character varying,IN bigint) OWNER TO versions;
+-- ddl-end --
 
+-- object: versions.pgvscommit | type: FUNCTION --
+-- DROP FUNCTION IF EXISTS versions.pgvscommit(character varying,text) CASCADE;
+CREATE OR REPLACE FUNCTION versions.pgvscommit ( _param1 character varying,  _param2 text)
+	RETURNS SETOF versions.conflicts
+	LANGUAGE plpgsql
+	VOLATILE 
+	CALLED ON NULL INPUT
+	SECURITY INVOKER
+	COST 100
+	ROWS 1000
+	AS $$
 
---
--- TOC entry 1396 (class 1255 OID 360256)
--- Name: pgvscommit(character varying, text); Type: FUNCTION; Schema: versions; Owner: -
---
-
-CREATE OR REPLACE FUNCTION pgvscommit(character varying, text) RETURNS SETOF conflicts
-    LANGUAGE plpgsql
-    AS $_$
 
   DECLARE
     inTable ALIAS FOR $1;
@@ -562,94 +552,23 @@ with a listing of the conflicting objects.
   END;
 
 
-$_$;
 
-
---
--- TOC entry 1397 (class 1255 OID 360258)
--- Name: pgvsdiff(anyelement, integer); Type: FUNCTION; Schema: versions; Owner: -
---
-
-CREATE OR REPLACE FUNCTION pgvsdiff(_rowtype anyelement, revision integer) RETURNS void
-    LANGUAGE plpgsql
-    AS $$
-
-DECLARE
-  attributes RECORD;
-  inTable TEXT;
-  mySchema TEXT;
-  myTable TEXT;
-  fields TEXT;
-  pos INTEGER;
-  qry TEXT;
-  
-BEGIN
-
-  inTable := pg_typeof(_rowtype)::TEXT;
-  
-  pos := strpos(inTable,'.');
-  fields := '';
-  
-  if pos=0 then 
-     mySchema := 'public';
-     myTable := inTable; 
-  else 
-     mySchema := substr(inTable,0,pos);
-     pos := pos + 1; 
-     myTable := substr(inTable,pos);
-  END IF;  
-
-  for attributes in SELECT column_name
-                  FROM information_schema.columns
-                  WHERE table_schema = mySchema::NAME
-                    AND table_name   = myTable::NAME
-                  ORDER by ordinal_position
-
-    LOOP
-      fields := fields||','||attributes.column_name;
-    END LOOP;
-
-    fields := substring(fields,2);
-    
-EXECUTE format('create or replace view versions.%s_%s_diff as 
-        select 
-        row_number() OVER () AS rownum, ''insert'' as action, 
-        %s from (
-        select v.%s, st_asewkb(geom) 
-        from %s_version as v 
-        except
-        select v.%s, st_asewkb(geom) 
-        from versions.pgvscheckout(''%s'', 1) as c, 
-             versions.%s_%s_version_log as v 
-        where c.log_id = v.id_0 
-          and c.systime = v.systime
-      ) as foo
-     union all
-     select 
-        row_number() OVER () AS rownum, ''delete'' as action, 
-        %s from (
-        select v.%s, st_asewkb(geom) 
-        from versions.pgvscheckout(''%s'', 1) as c, 
-             versions.%s_%s_version_log as v 
-        where c.log_id = v.id_0 
-          and c.systime = v.systime
-        except
-        select v.%s, st_asewkb(geom) 
-        from %s_version as v) as foo ', mySchema, myTable, fields, fields, pg_typeof(_rowtype),fields, pg_typeof(_rowtype), mySchema, myTable, 
-                                        fields, fields, pg_typeof(_rowtype), mySchema, myTable, fields, pg_typeof(_rowtype));
-
-END
 $$;
+-- ddl-end --
+ALTER FUNCTION versions.pgvscommit(character varying,text) OWNER TO versions;
+-- ddl-end --
 
+-- object: versions.pgvsdrop | type: FUNCTION --
+-- DROP FUNCTION IF EXISTS versions.pgvsdrop(character varying) CASCADE;
+CREATE OR REPLACE FUNCTION versions.pgvsdrop ( _param1 character varying)
+	RETURNS boolean
+	LANGUAGE plpgsql
+	VOLATILE 
+	CALLED ON NULL INPUT
+	SECURITY INVOKER
+	COST 100
+	AS $$
 
---
--- TOC entry 1404 (class 1255 OID 360259)
--- Name: pgvsdrop(character varying); Type: FUNCTION; Schema: versions; Owner: -
---
-
-CREATE OR REPLACE FUNCTION pgvsdrop(character varying) RETURNS boolean
-    LANGUAGE plpgsql
-    AS $_$
   DECLARE
     inTable ALIAS FOR $1;
     pos INTEGER;
@@ -787,17 +706,23 @@ CREATE OR REPLACE FUNCTION pgvsdrop(character varying) RETURNS boolean
   RETURN true ;                             
 
   END;
-$_$;
 
+$$;
+-- ddl-end --
+ALTER FUNCTION versions.pgvsdrop(character varying) OWNER TO versions;
+-- ddl-end --
 
---
--- TOC entry 1398 (class 1255 OID 360260)
--- Name: pgvsinit(character varying); Type: FUNCTION; Schema: versions; Owner: -
---
+-- object: versions.pgvsinit | type: FUNCTION --
+-- DROP FUNCTION IF EXISTS versions.pgvsinit(character varying) CASCADE;
+CREATE OR REPLACE FUNCTION versions.pgvsinit ( _param1 character varying)
+	RETURNS boolean
+	LANGUAGE plpgsql
+	VOLATILE 
+	CALLED ON NULL INPUT
+	SECURITY INVOKER
+	COST 100
+	AS $$
 
-CREATE OR REPLACE FUNCTION pgvsinit(character varying) RETURNS boolean
-    LANGUAGE plpgsql
-    AS $_$
   DECLARE
     inTable ALIAS FOR $1;
     pos INTEGER;
@@ -1031,17 +956,24 @@ CREATE OR REPLACE FUNCTION pgvsinit(character varying) RETURNS boolean
   RETURN true ;                             
 
   END;
-$_$;
 
+$$;
+-- ddl-end --
+ALTER FUNCTION versions.pgvsinit(character varying) OWNER TO versions;
+-- ddl-end --
 
---
--- TOC entry 1407 (class 1255 OID 360262)
--- Name: pgvslogview(character varying); Type: FUNCTION; Schema: versions; Owner: -
---
-
-CREATE OR REPLACE FUNCTION pgvslogview(character varying) RETURNS SETOF logview
-    LANGUAGE plpgsql
-    AS $_$    
+-- object: versions.pgvslogview | type: FUNCTION --
+-- DROP FUNCTION IF EXISTS versions.pgvslogview(character varying) CASCADE;
+CREATE OR REPLACE FUNCTION versions.pgvslogview ( _param1 character varying)
+	RETURNS SETOF versions.logview
+	LANGUAGE plpgsql
+	VOLATILE 
+	CALLED ON NULL INPUT
+	SECURITY INVOKER
+	COST 100
+	ROWS 1000
+	AS $$
+    
   DECLARE
     inTable ALIAS FOR $1;
     mySchema TEXT;
@@ -1083,17 +1015,23 @@ CREATE OR REPLACE FUNCTION pgvslogview(character varying) RETURNS SETOF logview
     end loop;                       
   
   END;
-$_$;
 
+$$;
+-- ddl-end --
+ALTER FUNCTION versions.pgvslogview(character varying) OWNER TO versions;
+-- ddl-end --
 
---
--- TOC entry 1405 (class 1255 OID 360263)
--- Name: pgvsmerge(character varying, integer, character varying); Type: FUNCTION; Schema: versions; Owner: -
---
-
-CREATE OR REPLACE FUNCTION pgvsmerge("inTable" character varying, "targetGid" integer, "targetProject" character varying) RETURNS boolean
-    LANGUAGE plpgsql
-    AS $_$  DECLARE
+-- object: versions.pgvsmerge | type: FUNCTION --
+-- DROP FUNCTION IF EXISTS versions.pgvsmerge(character varying,integer,character varying) CASCADE;
+CREATE OR REPLACE FUNCTION versions.pgvsmerge ( "inTable" character varying,  "targetGid" integer,  "targetProject" character varying)
+	RETURNS boolean
+	LANGUAGE plpgsql
+	VOLATILE 
+	CALLED ON NULL INPUT
+	SECURITY INVOKER
+	COST 100
+	AS $$
+  DECLARE
     inTable ALIAS FOR $1;
     targetGid ALIAS FOR $2;
     targetProject ALIAS FOR $3;
@@ -1215,17 +1153,23 @@ myDebug := 'select a.'||myPkey||' as objectkey,
   
   RETURN True;
   
-  END;$_$;
+  END;
+$$;
+-- ddl-end --
+ALTER FUNCTION versions.pgvsmerge(character varying,integer,character varying) OWNER TO versions;
+-- ddl-end --
 
+-- object: versions.pgvsrevert | type: FUNCTION --
+-- DROP FUNCTION IF EXISTS versions.pgvsrevert(character varying) CASCADE;
+CREATE OR REPLACE FUNCTION versions.pgvsrevert ( _param1 character varying)
+	RETURNS integer
+	LANGUAGE plpgsql
+	VOLATILE 
+	CALLED ON NULL INPUT
+	SECURITY INVOKER
+	COST 100
+	AS $$
 
---
--- TOC entry 1409 (class 1255 OID 360264)
--- Name: pgvsrevert(character varying); Type: FUNCTION; Schema: versions; Owner: -
---
-
-CREATE OR REPLACE FUNCTION pgvsrevert(character varying) RETURNS integer
-    LANGUAGE plpgsql
-    AS $_$
   DECLARE
     inTable ALIAS FOR $1;
     pos INTEGER;
@@ -1295,35 +1239,47 @@ CREATE OR REPLACE FUNCTION pgvsrevert(character varying) RETURNS integer
   RETURN revision ;                             
 
   END;
-$_$;
 
+$$;
+-- ddl-end --
+ALTER FUNCTION versions.pgvsrevert(character varying) OWNER TO versions;
+-- ddl-end --
 
---
--- TOC entry 1399 (class 1255 OID 360265)
--- Name: pgvsrevision(); Type: FUNCTION; Schema: versions; Owner: -
---
-
-CREATE OR REPLACE FUNCTION pgvsrevision() RETURNS text
-    LANGUAGE plpgsql
-    AS $$    
+-- object: versions.pgvsrevision | type: FUNCTION --
+-- DROP FUNCTION IF EXISTS versions.pgvsrevision() CASCADE;
+CREATE OR REPLACE FUNCTION versions.pgvsrevision ()
+	RETURNS text
+	LANGUAGE plpgsql
+	VOLATILE 
+	CALLED ON NULL INPUT
+	SECURITY INVOKER
+	COST 100
+	AS $$
+    
 DECLARE
   revision TEXT;
   BEGIN	
-    revision := '2.0.0';
+    revision := '2.1.0';
   RETURN revision ;                             
 
   END;
+
 $$;
+-- ddl-end --
+ALTER FUNCTION versions.pgvsrevision() OWNER TO versions;
+-- ddl-end --
 
+-- object: versions.pgvsrollback | type: FUNCTION --
+-- DROP FUNCTION IF EXISTS versions.pgvsrollback(character varying,integer) CASCADE;
+CREATE OR REPLACE FUNCTION versions.pgvsrollback ( _param1 character varying,  _param2 integer)
+	RETURNS boolean
+	LANGUAGE plpgsql
+	VOLATILE 
+	CALLED ON NULL INPUT
+	SECURITY INVOKER
+	COST 100
+	AS $$
 
---
--- TOC entry 1406 (class 1255 OID 360266)
--- Name: pgvsrollback(character varying, integer); Type: FUNCTION; Schema: versions; Owner: -
---
-
-CREATE OR REPLACE FUNCTION pgvsrollback(character varying, integer) RETURNS boolean
-    LANGUAGE plpgsql
-    AS $_$
   DECLARE
     inTable ALIAS FOR $1;
     myRevision ALIAS FOR $2;
@@ -1436,239 +1392,24 @@ rollbackQry := 'insert into '||versionLogTable||' ('||myInsertFields||', action)
   RETURN true ;                             
 
   END;
-$_$;
 
-
---
--- TOC entry 1400 (class 1255 OID 360267)
--- Name: pgvsupdatecheck(character varying); Type: FUNCTION; Schema: versions; Owner: -
---
-
-CREATE OR REPLACE FUNCTION pgvsupdatecheck(character varying) RETURNS boolean
-    LANGUAGE plpgsql
-    AS $_$    
-DECLARE
-  inRevision ALIAS FOR $1;
-  aktRevision TEXT;
-  inMajor integer;
-  inMinor integer;
-  aktMajor integer;
-  aktMinor integer;
-
-  
-  BEGIN	
-      inMajor = to_number(substr(inRevision,1,1),'9');
-      inMinor = to_number(substr(inRevision,3,1),'9');
-      aktMajor = to_number(substr(versions.pgvsrevision(),1,1),'9');
-      aktMinor = to_number(substr(versions.pgvsrevision(),3,1),'9');
-      
-      if aktMinor>=7 and inMinor<7 THEN
-        execute 'select versions._update07()';
-        return False;
-      ELSE
-        return True;
-      END IF;
-      
-  RETURN revision ;                             
-
-  END;
-$_$;
-
-
-SET default_tablespace = '';
-
-SET default_with_oids = false;
-
---
--- TOC entry 230 (class 1259 OID 360367)
--- Name: version_tables; Type: TABLE; Schema: versions; Owner: -
---
-
-CREATE TABLE IF NOT EXISTS version_tables (
-    version_table_id bigint NOT NULL,
-    version_table_schema character varying,
-    version_table_name character varying,
-    version_view_schema character varying,
-    version_view_name character varying,
-    version_view_pkey character varying,
-    version_view_geometry_column character varying
-);
-
-
---
--- TOC entry 231 (class 1259 OID 360373)
--- Name: version_tables_logmsg; Type: TABLE; Schema: versions; Owner: -
---
-
-CREATE TABLE IF NOT EXISTS version_tables_logmsg (
-    id bigint NOT NULL,
-    version_table_id bigint,
-    revision character varying,
-    logmsg character varying,
-    systime bigint DEFAULT (date_part('epoch'::text, now()) * (1000)::double precision),
-    project character varying DEFAULT "current_user"()
-);
-
-
---
--- TOC entry 232 (class 1259 OID 360381)
--- Name: version_tables_logmsg_id_seq; Type: SEQUENCE; Schema: versions; Owner: -
---
-
-CREATE SEQUENCE version_tables_logmsg_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- TOC entry 3423 (class 0 OID 0)
--- Dependencies: 232
--- Name: version_tables_logmsg_id_seq; Type: SEQUENCE OWNED BY; Schema: versions; Owner: -
---
-
-ALTER SEQUENCE version_tables_logmsg_id_seq OWNED BY version_tables_logmsg.id;
-
-
---
--- TOC entry 233 (class 1259 OID 360383)
--- Name: version_tables_version_table_id_seq; Type: SEQUENCE; Schema: versions; Owner: -
---
-
-CREATE SEQUENCE version_tables_version_table_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- TOC entry 3424 (class 0 OID 0)
--- Dependencies: 233
--- Name: version_tables_version_table_id_seq; Type: SEQUENCE OWNED BY; Schema: versions; Owner: -
---
-
-ALTER SEQUENCE version_tables_version_table_id_seq OWNED BY version_tables.version_table_id;
-
-
---
--- TOC entry 234 (class 1259 OID 360385)
--- Name: version_tags; Type: TABLE; Schema: versions; Owner: -
---
-
-CREATE TABLE IF NOT EXISTS version_tags (
-    tags_id bigint NOT NULL,
-    version_table_id bigint NOT NULL,
-    revision bigint NOT NULL,
-    tag_text character varying NOT NULL
-);
-
-
---
--- TOC entry 235 (class 1259 OID 360391)
--- Name: version_tags_tags_id_seq; Type: SEQUENCE; Schema: versions; Owner: -
---
-
-CREATE SEQUENCE version_tags_tags_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- TOC entry 3425 (class 0 OID 0)
--- Dependencies: 235
--- Name: version_tags_tags_id_seq; Type: SEQUENCE OWNED BY; Schema: versions; Owner: -
---
-
-ALTER SEQUENCE version_tags_tags_id_seq OWNED BY version_tags.tags_id;
-
-
---
--- TOC entry 3291 (class 2604 OID 361760)
--- Name: version_table_id; Type: DEFAULT; Schema: versions; Owner: -
---
-
-ALTER TABLE ONLY version_tables ALTER COLUMN version_table_id SET DEFAULT nextval('version_tables_version_table_id_seq'::regclass);
-
-
---
--- TOC entry 3294 (class 2604 OID 361761)
--- Name: id; Type: DEFAULT; Schema: versions; Owner: -
---
-
-ALTER TABLE ONLY version_tables_logmsg ALTER COLUMN id SET DEFAULT nextval('version_tables_logmsg_id_seq'::regclass);
-
-
---
--- TOC entry 3295 (class 2604 OID 361762)
--- Name: tags_id; Type: DEFAULT; Schema: versions; Owner: -
---
-
-ALTER TABLE ONLY version_tags ALTER COLUMN tags_id SET DEFAULT nextval('version_tags_tags_id_seq'::regclass);
-
-
---
--- TOC entry 3297 (class 2606 OID 360589)
--- Name: version_table_pkey; Type: CONSTRAINT; Schema: versions; Owner: -
---
-
-ALTER TABLE ONLY version_tables
-    ADD CONSTRAINT version_table_pkey PRIMARY KEY (version_table_id);
-
-
---
--- TOC entry 3300 (class 2606 OID 360591)
--- Name: version_tables_logmsg_pkey; Type: CONSTRAINT; Schema: versions; Owner: -
---
-
-ALTER TABLE ONLY version_tables_logmsg
-    ADD CONSTRAINT version_tables_logmsg_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 3302 (class 2606 OID 360593)
--- Name: version_tags_pkey; Type: CONSTRAINT; Schema: versions; Owner: -
---
-
-ALTER TABLE ONLY version_tags
-    ADD CONSTRAINT version_tags_pkey PRIMARY KEY (version_table_id, revision, tag_text);
-
-
---
--- TOC entry 3298 (class 1259 OID 360597)
--- Name: fki_version_tables_fkey; Type: INDEX; Schema: versions; Owner: -
---
-
-CREATE INDEX fki_version_tables_fkey ON version_tables_logmsg USING btree (version_table_id);
-
-
---
--- TOC entry 3304 (class 2606 OID 360634)
--- Name: version_tables_fk; Type: FK CONSTRAINT; Schema: versions; Owner: -
---
-
-ALTER TABLE ONLY version_tags
-    ADD CONSTRAINT version_tables_fk FOREIGN KEY (version_table_id) REFERENCES version_tables(version_table_id) MATCH FULL ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- TOC entry 3303 (class 2606 OID 360639)
--- Name: version_tables_fkey; Type: FK CONSTRAINT; Schema: versions; Owner: -
---
-
-ALTER TABLE ONLY version_tables_logmsg
-    ADD CONSTRAINT version_tables_fkey FOREIGN KEY (version_table_id) REFERENCES version_tables(version_table_id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
--- Completed on 2016-12-07 18:13:58 CET
-
---
--- PostgreSQL database dump complete
---
-
+$$;
+-- ddl-end --
+ALTER FUNCTION versions.pgvsrollback(character varying,integer) OWNER TO versions;
+-- ddl-end --
+ALTER TABLE versions.version_tags OWNER TO versions;
+-- ddl-end --
+ALTER TABLE versions.version_tables_logmsg OWNER TO versions;
+-- ddl-end --
+ALTER TABLE versions.version_tables OWNER TO versions;
+ALTER SEQUENCE versions.version_tables_version_table_id_seq OWNER TO versions;
+-- ddl-end --
+ALTER SEQUENCE versions.version_tables_logmsg_id_seq OWNER TO versions;
+
+-- ddl-end --
+ALTER SEQUENCE versions.version_tags_tags_id_seq OWNER TO versions;
+-- ddl-end --
+
+-- ddl-end --
+COMMENT ON EXTENSION postgis IS '';
+-- ddl-end --

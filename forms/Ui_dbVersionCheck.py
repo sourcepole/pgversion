@@ -14,55 +14,36 @@ class DbVersionCheckDialog(QDialog, Ui_DbVersionCheck):
     Class documentation goes here.
     """
         
-    def __init__(self, myDb, pgvsRevision, parent = None):
+    def __init__(self, myDb, pgvs_revision, install_path,  type,  parent = None):
         """
         Constructor
         """
         QDialog.__init__(self, parent)
         self.setupUi(self)
         self.myDb = myDb
-        self.pgvsRevision = pgvsRevision
-    
+        self.install_path = install_path
+        self.type = type
+        self.pgvs_revision = pgvs_revision
+        
     @pyqtSignature("bool")
     def on_btnUpdate_clicked(self, checked):
 
-        btnText = self.btnUpdate.text()
-
-        userPluginPath = QFileInfo(QgsApplication.qgisUserDbFilePath()).path()+"/python/plugins/pgversion"  
-        systemPluginPath = QgsApplication.prefixPath()+"/share/qgis/python/plugins/pgversion"
-
-        if QFileInfo(userPluginPath).exists():
-          self.pluginPath = userPluginPath
-          if (btnText == 'Install pgvs'):
-              self.functionsPath = userPluginPath+"/docs/create_versions_schema.sql"
-#          else:
-#              self.functionsPath = userPluginPath+"/tools/updateFunctions.sql"
-        elif QFileInfo(systemPluginPath).exists():
-          self.pluginPath = systemPluginPath
-          if (btnText == 'Install pgvs'):
-              self.functionsPath = systemPluginPath+"/docs/create_versions_schema.sql"              
-#          else:
-#              self.functionsPath = systemPluginPath+"/tools/updateFunctions.sql"
         
-        fp = open(self.functionsPath)
+        fp = open(self.install_path)
         s = fp.read()
         data = s.decode("utf-8-sig")
-#        sqlFile = QFile(self.functionsPath)
-#        sqlFile.open(QIODevice.ReadOnly)
-#        data = sqlFile.read(QFileInfo(sqlFile).size())
         result = self.myDb.runError(data)
-#        result = self.myDb.runError("select versions.pgvsupdatecheck('"+self.pgvsRevision+"')")
         
         if len(result) > 1:
-          QMessageBox.information(None, QCoreApplication.translate('dbVersionCheckDialog','Error'), result)
-          return 1
+          QMessageBox.information(None, self.tr('Error'), result)
+          return False
         else:
-            if (btnText == 'Install pgvs'):
-               QMessageBox.information(None, QCoreApplication.translate('dbVersionCheckDialog',''), QCoreApplication.translate('dbVersionCheckDialog','installation was successful'))    
+            if (self.type == 'install'):
+               QMessageBox.information(None, self.tr('Installation'),  self.tr('Installation of pgvs was successful') )    
             else:
-               QMessageBox.information(None, QCoreApplication.translate('dbVersionCheckDialog',''), QCoreApplication.translate('dbVersionCheckDialog','upgrade successful'))
+               QMessageBox.information(None, self.tr('Upgrade'), self.tr('Upgrade of pgvs was successful'))
             self.close()
-            return 0
+            return True
         
     
     @pyqtSignature("bool")

@@ -66,6 +66,34 @@
     </message>
 </context>
 <context>
+    <name>DbVersionCheckDialog</name>
+    <message>
+        <location filename="../forms/Ui_dbVersionCheck.py" line="49"/>
+        <source>Error</source>
+        <translation>Fehler</translation>
+    </message>
+    <message>
+        <location filename="../forms/Ui_dbVersionCheck.py" line="53"/>
+        <source>Installation</source>
+        <translation>Installation</translation>
+    </message>
+    <message>
+        <location filename="../forms/Ui_dbVersionCheck.py" line="53"/>
+        <source>Installation of pgvs Revision %s was successful</source>
+        <translation>Die Installation von pgvs Version %s war erfolgreich</translation>
+    </message>
+    <message>
+        <location filename="../forms/Ui_dbVersionCheck.py" line="55"/>
+        <source>Upgrade</source>
+        <translation>Aktualisieren</translation>
+    </message>
+    <message>
+        <location filename="../forms/Ui_dbVersionCheck.py" line="55"/>
+        <source>Upgrade was successful</source>
+        <translation>Die Aktualisierung war erfolgreich</translation>
+    </message>
+</context>
+<context>
     <name>DiffDlg</name>
     <message>
         <location filename="../forms/Ui_Ui_diff.py" line="119"/>
@@ -559,11 +587,6 @@ p, li { white-space: pre-wrap; }
     <name>PgVersionTools</name>
     <message>
         <location filename="../pgVersionTools.py" line="61"/>
-        <source>Error</source>
-        <translation>Fehler</translation>
-    </message>
-    <message>
-        <location filename="../pgVersionTools.py" line="61"/>
         <source>No Database Connection Established.</source>
         <translation>Keine Datenbankverbindung aufgebaut.</translation>
     </message>
@@ -590,14 +613,60 @@ Bitte installieren Sie die pgvs Umgebung aus der datei
 wie in der Hilfe beschrieben</translation>
     </message>
     <message>
-        <location filename="../pgVersionTools.py" line="247"/>
+        <location filename="../pgVersionTools.py" line="246"/>
         <source>Table {0} is not versionized</source>
         <translation>Die Tabelle {0}  ist nicht versioniert</translation>
     </message>
     <message>
-        <location filename="../pgVersionTools.py" line="271"/>
+        <location filename="../pgVersionTools.py" line="270"/>
         <source>select Candidate</source>
         <translation>Wählen Sie einen Kandidaten aus</translation>
+    </message>
+    <message>
+        <location filename="../pgVersionTools.py" line="444"/>
+        <source>The Plugin expects pgvs revision %s but DB-functions revision %s are installed.
+
+ Please contact your DB-administrator to update the DB-functions from the file:
+
+ %s
+
+ If you have appropriate DB permissions you can update the DB directly with click on DB-Update.</source>
+        <translation>Das Plugin erwartet die pgvs Version %s, aber die pgvs Funktionen der Version %s sind installiert.
+
+Bitte fragen Sie Ihren DB-Administrator um die Aktualisierung der Funktionen aus der Datei:
+
+%s
+
+Wenn Sie Administratoren-Rechte für die DB haben können Sie die Funktionen auch direkt mit einem Klick auf upgrade aktualisieren.</translation>
+    </message>
+    <message>
+        <location filename="../pgVersionTools.py" line="447"/>
+        <source>Upgrade pgvs to Revision %s</source>
+        <translation>Auf die Version %s aktualisieren</translation>
+    </message>
+    <message>
+        <location filename="../pgVersionTools.py" line="61"/>
+        <source>Error</source>
+        <translation>Fehler</translation>
+    </message>
+    <message>
+        <location filename="../pgVersionTools.py" line="430"/>
+        <source>pgvs is not installed in the selected DB.
+
+Please contact your DB-administrator to install the DB-functions from the file:
+
+%s
+
+ If you have appropriate DB permissions you can install the DB functions directly with click on Install pgvs.</source>
+        <translation>pgvs ist nicht in der ausgewählten DB installiert.
+
+Bitte fragen Sie Ihren DB-Administrator die Funktionen aus der Datei
+
+%s
+
+zu installieren.
+
+Wenn Sie über DB-Administrator-Rechte verfügen können Sie die Funktionen auch direkt hier installieren. </translation>
     </message>
 </context>
 <context>
@@ -606,24 +675,6 @@ wie in der Hilfe beschrieben</translation>
         <location filename="../forms/Ui_Ui_help.py" line="40"/>
         <source>Dialog</source>
         <translation>Dialog</translation>
-    </message>
-</context>
-<context>
-    <name>dbVersionCheckDialog</name>
-    <message>
-        <location filename="../forms/Ui_dbVersionCheck.py" line="57"/>
-        <source>Error</source>
-        <translation>Fehler</translation>
-    </message>
-    <message>
-        <location filename="../forms/Ui_dbVersionCheck.py" line="61"/>
-        <source>installation was successful</source>
-        <translation>Die Installation war erfolgreich</translation>
-    </message>
-    <message>
-        <location filename="../forms/Ui_dbVersionCheck.py" line="63"/>
-        <source>upgrade successful</source>
-        <translation>Die aktualisierung war erfolgreich</translation>
     </message>
 </context>
 <context>

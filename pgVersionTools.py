@@ -25,17 +25,17 @@ from qgis.core import *
 from forms.Ui_dbVersionCheck import DbVersionCheckDialog 
 from datetime import datetime
 from .dbtools.dbTools import *
-import time,  sys
+import time,  sys,  os
 import apicompat
 
-class PgVersionTools:
+class PgVersionTools(QObject):
 
 # Konstruktor 
   def __init__(self,  iface,  parent=None):
-      self.pgvsRevision = '2.0.0'
+      QObject.__init__(self,  parent)
+      self.pgvsRevision = '2.1.0'
       self.iface = iface
       self.parent = parent
-      self.createVersionPath = '<Plugin-Directory>/pgversion/docs/create_versions_schema.sql'
       pass
 
   def layerRepaint(self):
@@ -58,7 +58,7 @@ class PgVersionTools:
           myDb = DbObj(pluginname=connectionName,typ='pg',hostname=myUri.host(),port=myUri.port(),dbname=myUri.database(),username=myUri.username(), passwort=myUri.password())
           return myDb
       except:
-          QMessageBox.information(None, QCoreApplication.translate('PgVersionTools','Error'), QCoreApplication.translate('PgVersionTools','No Database Connection Established.'))
+          QMessageBox.information(None, self.tr('Error'), self.tr('No Database Connection Established.'))
           return None
 
       if not self.tools.checkPGVSRevision(myDb):
@@ -186,14 +186,13 @@ class PgVersionTools:
           myDb.close()
 
           if len(result["SCHEMA"]) > 1:
-            QMessageBox.information(None, '', QCoreApplication.translate('PgVersionTools','Table {schema}.{table} is already versionized').format(schema=mySchema,  table=myTable))
+            QMessageBox.information(None, '', self.tr('Table {schema}.{table} is already versionized').format(schema=mySchema,  table=myTable))
             return True
           else:
             return False
       except:
             QMessageBox.information(None, '', \
-            QCoreApplication.translate('PgVersionTools',\
-            'pgvs is not installed in your database. \n\n Please install the pgvs functions from file \n\n {createVersionPath}\n\n as mentioned in help') .format(createVersionPath=self.createVersionPath))
+            self.tr('pgvs is not installed in your database. \n\n Please install the pgvs functions from file \n\n {createVersionPath}\n\n as mentioned in help') .format(createVersionPath=self.createVersionPath))
             return True
 
   def createGridView(self, tabView, tabData, headerText, colWidth, rowHeight):
@@ -244,7 +243,7 @@ class PgVersionTools:
       result  = myDb.read(sql)
 
       if len(result["SCHEMA"]) == 0:
-        QMessageBox.information(None, '', QCoreApplication.translate('PgVersionTools','Table {0} is not versionized').format(self.mySchema+'.'+self.myTable))
+        QMessageBox.information(None, '', self.tr('Table {0} is not versionized').format(self.mySchema+'.'+self.myTable))
         return None
       else:
         sql = "select count(myuser) from versions.pgvscheck('%s.%s')" % (mySchema, myTable)
@@ -268,7 +267,7 @@ class PgVersionTools:
               confRecords.append(resString)
               resString = result["OBJECTKEY"][i]+" - "+result["CONFLICT_USER"][i].strip()+" - "+datetime.strftime(datetime.fromtimestamp(float(result["CONFLICT_SYSTIME"][i])/1000.0), "%x %H:%M:%S")
               confRecords.append(resString)
-          confRecords.insert(0, QCoreApplication.translate('PgVersionTools','select Candidate'))          
+          confRecords.insert(0, self.tr('select Candidate'))          
           return confRecords
       else:
           return None
@@ -406,43 +405,42 @@ class PgVersionTools:
     return 0                      
 
 
+  def file_path(name, base_path=None):
+    if not base_path:
+      base_path = os.path.dirname(os.path.realpath(__file__))
+    return os.path.join(base_path, name)
+
+
 # Check the revision of the DB-Functions
-  def checkPGVSRevision(self,  myDb):      
-      try:
-          check = pystring(myDb.runError('select pgvsrevision from versions.pgvsrevision()'))
-          if len(check) > 1:
-                self.vsCheck = DbVersionCheckDialog(myDb,  '0.0.0')
-                revisionMessage =QCoreApplication.translate('PgVersionTools', "pgvs is not installed in the selected DB.\n\n\
+  def checkPGVSRevision(self,    myDb):          
+        user_plugin_path= QFileInfo(QgsApplication.qgisUserDbFilePath()).path()+"python/plugins/pgversion"
+        create_version_path = '%s/docs/create_pgversion_schema.sql' % (user_plugin_path)
+        upgrade_version_path = '%s/docs/upgrade_pgversion_schema.sql' % (user_plugin_path)
+        check = pystring(myDb.runError('select pgvsrevision from versions.pgvsrevision()'))
+          
+        if len(check) > 1:
+            self.vsCheck = DbVersionCheckDialog(myDb,  '',  create_version_path,  'install')
+            revisionMessage = self.tr("pgvs is not installed in the selected DB.\n\n\
 Please contact your DB-administrator to install the DB-functions from the file:\n\n%s\n\n \
 If you have appropriate DB permissions you can install the DB \
-functions directly with click on Install pgvs." %(self.createVersionPath))
-                self.vsCheck.messageTextEdit.setText(revisionMessage)
-                self.vsCheck.btnUpdate.setText('Install pgvs')
-                self.vsCheck.show()
-                return False
-          else:  
+functions directly with click on Install pgvs." %(create_version_path))
+            self.vsCheck.messageTextEdit.setText(revisionMessage)
+            self.vsCheck.btnUpdate.setText('Install pgvs')
+            self.vsCheck.show()
+            return False
+        else:  
             result = myDb.read('select pgvsrevision from versions.pgvsrevision()')
             if self.pgvsRevision != result["PGVSREVISION"][0]:
-                self.vsCheck = DbVersionCheckDialog(myDb,  result["PGVSREVISION"][0])              
-                revisionMessage =QCoreApplication.translate('PgVersionTools', \
-'The Plugin expects pgvs revision %s but DB-functions revision %s are installed.\n\n \
-Please contact your DB-administrator to update the DB-functions from the file:\n\n %s\n\n \
-If you have appropriate DB permissions you can update the DB directly with click on DB-Update.' % (self.pgvsRevision,  result["PGVSREVISION"][0],  self.createVersionPath))
+                self.vsCheck = DbVersionCheckDialog(myDb,  result["PGVSREVISION"][0],  upgrade_version_path,  'upgrade')              
+                revisionMessage =self.tr('The Plugin expects pgvs revision %s but DB-functions revision %s are installed.\n\n \
+Please contact your DB-administrator to upgrade the DB-functions from the file:\n\n %s\n\n \
+If you have appropriate DB permissions you can update the DB directly with click on DB-Update.') % (self.pgvsRevision,  result["PGVSREVISION"][0],  upgrade_version_path)
                 
                 self.vsCheck.messageTextEdit.setText(revisionMessage)
+                self.vsCheck.btnUpdate.setText(self.tr('Upgrade pgvs to Revision %s') % (self.pgvsRevision))
                 self.vsCheck.show()
-                return False
-            else:
-              return True
-      except:
-          self.vsCheck = DbVersionCheckDialog(myDb,  '0.0.0')
-          revisionMessage = QCoreApplication.translate('PgVersionTools',"Please upgrade the DB-functions \
-from the file:\n\n %s\n\n \
-If you have appropriate DB permissions you can update the DB directly with click on \
-DB-Update." % (self.createVersionPath))
-          self.vsCheck.messageTextEdit.setText(revisionMessage)
-          self.vsCheck.show()          
-          return False    
+                return False       
+        return False    
 
 
 #Get the Fieldnames of a Vector Layer
