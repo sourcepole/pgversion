@@ -440,7 +440,7 @@ If you have appropriate DB permissions you can update the DB directly with click
                 self.vsCheck.btnUpdate.setText(self.tr('Upgrade pgvs to Revision %s') % (self.pgvsRevision))
                 self.vsCheck.show()
                 return False       
-        return False    
+        return True
 
 
 #Get the Fieldnames of a Vector Layer
