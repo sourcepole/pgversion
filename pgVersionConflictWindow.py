@@ -11,14 +11,14 @@ class ConflictWindow(QMainWindow):
     
   mergeCompleted = pyqtSignal()
     
-  def __init__(self, iface,  layer,  type='conflict',  parent=None):
+  def __init__(self, layer,  type='conflict',  parent=None):
     QMainWindow.__init__(self)
 
     self.iface = iface
-    self.tools = PgVersionTools(self)    
     self.layer = layer
     self.parent = parent
     settings = QSettings()
+    self.tools = PgVersionTools(self)    
           
     # Restore Window Settings
     settings = QSettings()

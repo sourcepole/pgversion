@@ -335,7 +335,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
               else:
                 if self.w != None:
                     self.w = None
-                self.w = ConflictWindow(self.iface,  theLayer,  'conflict',  self)
+                self.w = ConflictWindow(theLayer,  'conflict',  self)
                 self.w.mergeCompleted.connect(self.doCommit)
                 self.w.show()
     
