@@ -81,35 +81,33 @@ class PgVersionTools(QObject):
 
   def hasVersion(self,  theLayer):
         
+        myLayerUri = QgsDataSourceURI(theLayer.source())
+
+        myDb = self.layerDB('hasVersion',  theLayer)
+
+        if myDb == None:
+            return None
+
+        if len(myLayerUri.schema()) == 1:
+          schema = 'public'
+        else:
+          schema = myLayerUri.schema()
+
+
+        sql = "select count(version_table_name) \
+          from versions.version_tables import \
+          where version_view_schema = '%s' and version_view_name = '%s'" % (schema,  myLayerUri.table())
+          
+        result = myDb.read(sql)
+        myDb.close()
         try:
-            myLayerUri = QgsDataSourceURI(theLayer.source())
-    
-            myDb = self.layerDB('hasVersion',  theLayer)
-    
-            if myDb == None:
-                return None
-    
-            if len(myLayerUri.schema()) == 1:
-              schema = 'public'
+            if result['COUNT'][0] == '1':
+                return True
             else:
-              schema = myLayerUri.schema()
-    
-    
-            sql = "select count(version_table_name) \
-              from versions.version_tables import \
-              where version_view_schema = '%s' and version_view_name = '%s'" % (schema,  myLayerUri.table())
-              
-            result = myDb.read(sql)
-            myDb.close()
-            try:
-                if result['COUNT'][0] == '1':
-                    return True
-                else:
-                    return False
-            except:
                 return False
         except:
-            pass
+            return False
+
       
   def isModified(self, myLayer=None):
 
