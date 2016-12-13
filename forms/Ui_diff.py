@@ -23,7 +23,7 @@ class DiffDlg(QDialog, Ui_DiffDlg):
         QDialog.__init__(self, parent)
         self.setupUi(self)
         self.iface = iface
-        self.tools = PgVersionTools(iface)
+        self.tools = PgVersionTools(self)
     
 
         self.dateEditRev1.setDate(QDate.currentDate())

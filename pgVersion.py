@@ -48,7 +48,6 @@ class PgVersion(QObject):
     QObject.__init__(self)
     # Save reference to the QGIS interface
     self.iface = iface
-    self.tools = PgVersionTools(self.iface)
     self.w = None
     self.vsCheck = None
 
@@ -160,13 +159,13 @@ class PgVersion(QObject):
                 self.actionDelete.setEnabled(False) # true
 
   def layers_init(self):
-      canvas = self.iface.mapCanvas()
-      layerList = canvas.layers()
-
-      for l in layerList:
-          if l.type() == QgsMapLayer.VectorLayer and l.providerType() == 'postgres' and self.tools.hasVersion(l):
-              l.editingStopped.connect(lambda lay = l: self.tools.setModified(l))
-              self.tools.setModified(l)
+        self.layer_list = self.iface.legendInterface().layers()
+        self.tools = PgVersionTools(self)
+        for i in range(len(self.layer_list)):
+            if self.layer_list[i].type() == 0  \
+            and self.layer_list[i].providerType() == 'postgres' \
+            and self.tools.hasVersion(self.layer_list[i]):
+                self.tools.setModified()
 
   def unload(self):
         # remove menubar
@@ -210,7 +209,7 @@ class PgVersion(QObject):
                 QApplication.restoreOverrideCursor()
                 currentLayer.removeSelection()
                 currentLayer.triggerRepaint()
-                self.tools.setModified(currentLayer)
+                self.tools.setModified()
 #                self.actionDelete.setEnabled(false)
         
 
@@ -249,7 +248,7 @@ Please set the user permissions for table {0} and reload it via Database -> PG V
 
   def doLoad(self): 
 
-     self.dlg = PgVersionLoadDialog(self.iface)
+     self.dlg = PgVersionLoadDialog(self)
      self.dlg.show()
 
   def doRollback(self,  item):
@@ -296,15 +295,15 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
             self.LogViewDialog.close()
             currentLayer.triggerRepaint()
             QApplication.restoreOverrideCursor()
-            self.tools.setModified(currentLayer)
-            self.iface.messageBar().pushMessage('INFO', QCoreApplication.translate('PgVersion','Rollback to revision {0} was successful!').format(revision), level=QgsMessageBar.INFO, duration=3)
+            self.tools.setModified()
+            self.iface.messageBar().pushMessage('INFO', self.tr('Rollback to revision {0} was successful!').format(revision), level=QgsMessageBar.INFO, duration=3)
             return
 
   def doCommit(self):
       canvas = self.iface.mapCanvas()
       
       if canvas.currentLayer() == None:
-          self.iface.messageBar().pushMessage('Error', QCoreApplication.translate('PgVersion','Please select a versioned layer for committing'), level=QgsMessageBar.CRITICAL, duration=3)
+          self.iface.messageBar().pushMessage('Error', self.tr('Please select a versioned layer for committing'), level=QgsMessageBar.CRITICAL, duration=3)
           return
 
       canvas = self.iface.mapCanvas()
@@ -313,7 +312,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
       myTable = self.tools.layerTable(theLayer).replace('_version', '')
 
       if not self.tools.hasVersion(theLayer):
-          QMessageBox.warning(None,   QCoreApplication.translate('PgVersion','Warning'),   QCoreApplication.translate('PgVersion','Please select a versioned layer!'))
+          QMessageBox.warning(None,   self.tr('Warning'),   self.tr('Please select a versioned layer!'))
       else:
           if self.tools.isModified(theLayer):
               confRecords = self.tools.confRecords(theLayer)            
@@ -330,8 +329,8 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
                         myDB.run(sql)
                         myDB.close()
                         self.tools.layerRepaint()
-                        self.iface.messageBar().pushMessage("Info", QCoreApplication.translate('PgVersion','Commit of your changes was successful'), level=QgsMessageBar.INFO, duration=3)            
-                        self.tools.setModified(theLayer,  True)
+                        self.iface.messageBar().pushMessage("Info", self.tr('Commit of your changes was successful'), level=QgsMessageBar.INFO, duration=3)            
+                        self.tools.setModified(True)
                         QApplication.restoreOverrideCursor()
               else:
                 if self.w != None:
@@ -340,9 +339,9 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
                 self.w.mergeCompleted.connect(self.doCommit)
                 self.w.show()
     
-              self.tools.setModified(theLayer,  True)
+              self.tools.setModified(True)
           else:
-              self.iface.messageBar().pushMessage('INFO', QCoreApplication.translate('PgVersion','No layer changes for committing, everything is OK'), level=QgsMessageBar.INFO, duration=3)
+              self.iface.messageBar().pushMessage('INFO', self.tr('No layer changes for committing, everything is OK'), level=QgsMessageBar.INFO, duration=3)
 
 
   def doCheckout(self,  revision,  tag=None):
@@ -432,7 +431,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
                 QMessageBox.information(None, '',result)
             else:
                 self.iface.messageBar().pushMessage("Info", QCoreApplication.translate('PgVersion','All changes are set back to the HEAD revision: {0}').format(str(result["PGVSREVERT"][0])), level=QgsMessageBar.INFO, duration=3)            
-            self.tools.setModified(theLayer,  True)
+            self.tools.setModified(True)
         theLayer.triggerRepaint()
         myDb.close()
     pass

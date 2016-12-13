@@ -31,12 +31,12 @@ import apicompat
 class PgVersionTools(QObject):
 
 # Konstruktor 
-  def __init__(self,  iface,  parent=None):
+  def __init__(self,  parent=None):
       QObject.__init__(self,  parent)
-      self.pgvsRevision = '2.1.0'
-      self.iface = iface
+      self.pgvsRevision = '2.1.1'
+      self.iface = parent.iface
       self.parent = parent
-      pass
+      
 
   def layerRepaint(self):
         for layer in self.iface.mapCanvas().layers():
@@ -139,16 +139,16 @@ class PgVersionTools(QObject):
         except:
             pass
 
-  def setModified(self, myLayer=None,  unsetModified=False):
+  def setModified(self,  unset=False):
 
-    if myLayer==None:
-      myLayer = self.iface.mapCanvas().currentLayer()
-
-    if self.isModified(myLayer):
-      if '(modified)' not in myLayer.name():
-        myLayer.setLayerName(myLayer.name()+' (modified)')
-    elif unsetModified:
-      myLayer.setLayerName(myLayer.name().replace(' (modified)', ''))      
+    for i in range(len(self.parent.layer_list)):
+        if self.isModified(self.parent.layer_list[i]):
+            if '(modified)' not in self.parent.layer_list[i].name():
+                self.parent.layer_list[i].setLayerName(self.parent.layer_list[i].name()+' (modified)')
+        else:
+            self.parent.layer_list[i].setLayerName(self.parent.layer_list[i].name().replace(' (modified)', ''))     
+           
+        self.parent.layer_list[i].editingStopped.connect(self.setModified)
 
 # Return QgsVectorLayer from a layer name ( as string )
   def vectorLayerExists(self,   myName ):
@@ -301,19 +301,22 @@ class PgVersionTools(QObject):
            
       result = myDb.read(sql)
       cols = myDb.cols(sql)
-      cols.remove('action')
-      cols.remove('systime')
-      cols.remove('commit')
-      cols.remove(geomCol)
+      print cols
+      try:
+          cols.remove('action')
+          cols.remove('systime')
+          cols.remove('commit')
+          cols.remove(geomCol)
 
-      cols.insert(0, cols.pop(-1))
-      cols.insert(0, cols.pop(-1))
-      cols.insert(0, cols.pop(-1))
-
-      resultArray = []
-      resultArray.append(result)
-      resultArray.append(cols)
-      
+          cols.insert(0, cols.pop(-1))
+          cols.insert(0, cols.pop(-1))
+          cols.insert(0, cols.pop(-1))
+    
+          resultArray = []
+          resultArray.append(result)
+          resultArray.append(cols)
+      except:
+          pass
       myDb.close()
       return resultArray
 

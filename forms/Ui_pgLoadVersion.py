@@ -11,12 +11,13 @@ import pgversion.apicompat as pgversion
 
 class PgVersionLoadDialog(QDialog, Ui_pgLoadVersion):
     
-    def __init__(self, iface):
+    def __init__(self, parent):
         QDialog.__init__(self)
         self.setupUi(self)
         self.getDbSettings()
-        self.tools = PgVersionTools(iface)
-        self.iface = iface
+        self.tools = PgVersionTools(parent)
+        self.iface = parent.iface
+        self.parent = parent
 
     
     def getDbSettings(self):
@@ -132,28 +133,36 @@ class PgVersionLoadDialog(QDialog, Ui_pgLoadVersion):
         DBPORT = pystring(settings.value(mySettings + '/port'))
         DBPASSWD = pystring(settings.value(mySettings + '/password'))
         DBTYPE = 'pg'
+        
         if DBUSER == '' or DBPASSWD == '':
             connectionInfo = "dbname='" + DBNAME + "' host=" + DBHOST + ' port=' + DBPORT
             (success, user, password) = QgsCredentials.instance().get(connectionInfo, None, None)
             QgsCredentials.instance().put(connectionInfo, user, password)
             DBUSER = user
             DBPASSWD = password
+            
         myDb = DbObj(pluginname = connectionName, typ = DBTYPE, hostname = DBHOST, port = DBPORT, dbname = DBNAME, username = DBUSER, passwort = DBPASSWD)
-        sql = "select * from versions.version_tables where version_table_schema = '%s' and version_table_name = '%s'" % (schema, table)
+        sql = "select * from versions.version_tables \
+        where version_table_schema = '%s' \
+          and version_table_name = '%s'" % (schema, table)
+          
         layer = myDb.read(sql)
         uri = QgsDataSourceURI()
         uri.setConnection(DBHOST, DBPORT, DBNAME, DBUSER, DBPASSWD)
         uri.setDataSource(layer['VERSION_VIEW_SCHEMA'][0], layer['VERSION_VIEW_NAME'][0], '' + layer['VERSION_VIEW_GEOMETRY_COLUMN'][0] + '', '', layer['VERSION_VIEW_PKEY'][0])
         layerName = layer['VERSION_TABLE_NAME'][0]
         vLayer = QgsVectorLayer(uri.uri(), layerName, 'postgres')
-        vLayer.editingStopped.connect(lambda l = vLayer:  self.tools.setModified(l))
-        self.tools.setModified(vLayer)
+        
         if self.tools.vectorLayerExists(vLayer.name()) or self.tools.vectorLayerExists(vLayer.name() + ' (modified)'):
             QMessageBox.warning(None, '', QCoreApplication.translate('PgVersion', 'Layer {0} is already loaded').format(table))
             QApplication.restoreOverrideCursor()
             QApplication.setOverrideCursor(Qt.ArrowCursor)
             return None
+            
         QgsMapLayerRegistry.instance().addMapLayer(vLayer)
+        self.parent.layer_list.append(vLayer)
+        self.tools.setModified()
+        
         myDb.close()
         QApplication.restoreOverrideCursor()
         QApplication.setOverrideCursor(Qt.ArrowCursor)

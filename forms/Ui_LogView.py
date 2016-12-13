@@ -28,7 +28,7 @@ class LogView(QDialog, Ui_LogView):
         self.setupUi(self)
         
         self.iface = iface
-        self.tools = PgVersionTools(self.iface)
+        self.tools = PgVersionTools(self)
     
         self.myAction = QAction(QIcon(""), self.tr("Set Tag for current revision"),  self)
         self.myAction.setStatusTip(self.tr("Set Tag for current revision"))
