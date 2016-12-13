@@ -42,9 +42,10 @@ from about.doAbout import  DlgAbout
 import apicompat,  tempfile
 
 
-class PgVersion: 
+class PgVersion(QObject):
 
   def __init__(self, iface):
+    QObject.__init__(self)
     # Save reference to the QGIS interface
     self.iface = iface
     self.tools = PgVersionTools(self.iface)
@@ -73,7 +74,7 @@ class PgVersion:
 
     self.plugin_dir = pystring(QFileInfo(QgsApplication.qgisUserDbFilePath()).path()) + "/python/plugins/pgversion"      
 
-    self.iface.projectRead.connect(self.layersInit)
+    self.iface.projectRead.connect(self.layers_init)
 
 
   def initGui(self):  
@@ -91,7 +92,6 @@ class PgVersion:
     self.actionRevert = QAction(QIcon(":/plugins/pgversion/icons/pgversion-revert.png"), QCoreApplication.translate("PgVersion","Revert to HEAD Revision"), self.iface.mainWindow())
     self.actionLogView = QAction(QIcon(":/plugins/pgversion/icons/pgversion-logview.png"), QCoreApplication.translate("PgVersion","Show Logs"), self.iface.mainWindow())
     self.actionDiff = QAction(QIcon(":/plugins/pgversion/icons/pgversion-diff.png"), QCoreApplication.translate("PgVersion","Show Diffs"), self.iface.mainWindow())
-#    self.actionCommit.setEnabled(False)
     self.actionDrop = QAction(QIcon(":/plugins/pgversion/icons/pgversion-drop.png"), QCoreApplication.translate("PgVersion","Drop Versioning from Layer"), self.iface.mainWindow())    
     self.actionHelp = QAction(QIcon(""), QCoreApplication.translate("PgVersion","Help"), self.iface.mainWindow())       
     self.actionAbout = QAction(QIcon(""), QCoreApplication.translate("PgVersion","About"), self.iface.mainWindow())       
@@ -101,9 +101,6 @@ class PgVersion:
 
     self.actionList =  [ self.actionInit,self.actionLoad, self.actionCommit, self.actionDiff, self.actionRevert,  self.actionLogView, self.actionDrop, self.actionLogView,  self.actionDelete, self.actionHelp,  self.actionAbout]         
  
-
-#    self.actionList =  [ self.actionInit,self.actionLoad,self.actionCommit,self.actionRevert, self.actionLogView, self.actionDrop, self.actionLogView,  self.actionHelp,  self.actionAbout]         
-
     self.toolBar.addAction(self.actionInit)
     self.toolBar.addAction(self.actionLoad)
     self.toolBar.addAction(self.actionCommit)
@@ -162,13 +159,13 @@ class PgVersion:
             else:
                 self.actionDelete.setEnabled(False) # true
 
-  def layersInit(self):
+  def layers_init(self):
       canvas = self.iface.mapCanvas()
       layerList = canvas.layers()
 
       for l in layerList:
-          if l.type() == QgsMapLayer.VectorLayer and l.providerType() == 'postgres' and self.tools.isModified(l):
-              l.editingStopped.connect(self.tools.setModified)
+          if l.type() == QgsMapLayer.VectorLayer and l.providerType() == 'postgres' and self.tools.hasVersion(l):
+              l.editingStopped.connect(lambda lay = l: self.tools.setModified(l))
               self.tools.setModified(l)
 
   def unload(self):
@@ -213,7 +210,7 @@ class PgVersion:
                 QApplication.restoreOverrideCursor()
                 currentLayer.removeSelection()
                 currentLayer.triggerRepaint()
-                self.tools.setModified()
+                self.tools.setModified(currentLayer)
 #                self.actionDelete.setEnabled(false)
         
 
@@ -334,7 +331,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
                         myDB.close()
                         self.tools.layerRepaint()
                         self.iface.messageBar().pushMessage("Info", QCoreApplication.translate('PgVersion','Commit of your changes was successful'), level=QgsMessageBar.INFO, duration=3)            
-                        self.tools.setModified(None,  True)
+                        self.tools.setModified(theLayer,  True)
                         QApplication.restoreOverrideCursor()
               else:
                 if self.w != None:
@@ -343,7 +340,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
                 self.w.mergeCompleted.connect(self.doCommit)
                 self.w.show()
     
-              self.tools.setModified(None,  True)
+              self.tools.setModified(theLayer,  True)
           else:
               self.iface.messageBar().pushMessage('INFO', QCoreApplication.translate('PgVersion','No layer changes for committing, everything is OK'), level=QgsMessageBar.INFO, duration=3)
 
@@ -435,7 +432,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
                 QMessageBox.information(None, '',result)
             else:
                 self.iface.messageBar().pushMessage("Info", QCoreApplication.translate('PgVersion','All changes are set back to the HEAD revision: {0}').format(str(result["PGVSREVERT"][0])), level=QgsMessageBar.INFO, duration=3)            
-            self.tools.setModified(None,  True)
+            self.tools.setModified(theLayer,  True)
         theLayer.triggerRepaint()
         myDb.close()
     pass
