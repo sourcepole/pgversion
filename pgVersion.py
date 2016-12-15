@@ -48,10 +48,10 @@ class PgVersion(QObject):
     QObject.__init__(self)
     # Save reference to the QGIS interface
     self.iface = iface
-    self.tools = PgVersionTools(self.iface)
     self.w = None
     self.vsCheck = None
     self.layer_list = []
+    self.tools = PgVersionTools(self)
 
     #Initialise thetranslation environment    
     userPluginPath = QFileInfo(QgsApplication.qgisUserDbFilePath()).path()+"/python/plugins/pgversion"  
@@ -83,7 +83,7 @@ class PgVersion(QObject):
   def initGui(self):  
 
     self.helpDialog = HelpDialog()
-    self.LogViewDialog = LogView(self.iface)
+    self.LogViewDialog = LogView(self)
 
     self.toolBar = self.iface.addToolBar("PG Version")
     self.toolBar.setObjectName("PG Version")
@@ -170,14 +170,18 @@ class PgVersion(QObject):
   def add_layer(self,  layer):
       
     for l in layer:
-        self.layer_list.append(l.id())
+        if self.tools.hasVersion(l):
+            self.layer_list.append(l.id())
     
     self.layers_init()
     
 
   def remove_layer(self,  id):
-      self.layer_list.remove(id)
-      self.layers_init()
+      print self.layer_list
+      print id
+      if id in self.layer_list:
+          self.layer_list.remove(id)
+          self.layers_init()
       
   def layers_init(self):
       for i in range(len(self.layer_list)):
@@ -186,6 +190,8 @@ class PgVersion(QObject):
           if map_layer.type() == QgsMapLayer.VectorLayer and map_layer.providerType() == 'postgres':
               map_layer.editingStopped.connect(self.tools.setModified)
               self.tools.setModified(map_layer)
+
+
 
   def unload(self):
         # remove menubar

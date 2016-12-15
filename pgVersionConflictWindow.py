@@ -15,7 +15,7 @@ class ConflictWindow(QMainWindow):
     QMainWindow.__init__(self)
 
     self.iface = iface
-    self.tools = PgVersionTools(iface)    
+    self.tools = PgVersionTools(parent)    
     self.layer = layer
     self.parent = parent
     settings = QSettings()

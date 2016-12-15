@@ -20,15 +20,15 @@ class LogView(QDialog, Ui_LogView):
     checkoutLayer = pyqtSignal(str)
     checkoutTag = pyqtSignal(str,  str)
       
-    def __init__(self, iface,  parent = None):
+    def __init__(self, parent):
         """
         Constructor
         """
-        QDialog.__init__(self, parent)
+        QDialog.__init__(self, None)
         self.setupUi(self)
         
-        self.iface = iface
-        self.tools = PgVersionTools(self.iface)
+        self.iface = parent.iface
+        self.tools = PgVersionTools(parent)
     
         self.myAction = QAction(QIcon(""), self.tr("Set Tag for current revision"),  self)
         self.myAction.setStatusTip(self.tr("Set Tag for current revision"))

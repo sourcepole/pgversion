@@ -31,7 +31,7 @@ class PgVersionLoadDialog(QDialog, Ui_pgLoadVersion):
         QDialog.__init__(self)
         self.setupUi(self)
         self.getDbSettings()
-        self.tools = PgVersionTools(parent.iface)
+        self.tools = PgVersionTools(parent)
         self.iface = parent.iface
         self.parent = parent
 

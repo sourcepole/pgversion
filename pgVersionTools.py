@@ -31,11 +31,12 @@ import apicompat
 class PgVersionTools(QObject):
 
 # Konstruktor 
-  def __init__(self,  iface,  parent=None):
+  def __init__(self,  parent):
       QObject.__init__(self,  parent)
       self.pgvsRevision = '2.1.0'
-      self.iface = iface
       self.parent = parent
+      self.iface = parent.iface
+      self.layer_list = parent.layer_list
       pass
 
   def layerRepaint(self):
@@ -141,14 +142,13 @@ class PgVersionTools(QObject):
 
   def setModified(self, unsetModified=False):
 
-    self.layer_list = self.iface.legendInterface().layers()
-
     for i in range(len(self.layer_list)):
-        if self.isModified(self.layer_list[i]):
-          if '(modified)' not in self.layer_list[i].name():
-            self.layer_list[i].setLayerName(self.layer_list[i].name()+' (modified)')
+        map_layer = QgsMapLayerRegistry.instance().mapLayer(self.layer_list[i])
+        if self.isModified(map_layer):
+          if '(modified)' not in map_layer.name():
+            map_layer.setLayerName(map_layer.name()+' (modified)')
         else:
-          self.layer_list[i].setLayerName(self.layer_list[i].name().replace(' (modified)', ''))      
+          map_layer.setLayerName(map_layer.name().replace(' (modified)', ''))      
     
     
     
