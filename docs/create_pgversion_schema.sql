@@ -1,5 +1,5 @@
 -- Database generated with pgModeler (PostgreSQL Database Modeler).
--- pgModeler  version: 0.9.0-alpha1
+-- pgModeler  version: 0.9.0-alpha
 -- PostgreSQL version: 9.3
 -- Project Site: pgmodeler.com.br
 -- Model Author: ---
@@ -20,8 +20,8 @@ CREATE ROLE versions WITH
 -- -- DROP DATABASE IF EXISTS pgversion_create_scripts;
 -- CREATE DATABASE pgversion_create_scripts
 -- 	ENCODING = 'UTF8'
--- 	LC_COLLATE = 'de_DE.UTF-8'
--- 	LC_CTYPE = 'de_DE.UTF-8'
+-- 	LC_COLLATE = 'de_DE.UTF-8.UTF8'
+-- 	LC_CTYPE = 'de_DE.UTF-8.UTF8'
 -- 	TABLESPACE = pg_default
 -- ;
 -- -- ddl-end --
@@ -372,7 +372,6 @@ CREATE FUNCTION versions.pgvscommit ( _param1 character varying,  _param2 text)
 	ROWS 1000
 	AS $$
 
-
   DECLARE
     inTable ALIAS FOR $1;
     logMessage ALIAS FOR $2;
@@ -523,8 +522,8 @@ with a listing of the conflicting objects.
                 version_table_id, revision, logmsg) 
               SELECT version_table_id, '||revision||', '''||logMessage||''' as logmsg 
               FROM versions.version_tables 
-              where version_table_schema = '''||quote_ident(mySchema)||'''
-               and version_table_name = '''|| quote_ident(myTable)||''''; 
+              where version_table_schema = '''||mySchema||'''
+               and version_table_name = '''|| myTable||''''; 
                       
 
         execute commitQuery;              
@@ -534,7 +533,6 @@ with a listing of the conflicting objects.
   RETURN;                             
 
   END;
-
 
 
 $$;
@@ -706,7 +704,6 @@ CREATE FUNCTION versions.pgvsinit ( _param1 character varying)
 	SECURITY INVOKER
 	COST 100
 	AS $$
-
   DECLARE
     inTable ALIAS FOR $1;
     pos INTEGER;
@@ -983,9 +980,8 @@ CREATE FUNCTION versions.pgvslogview ( _param1 character varying)
     versionLogTable := 'versions.'||quote_ident(mySchema||'_'||myTable||'_version_log');       
 
     logViewQry := 'select logt.revision, to_timestamp(logt.systime/1000), logt.project,  logt.logmsg
-                           from  versions.version_tables as vt, versions.version_tables_logmsg as logt
-                           where vt.version_table_id = logt.version_table_id
-                             and vt.version_table_schema = '''||mySchema||'''
+                           from  versions.version_tables as vt left join versions.version_tables_logmsg as logt on (vt.version_table_id = logt.version_table_id)
+                           where vt.version_table_schema = '''||mySchema||'''
                              and vt.version_table_name = '''||myTable||''' 
                            order by revision desc';
 
@@ -1243,7 +1239,7 @@ CREATE FUNCTION versions.pgvsrevision ()
 DECLARE
   revision TEXT;
   BEGIN	
-    revision := '2.1.0';
+    revision := '2.1.1';
   RETURN revision ;                             
 
   END;

@@ -27,7 +27,7 @@ DROP FUNCTION IF EXISTS versions.pgvsdiff(anyelement,integer) CASCADE;
 -- [ Created objects ] --
 -- object: versions._primarykey | type: FUNCTION --
 -- DROP FUNCTION IF EXISTS versions._primarykey(IN character varying) CASCADE;
-CREATE FUNCTION versions._primarykey (IN intable character varying, OUT pkey_column character varying, OUT success boolean)
+CREATE or replace FUNCTION versions._primarykey (IN intable character varying, OUT pkey_column character varying, OUT success boolean)
 	RETURNS record
 	LANGUAGE plpgsql
 	VOLATILE 

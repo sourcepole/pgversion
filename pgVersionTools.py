@@ -133,26 +133,26 @@ class PgVersionTools(QObject):
         result = myDb.read(sql)
         myDb.close()
 
-        try:
-          if int(result["COUNT"][0]) == 0:
-            return False
-          else:
-            return True      
-        except:
-            pass
+        if int(result["COUNT"][0]) == 0:
+          return False
+        else:
+          return True      
 
-  def setModified(self, myLayer=None,  unsetModified=False):
 
-    if myLayer==None:
-      myLayer = self.iface.mapCanvas().currentLayer()
+  def setModified(self, unsetModified=False):
 
-    if self.isModified(myLayer):
-      if '(modified)' not in myLayer.name():
-        myLayer.setLayerName(myLayer.name()+' (modified)')
-    elif unsetModified:
-      myLayer.setLayerName(myLayer.name().replace(' (modified)', ''))      
+    self.layer_list = self.iface.legendInterface().layers()
 
-# Return QgsVectorLayer from a layer name ( as string )
+    for i in range(len(self.layer_list)):
+        if self.isModified(self.layer_list[i]):
+          if '(modified)' not in self.layer_list[i].name():
+            self.layer_list[i].setLayerName(self.layer_list[i].name()+' (modified)')
+        else:
+          self.layer_list[i].setLayerName(self.layer_list[i].name().replace(' (modified)', ''))      
+    
+    
+    
+    # Return QgsVectorLayer from a layer name ( as string )
   def vectorLayerExists(self,   myName ):
      layermap = QgsMapLayerRegistry.instance().mapLayers()
      for name, layer in layermap.iteritems():
@@ -440,7 +440,7 @@ If you have appropriate DB permissions you can update the DB directly with click
                 self.vsCheck.btnUpdate.setText(self.tr('Upgrade pgvs to Revision %s') % (self.pgvsRevision))
                 self.vsCheck.show()
                 return False       
-        return False    
+        return True
 
 
 #Get the Fieldnames of a Vector Layer

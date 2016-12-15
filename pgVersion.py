@@ -42,14 +42,16 @@ from about.doAbout import  DlgAbout
 import apicompat,  tempfile
 
 
-class PgVersion: 
+class PgVersion(QObject): 
 
   def __init__(self, iface):
+    QObject.__init__(self)
     # Save reference to the QGIS interface
     self.iface = iface
     self.tools = PgVersionTools(self.iface)
     self.w = None
     self.vsCheck = None
+    self.layer_list = []
 
     #Initialise thetranslation environment    
     userPluginPath = QFileInfo(QgsApplication.qgisUserDbFilePath()).path()+"/python/plugins/pgversion"  
@@ -73,7 +75,9 @@ class PgVersion:
 
     self.plugin_dir = pystring(QFileInfo(QgsApplication.qgisUserDbFilePath()).path()) + "/python/plugins/pgversion"      
 
-    self.iface.projectRead.connect(self.layersInit)
+    self.iface.projectRead.connect(self.layers_init)
+    QgsMapLayerRegistry.instance().layerRemoved.connect(self.remove_layer)
+    QgsMapLayerRegistry.instance().layersAdded.connect(self.add_layer)
 
 
   def initGui(self):  
@@ -162,14 +166,26 @@ class PgVersion:
             else:
                 self.actionDelete.setEnabled(False) # true
 
-  def layersInit(self):
-      canvas = self.iface.mapCanvas()
-      layerList = canvas.layers()
 
-      for l in layerList:
-          if l.type() == QgsMapLayer.VectorLayer and l.providerType() == 'postgres' and self.tools.isModified(l):
-              l.editingStopped.connect(self.tools.setModified)
-              self.tools.setModified(l)
+  def add_layer(self,  layer):
+      
+    for l in layer:
+        self.layer_list.append(l.id())
+    
+    self.layers_init()
+    
+
+  def remove_layer(self,  id):
+      self.layer_list.remove(id)
+      self.layers_init()
+      
+  def layers_init(self):
+      for i in range(len(self.layer_list)):
+          map_layer = QgsMapLayerRegistry.instance().mapLayer(self.layer_list[i])
+          
+          if map_layer.type() == QgsMapLayer.VectorLayer and map_layer.providerType() == 'postgres':
+              map_layer.editingStopped.connect(self.tools.setModified)
+              self.tools.setModified(map_layer)
 
   def unload(self):
         # remove menubar
@@ -252,7 +268,7 @@ Please set the user permissions for table {0} and reload it via Database -> PG V
 
   def doLoad(self): 
 
-     self.dlg = PgVersionLoadDialog(self.iface)
+     self.dlg = PgVersionLoadDialog(self)
      self.dlg.show()
 
   def doRollback(self,  item):
@@ -299,7 +315,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
             self.LogViewDialog.close()
             currentLayer.triggerRepaint()
             QApplication.restoreOverrideCursor()
-            self.tools.setModified(currentLayer)
+            self.tools.setModified()
             self.iface.messageBar().pushMessage('INFO', QCoreApplication.translate('PgVersion','Rollback to revision {0} was successful!').format(revision), level=QgsMessageBar.INFO, duration=3)
             return
 
@@ -334,7 +350,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
                         myDB.close()
                         self.tools.layerRepaint()
                         self.iface.messageBar().pushMessage("Info", QCoreApplication.translate('PgVersion','Commit of your changes was successful'), level=QgsMessageBar.INFO, duration=3)            
-                        self.tools.setModified(None,  True)
+                        self.tools.setModified()
                         QApplication.restoreOverrideCursor()
               else:
                 if self.w != None:
@@ -343,7 +359,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
                 self.w.mergeCompleted.connect(self.doCommit)
                 self.w.show()
     
-              self.tools.setModified(None,  True)
+              self.tools.setModified()
           else:
               self.iface.messageBar().pushMessage('INFO', QCoreApplication.translate('PgVersion','No layer changes for committing, everything is OK'), level=QgsMessageBar.INFO, duration=3)
 
@@ -420,12 +436,12 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
     myTable = QgsDataSourceURI(uri).table()    
     
     if not self.tools.hasVersion(theLayer):
-       QMessageBox.warning(None,   QCoreApplication.translate('PgVersion','Warning'),   QCoreApplication.translate('PgVersion','Please select a versioned layer!'))
+       QMessageBox.warning(None,   self.tr('Warning'),   self.tr('Please select a versioned layer!'))
     else:
         if len(mySchema) == 1:
           mySchema = 'public'
     
-        answer = QMessageBox.question(None, '', QCoreApplication.translate('PgVersion','are you sure to revert to the HEAD revision?'), QCoreApplication.translate('PgVersion','Yes'),  QCoreApplication.translate('PgVersion','No'))
+        answer = QMessageBox.question(None, '', self.tr('are you sure to revert to the HEAD revision?'), QCoreApplication.translate('PgVersion','Yes'),  QCoreApplication.translate('PgVersion','No'))
     
         if answer == 0:
             sql = "select * from versions.pgvsrevert('"+mySchema+"."+myTable.replace('_version', '')+"')"
@@ -435,7 +451,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
                 QMessageBox.information(None, '',result)
             else:
                 self.iface.messageBar().pushMessage("Info", QCoreApplication.translate('PgVersion','All changes are set back to the HEAD revision: {0}').format(str(result["PGVSREVERT"][0])), level=QgsMessageBar.INFO, duration=3)            
-            self.tools.setModified(None,  True)
+            self.tools.setModified()
         theLayer.triggerRepaint()
         myDb.close()
     pass
@@ -579,8 +595,6 @@ select * from version \
 except \
 select * from checkout) as foo1 \
 ) as foo ").format(schema = mySchema,  table=myTable,  origin=myTable.replace('_version', ''), cols = myCols,  uniqueCol = uniqueCol,  geo_idx = geo_idx )
-
-            print sql
             
             myUri = QgsDataSourceURI(self.tools.layerUri(currentLayer))
             myUri.setDataSource("", u"(%s\n)" % sql, geomCol, "", "rownum")
