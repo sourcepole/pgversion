@@ -11,8 +11,7 @@ SET check_function_bodies = false;
 -- DROP ROLE IF EXISTS versions;
 CREATE ROLE versions WITH 
 	INHERIT
-	ENCRYPTED PASSWORD '********'
-	ROLE paul,hdus;
+	ENCRYPTED PASSWORD '********';
 -- ddl-end --
 
 
@@ -26,7 +25,6 @@ CREATE ROLE versions WITH
 -- 	LC_COLLATE = 'de_DE.UTF-8'
 -- 	LC_CTYPE = 'de_DE.UTF-8'
 -- 	TABLESPACE = pg_default
--- 	OWNER = hdus
 -- ;
 -- -- ddl-end --
 -- 
@@ -1426,7 +1424,7 @@ DECLARE
 
 $$;
 -- ddl-end --
-ALTER FUNCTION versions.pgvsupdatecheck(character varying) OWNER TO hdus;
+ALTER FUNCTION versions.pgvsupdatecheck(character varying) OWNER TO versions;
 -- ddl-end --
 
 -- object: versions.version_tables_version_table_id_seq | type: SEQUENCE --
