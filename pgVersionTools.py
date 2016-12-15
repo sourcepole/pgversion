@@ -300,24 +300,27 @@ class PgVersionTools(QObject):
            where version_log_id in (%s)\
            order by "%s"' % (mySchema,  myTable,  timeListString,  layer["VERSION_VIEW_PKEY"][0])
            
-           
+
       result = myDb.read(sql)
-      cols = myDb.cols(sql)
-      cols.remove('action')
-      cols.remove('systime')
-      cols.remove('commit')
-      cols.remove(geomCol)
-
-      cols.insert(0, cols.pop(-1))
-      cols.insert(0, cols.pop(-1))
-      cols.insert(0, cols.pop(-1))
-
-      resultArray = []
-      resultArray.append(result)
-      resultArray.append(cols)
-      
-      myDb.close()
-      return resultArray
+      try:
+          cols = myDb.cols(sql)
+          cols.remove('action')
+          cols.remove('systime')
+          cols.remove('commit')
+          cols.remove(geomCol)
+    
+          cols.insert(0, cols.pop(-1))
+          cols.insert(0, cols.pop(-1))
+          cols.insert(0, cols.pop(-1))
+    
+          resultArray = []
+          resultArray.append(result)
+          resultArray.append(cols)
+          
+          myDb.close()
+          return resultArray
+      except:
+          return None
 
   def conflictLayer(self,  theLayer):
         provider = theLayer.dataProvider()

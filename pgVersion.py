@@ -76,6 +76,7 @@ class PgVersion(QObject):
     self.plugin_dir = pystring(QFileInfo(QgsApplication.qgisUserDbFilePath()).path()) + "/python/plugins/pgversion"      
 
     self.iface.projectRead.connect(self.layers_init)
+    
     QgsMapLayerRegistry.instance().layerRemoved.connect(self.remove_layer)
     QgsMapLayerRegistry.instance().layersAdded.connect(self.add_layer)
 
@@ -177,8 +178,6 @@ class PgVersion(QObject):
     
 
   def remove_layer(self,  id):
-      print self.layer_list
-      print id
       if id in self.layer_list:
           self.layer_list.remove(id)
           self.layers_init()

@@ -178,6 +178,7 @@ class ConflictWindow(QMainWindow):
       if tabData <> None:
           self.tools.createGridView(self.tabView, tabData[0], tabData[1], 100, 10)
       else:
+          QApplication.restoreOverrideCursor()
           self.mergeCompleted.emit()
           
       QApplication.restoreOverrideCursor()
