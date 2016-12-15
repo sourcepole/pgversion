@@ -1,5 +1,5 @@
 -- Database generated with pgModeler (PostgreSQL Database Modeler).
--- pgModeler  version: 0.9.0-alpha
+-- pgModeler  version: 0.9.0-alpha1
 -- PostgreSQL version: 9.3
 -- Project Site: pgmodeler.com.br
 -- Model Author: ---
@@ -7,22 +7,180 @@
 SET check_function_bodies = false;
 -- ddl-end --
 
+-- object: hdus | type: ROLE --
+-- DROP ROLE IF EXISTS hdus;
+CREATE ROLE hdus WITH 
+	SUPERUSER
+	CREATEDB
+	CREATEROLE
+	INHERIT
+	LOGIN
+	REPLICATION
+	ENCRYPTED PASSWORD '********';
+-- ddl-end --
+
+-- object: oc_hdus | type: ROLE --
+-- DROP ROLE IF EXISTS oc_hdus;
+CREATE ROLE oc_hdus WITH 
+	CREATEDB
+	INHERIT
+	LOGIN
+	ENCRYPTED PASSWORD '********';
+-- ddl-end --
+
+-- object: hdus_cp | type: ROLE --
+-- DROP ROLE IF EXISTS hdus_cp;
+CREATE ROLE hdus_cp WITH 
+	SUPERUSER
+	INHERIT
+	ENCRYPTED PASSWORD '********'
+	VALID UNTIL '2129-03-25 00:00:00';
+-- ddl-end --
+
+-- object: hdus_cp_cp | type: ROLE --
+-- DROP ROLE IF EXISTS hdus_cp_cp;
+CREATE ROLE hdus_cp_cp WITH 
+	SUPERUSER
+	INHERIT
+	ENCRYPTED PASSWORD '********'
+	VALID UNTIL '2129-03-25 00:00:00';
+-- ddl-end --
+
+-- object: dbu_tb_ww_write | type: ROLE --
+-- DROP ROLE IF EXISTS dbu_tb_ww_write;
+CREATE ROLE dbu_tb_ww_write WITH 
+	INHERIT
+	ENCRYPTED PASSWORD '********'
+	ROLE hdus;
+-- ddl-end --
+
+-- object: dbu_tb_ww_read | type: ROLE --
+-- DROP ROLE IF EXISTS dbu_tb_ww_read;
+CREATE ROLE dbu_tb_ww_read WITH 
+	INHERIT
+	ENCRYPTED PASSWORD '********'
+	ROLE hdus;
+-- ddl-end --
+
+-- object: "peter.zopfi" | type: ROLE --
+-- DROP ROLE IF EXISTS "peter.zopfi";
+CREATE ROLE "peter.zopfi" WITH 
+	INHERIT
+	LOGIN
+	ENCRYPTED PASSWORD '********';
+-- ddl-end --
+
+-- object: version | type: ROLE --
+-- DROP ROLE IF EXISTS version;
+CREATE ROLE version WITH 
+	INHERIT
+	ENCRYPTED PASSWORD '********';
+-- ddl-end --
+
+-- object: qwat_viewer | type: ROLE --
+-- DROP ROLE IF EXISTS qwat_viewer;
+CREATE ROLE qwat_viewer WITH 
+	INHERIT
+	ENCRYPTED PASSWORD '********';
+-- ddl-end --
+
+-- object: vmail | type: ROLE --
+-- DROP ROLE IF EXISTS vmail;
+CREATE ROLE vmail WITH 
+	CREATEROLE
+	INHERIT
+	LOGIN
+	ENCRYPTED PASSWORD '********';
+-- ddl-end --
+
+-- object: pgversion_users | type: ROLE --
+-- DROP ROLE IF EXISTS pgversion_users;
+CREATE ROLE pgversion_users WITH 
+	INHERIT
+	ENCRYPTED PASSWORD '********';
+-- ddl-end --
+
+-- object: versions_admin | type: ROLE --
+-- DROP ROLE IF EXISTS versions_admin;
+CREATE ROLE versions_admin WITH 
+	INHERIT
+	ENCRYPTED PASSWORD '********';
+-- ddl-end --
+
+-- object: paul | type: ROLE --
+-- DROP ROLE IF EXISTS paul;
+CREATE ROLE paul WITH 
+	INHERIT
+	LOGIN
+	ENCRYPTED PASSWORD '********';
+-- ddl-end --
+
 -- object: versions | type: ROLE --
 -- DROP ROLE IF EXISTS versions;
 CREATE ROLE versions WITH 
-	INHERIT;
+	INHERIT
+	ENCRYPTED PASSWORD '********'
+	ROLE paul,hdus;
+-- ddl-end --
+
+-- object: metadb | type: ROLE --
+-- DROP ROLE IF EXISTS metadb;
+CREATE ROLE metadb WITH 
+	INHERIT
+	ENCRYPTED PASSWORD '********'
+	VALID UNTIL '2026-12-03 00:00:00'
+	ROLE hdus;
+-- ddl-end --
+
+-- object: metadb_admin | type: ROLE --
+-- DROP ROLE IF EXISTS metadb_admin;
+CREATE ROLE metadb_admin WITH 
+	INHERIT
+	ENCRYPTED PASSWORD '********'
+	ROLE hdus;
+-- ddl-end --
+
+-- object: mspublic | type: ROLE --
+-- DROP ROLE IF EXISTS mspublic;
+CREATE ROLE mspublic WITH 
+	INHERIT
+	ENCRYPTED PASSWORD '********'
+	ROLE hdus;
+-- ddl-end --
+
+-- object: hdus_cp1 | type: ROLE --
+-- DROP ROLE IF EXISTS hdus_cp1;
+CREATE ROLE hdus_cp1 WITH 
+	SUPERUSER
+	CREATEDB
+	CREATEROLE
+	INHERIT
+	LOGIN
+	REPLICATION
+	ENCRYPTED PASSWORD '********'
+	VALID UNTIL '2129-03-25 00:00:00';
+-- ddl-end --
+
+-- object: hdus_cp_cp1 | type: ROLE --
+-- DROP ROLE IF EXISTS hdus_cp_cp1;
+CREATE ROLE hdus_cp_cp1 WITH 
+	SUPERUSER
+	INHERIT
+	ENCRYPTED PASSWORD '********'
+	VALID UNTIL '2129-03-25 00:00:00';
 -- ddl-end --
 
 
 -- Database creation must be done outside an multicommand file.
 -- These commands were put in this file only for convenience.
--- -- object: pgversion_create_scripts | type: DATABASE --
--- -- DROP DATABASE IF EXISTS pgversion_create_scripts;
--- CREATE DATABASE pgversion_create_scripts
+-- -- object: pgversion_develop | type: DATABASE --
+-- -- DROP DATABASE IF EXISTS pgversion_develop;
+-- CREATE DATABASE pgversion_develop
 -- 	ENCODING = 'UTF8'
--- 	LC_COLLATE = 'de_DE.UTF-8.UTF8'
--- 	LC_CTYPE = 'de_DE.UTF-8.UTF8'
+-- 	LC_COLLATE = 'de_DE.UTF-8'
+-- 	LC_CTYPE = 'de_DE.UTF-8'
 -- 	TABLESPACE = pg_default
+-- 	OWNER = hdus
 -- ;
 -- -- ddl-end --
 -- 
@@ -89,6 +247,7 @@ CREATE FUNCTION versions.pgvs_version_record ()
 	SECURITY INVOKER
 	COST 100
 	AS $$
+
 
   DECLARE 
     pkey_rec record;
@@ -161,6 +320,7 @@ CREATE FUNCTION versions.pgvs_version_record ()
   END;
 
 
+
 $$;
 -- ddl-end --
 ALTER FUNCTION versions.pgvs_version_record() OWNER TO versions;
@@ -177,6 +337,7 @@ CREATE FUNCTION versions.pgvscheck ( _param1 character varying)
 	COST 100
 	ROWS 1000
 	AS $$
+
 
 
   DECLARE
@@ -267,6 +428,7 @@ with a listing of the conflicting objects.
 
 
 
+
 $$;
 -- ddl-end --
 ALTER FUNCTION versions.pgvscheck(character varying) OWNER TO versions;
@@ -283,6 +445,7 @@ CREATE FUNCTION versions.pgvscheckout (IN intable character varying, IN revision
 	COST 100
 	ROWS 1000
 	AS $$
+
 
   DECLARE
     mySchema TEXT;
@@ -355,6 +518,7 @@ CREATE FUNCTION versions.pgvscheckout (IN intable character varying, IN revision
 
 
 
+
 $$;
 -- ddl-end --
 ALTER FUNCTION versions.pgvscheckout(IN character varying,IN bigint) OWNER TO versions;
@@ -371,6 +535,7 @@ CREATE FUNCTION versions.pgvscommit ( _param1 character varying,  _param2 text)
 	COST 100
 	ROWS 1000
 	AS $$
+
 
   DECLARE
     inTable ALIAS FOR $1;
@@ -535,6 +700,7 @@ with a listing of the conflicting objects.
   END;
 
 
+
 $$;
 -- ddl-end --
 ALTER FUNCTION versions.pgvscommit(character varying,text) OWNER TO versions;
@@ -550,6 +716,7 @@ CREATE FUNCTION versions.pgvsdrop ( _param1 character varying)
 	SECURITY INVOKER
 	COST 100
 	AS $$
+
 
   DECLARE
     inTable ALIAS FOR $1;
@@ -689,6 +856,7 @@ CREATE FUNCTION versions.pgvsdrop ( _param1 character varying)
 
   END;
 
+
 $$;
 -- ddl-end --
 ALTER FUNCTION versions.pgvsdrop(character varying) OWNER TO versions;
@@ -704,6 +872,7 @@ CREATE FUNCTION versions.pgvsinit ( _param1 character varying)
 	SECURITY INVOKER
 	COST 100
 	AS $$
+
   DECLARE
     inTable ALIAS FOR $1;
     pos INTEGER;
@@ -938,6 +1107,7 @@ CREATE FUNCTION versions.pgvsinit ( _param1 character varying)
 
   END;
 
+
 $$;
 -- ddl-end --
 ALTER FUNCTION versions.pgvsinit(character varying) OWNER TO versions;
@@ -954,6 +1124,7 @@ CREATE FUNCTION versions.pgvslogview ( _param1 character varying)
 	COST 100
 	ROWS 1000
 	AS $$
+
     
   DECLARE
     inTable ALIAS FOR $1;
@@ -996,6 +1167,7 @@ CREATE FUNCTION versions.pgvslogview ( _param1 character varying)
   
   END;
 
+
 $$;
 -- ddl-end --
 ALTER FUNCTION versions.pgvslogview(character varying) OWNER TO versions;
@@ -1011,6 +1183,7 @@ CREATE FUNCTION versions.pgvsmerge ( "inTable" character varying,  "targetGid" i
 	SECURITY INVOKER
 	COST 100
 	AS $$
+
   DECLARE
     inTable ALIAS FOR $1;
     targetGid ALIAS FOR $2;
@@ -1134,6 +1307,7 @@ myDebug := 'select a.'||myPkey||' as objectkey,
   RETURN True;
   
   END;
+
 $$;
 -- ddl-end --
 ALTER FUNCTION versions.pgvsmerge(character varying,integer,character varying) OWNER TO versions;
@@ -1149,6 +1323,7 @@ CREATE FUNCTION versions.pgvsrevert ( _param1 character varying)
 	SECURITY INVOKER
 	COST 100
 	AS $$
+
 
   DECLARE
     inTable ALIAS FOR $1;
@@ -1220,6 +1395,7 @@ CREATE FUNCTION versions.pgvsrevert ( _param1 character varying)
 
   END;
 
+
 $$;
 -- ddl-end --
 ALTER FUNCTION versions.pgvsrevert(character varying) OWNER TO versions;
@@ -1235,6 +1411,7 @@ CREATE FUNCTION versions.pgvsrevision ()
 	SECURITY INVOKER
 	COST 100
 	AS $$
+
     
 DECLARE
   revision TEXT;
@@ -1243,6 +1420,7 @@ DECLARE
   RETURN revision ;                             
 
   END;
+
 
 $$;
 -- ddl-end --
@@ -1259,6 +1437,7 @@ CREATE FUNCTION versions.pgvsrollback ( _param1 character varying,  _param2 inte
 	SECURITY INVOKER
 	COST 100
 	AS $$
+
 
   DECLARE
     inTable ALIAS FOR $1;
@@ -1373,6 +1552,7 @@ rollbackQry := 'insert into '||versionLogTable||' ('||myInsertFields||', action)
 
   END;
 
+
 $$;
 -- ddl-end --
 ALTER FUNCTION versions.pgvsrollback(character varying,integer) OWNER TO versions;
@@ -1388,6 +1568,7 @@ CREATE FUNCTION versions.pgvsupdatecheck ( _param1 character varying)
 	SECURITY INVOKER
 	COST 100
 	AS $$
+
     
 DECLARE
   inRevision ALIAS FOR $1;
@@ -1396,7 +1577,6 @@ DECLARE
   inMinor integer;
   aktMajor integer;
   aktMinor integer;
-
   
   BEGIN	
       inMajor = to_number(substr(inRevision,1,1),'9');
@@ -1412,10 +1592,11 @@ DECLARE
       END IF;
       
   RETURN revision ;                             
-
   END;
 
 $$;
+-- ddl-end --
+ALTER FUNCTION versions.pgvsupdatecheck(character varying) OWNER TO hdus;
 -- ddl-end --
 
 -- object: versions.version_tables_version_table_id_seq | type: SEQUENCE --
@@ -1527,6 +1708,7 @@ CREATE FUNCTION versions._primarykey (IN intable character varying, OUT pkey_col
 	COST 100
 	AS $$
 
+
   DECLARE
     mySchema TEXT;
     myTable TEXT;
@@ -1568,21 +1750,17 @@ CREATE FUNCTION versions._primarykey (IN intable character varying, OUT pkey_col
   END;
 
 
+
 $$;
 -- ddl-end --
 ALTER FUNCTION versions._primarykey(IN character varying) OWNER TO versions;
 -- ddl-end --
 
--- object: plpgsql | type: EXTENSION --
--- DROP EXTENSION IF EXISTS plpgsql CASCADE;
-CREATE EXTENSION plpgsql
-      WITH SCHEMA public;
--- ddl-end --
-
 -- object: postgis | type: EXTENSION --
 -- DROP EXTENSION IF EXISTS postgis CASCADE;
 CREATE EXTENSION postgis
-      WITH SCHEMA public;
+      WITH SCHEMA public
+      VERSION '2.3.1';
 -- ddl-end --
 
 -- object: version_tables_fkey | type: CONSTRAINT --
@@ -1597,6 +1775,288 @@ ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE versions.version_tags ADD CONSTRAINT version_tables_fk FOREIGN KEY (version_table_id)
 REFERENCES versions.version_tables (version_table_id) MATCH FULL
 ON DELETE CASCADE ON UPDATE CASCADE;
+-- ddl-end --
+
+-- object: grant_bc5b9e87fa | type: PERMISSION --
+GRANT CREATE,USAGE
+   ON SCHEMA versions
+   TO versions;
+-- ddl-end --
+
+-- object: grant_040109aca4 | type: PERMISSION --
+GRANT CREATE,USAGE
+   ON SCHEMA versions
+   TO postgres;
+-- ddl-end --
+
+-- object: grant_2b359c36b7 | type: PERMISSION --
+GRANT CREATE,USAGE
+   ON SCHEMA versions
+   TO PUBLIC;
+-- ddl-end --
+
+-- object: grant_8a890802bb | type: PERMISSION --
+GRANT EXECUTE
+   ON FUNCTION versions.pgvscheck(character varying)
+   TO PUBLIC;
+-- ddl-end --
+
+-- object: grant_71087a7341 | type: PERMISSION --
+GRANT EXECUTE
+   ON FUNCTION versions.pgvscheck(character varying)
+   TO versions;
+-- ddl-end --
+
+-- object: grant_ab8f4ba2ef | type: PERMISSION --
+GRANT EXECUTE
+   ON FUNCTION versions.pgvscheck(character varying)
+   TO postgres;
+-- ddl-end --
+
+-- object: grant_0c3265b412 | type: PERMISSION --
+GRANT EXECUTE
+   ON FUNCTION versions.pgvscheckout(IN character varying,IN bigint)
+   TO PUBLIC;
+-- ddl-end --
+
+-- object: grant_d7a15603fe | type: PERMISSION --
+GRANT EXECUTE
+   ON FUNCTION versions.pgvscheckout(IN character varying,IN bigint)
+   TO versions;
+-- ddl-end --
+
+-- object: grant_6b66465bec | type: PERMISSION --
+GRANT EXECUTE
+   ON FUNCTION versions.pgvscommit(character varying,text)
+   TO PUBLIC;
+-- ddl-end --
+
+-- object: grant_b860a287ed | type: PERMISSION --
+GRANT EXECUTE
+   ON FUNCTION versions.pgvscommit(character varying,text)
+   TO versions;
+-- ddl-end --
+
+-- object: grant_e6aee4488d | type: PERMISSION --
+GRANT EXECUTE
+   ON FUNCTION versions.pgvscommit(character varying,text)
+   TO postgres;
+-- ddl-end --
+
+-- object: grant_e92f60c1c1 | type: PERMISSION --
+GRANT EXECUTE
+   ON FUNCTION versions.pgvscommit(character varying,text)
+   TO version;
+-- ddl-end --
+
+-- object: grant_ca919e0b10 | type: PERMISSION --
+GRANT EXECUTE
+   ON FUNCTION versions.pgvscommit(character varying,text)
+   TO pgversion_users;
+-- ddl-end --
+
+-- object: grant_a98e623900 | type: PERMISSION --
+GRANT EXECUTE
+   ON FUNCTION versions.pgvsdrop(character varying)
+   TO PUBLIC;
+-- ddl-end --
+
+-- object: grant_f34b070301 | type: PERMISSION --
+GRANT EXECUTE
+   ON FUNCTION versions.pgvsdrop(character varying)
+   TO versions;
+-- ddl-end --
+
+-- object: grant_64b241f3f4 | type: PERMISSION --
+GRANT EXECUTE
+   ON FUNCTION versions.pgvsdrop(character varying)
+   TO postgres;
+-- ddl-end --
+
+-- object: grant_113f6daf19 | type: PERMISSION --
+GRANT EXECUTE
+   ON FUNCTION versions.pgvsinit(character varying)
+   TO PUBLIC;
+-- ddl-end --
+
+-- object: grant_d67b489f0d | type: PERMISSION --
+GRANT EXECUTE
+   ON FUNCTION versions.pgvsinit(character varying)
+   TO versions;
+-- ddl-end --
+
+-- object: grant_59471459aa | type: PERMISSION --
+GRANT EXECUTE
+   ON FUNCTION versions.pgvsinit(character varying)
+   TO postgres;
+-- ddl-end --
+
+-- object: grant_058761c407 | type: PERMISSION --
+GRANT EXECUTE
+   ON FUNCTION versions.pgvsinit(character varying)
+   TO version;
+-- ddl-end --
+
+-- object: grant_78d7fea6fa | type: PERMISSION --
+GRANT EXECUTE
+   ON FUNCTION versions.pgvsinit(character varying)
+   TO pgversion_users;
+-- ddl-end --
+
+-- object: grant_bc90ced3fa | type: PERMISSION --
+GRANT EXECUTE
+   ON FUNCTION versions.pgvslogview(character varying)
+   TO PUBLIC;
+-- ddl-end --
+
+-- object: grant_f51df11109 | type: PERMISSION --
+GRANT EXECUTE
+   ON FUNCTION versions.pgvslogview(character varying)
+   TO versions;
+-- ddl-end --
+
+-- object: grant_12644bfa4a | type: PERMISSION --
+GRANT EXECUTE
+   ON FUNCTION versions.pgvslogview(character varying)
+   TO postgres;
+-- ddl-end --
+
+-- object: grant_7908bd53f2 | type: PERMISSION --
+GRANT EXECUTE
+   ON FUNCTION versions.pgvsmerge(character varying,integer,character varying)
+   TO PUBLIC;
+-- ddl-end --
+
+-- object: grant_33ca632033 | type: PERMISSION --
+GRANT EXECUTE
+   ON FUNCTION versions.pgvsmerge(character varying,integer,character varying)
+   TO versions;
+-- ddl-end --
+
+-- object: grant_3c8dd18f78 | type: PERMISSION --
+GRANT EXECUTE
+   ON FUNCTION versions.pgvsmerge(character varying,integer,character varying)
+   TO postgres;
+-- ddl-end --
+
+-- object: grant_672adad542 | type: PERMISSION --
+GRANT EXECUTE
+   ON FUNCTION versions.pgvsrevert(character varying)
+   TO PUBLIC;
+-- ddl-end --
+
+-- object: grant_599c4c10c7 | type: PERMISSION --
+GRANT EXECUTE
+   ON FUNCTION versions.pgvsrevert(character varying)
+   TO versions;
+-- ddl-end --
+
+-- object: grant_a97687cf68 | type: PERMISSION --
+GRANT EXECUTE
+   ON FUNCTION versions.pgvsrevert(character varying)
+   TO postgres;
+-- ddl-end --
+
+-- object: grant_fb6f7109fb | type: PERMISSION --
+GRANT EXECUTE
+   ON FUNCTION versions.pgvsrevision()
+   TO PUBLIC;
+-- ddl-end --
+
+-- object: grant_23d9083d9f | type: PERMISSION --
+GRANT EXECUTE
+   ON FUNCTION versions.pgvsrevision()
+   TO versions;
+-- ddl-end --
+
+-- object: grant_798af1727a | type: PERMISSION --
+GRANT EXECUTE
+   ON FUNCTION versions.pgvsrevision()
+   TO postgres;
+-- ddl-end --
+
+-- object: grant_009da8982b | type: PERMISSION --
+GRANT EXECUTE
+   ON FUNCTION versions.pgvsrollback(character varying,integer)
+   TO PUBLIC;
+-- ddl-end --
+
+-- object: grant_cb003484e2 | type: PERMISSION --
+GRANT EXECUTE
+   ON FUNCTION versions.pgvsrollback(character varying,integer)
+   TO versions;
+-- ddl-end --
+
+-- object: grant_018b6d3c5f | type: PERMISSION --
+GRANT EXECUTE
+   ON FUNCTION versions.pgvsrollback(character varying,integer)
+   TO postgres;
+-- ddl-end --
+
+-- object: grant_6eba990bcb | type: PERMISSION --
+GRANT EXECUTE
+   ON FUNCTION versions.pgvsupdatecheck(character varying)
+   TO PUBLIC;
+-- ddl-end --
+
+-- object: grant_97c9c3d020 | type: PERMISSION --
+GRANT EXECUTE
+   ON FUNCTION versions.pgvsupdatecheck(character varying)
+   TO hdus;
+-- ddl-end --
+
+-- object: grant_6eee38f4f9 | type: PERMISSION --
+GRANT EXECUTE
+   ON FUNCTION versions.pgvsupdatecheck(character varying)
+   TO postgres;
+-- ddl-end --
+
+-- object: grant_421f0513ae | type: PERMISSION --
+GRANT SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER
+   ON TABLE versions.version_tables_logmsg
+   TO versions;
+-- ddl-end --
+
+-- object: grant_4f53a0ca99 | type: PERMISSION --
+GRANT SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER
+   ON TABLE versions.version_tables_logmsg
+   TO postgres;
+-- ddl-end --
+
+-- object: grant_0d5313222a | type: PERMISSION --
+GRANT SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER
+   ON TABLE versions.version_tables_logmsg
+   TO PUBLIC;
+-- ddl-end --
+
+-- object: grant_789d6f3f7c | type: PERMISSION --
+GRANT SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER
+   ON TABLE versions.version_tables
+   TO versions;
+-- ddl-end --
+
+-- object: grant_efc90ff422 | type: PERMISSION --
+GRANT SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER
+   ON TABLE versions.version_tables
+   TO postgres;
+-- ddl-end --
+
+-- object: grant_b3d478305f | type: PERMISSION --
+GRANT SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER
+   ON TABLE versions.version_tables
+   TO PUBLIC;
+-- ddl-end --
+
+-- object: grant_91a6eeb8d3 | type: PERMISSION --
+GRANT SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER
+   ON TABLE versions.version_tags
+   TO versions;
+-- ddl-end --
+
+-- object: grant_ca710ef483 | type: PERMISSION --
+GRANT SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER
+   ON TABLE versions.version_tags
+   TO hdus_cp;
 -- ddl-end --
 
 
