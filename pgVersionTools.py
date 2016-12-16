@@ -416,7 +416,7 @@ class PgVersionTools(QObject):
 
 # Check the revision of the DB-Functions
   def checkPGVSRevision(self,    myDb):          
-        user_plugin_path= QFileInfo(QgsApplication.qgisUserDbFilePath()).path()+"python/plugins/pgversion"
+        user_plugin_path= QFileInfo(QgsApplication.qgisUserDbFilePath()).path()+"python/plugins/pgversion/"
         create_version_path = '%s/docs/create_pgversion_schema.sql' % (user_plugin_path)
         upgrade_version_path = '%s/docs/upgrade_pgversion_schema.sql' % (user_plugin_path)
         check = pystring(myDb.runError('select pgvsrevision from versions.pgvsrevision()'))
