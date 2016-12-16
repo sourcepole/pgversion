@@ -356,7 +356,7 @@ class PgVersionTools(QObject):
            uri.setDataSource("versions", mySchema+"_"+myTable+"_log", layer["VERSION_VIEW_GEOMETRY_COLUMN"][0], myFilter,  layer["VERSION_VIEW_PKEY"][0])
            layerName = myTable+"_conflicts"
            vLayer = QgsVectorLayer(uri.uri(), layerName, "postgres")
-           userPluginPath = QFileInfo(QgsApplication.qgisUserDbFilePath()).path()+"/python/plugins/pgversion"  
+           userPluginPath = QFileInfo(QgsApplication.qgisUserDbFilePath()).path()+"/python/plugins/pgversion/"  
            vLayer.setRendererV2(None)
            vLayer.loadNamedStyle(userPluginPath+"/legends/conflict.qml")   
            myDb.close()
@@ -416,9 +416,8 @@ class PgVersionTools(QObject):
 
 # Check the revision of the DB-Functions
   def checkPGVSRevision(self,    myDb):          
-        user_plugin_path= QFileInfo(QgsApplication.qgisUserDbFilePath()).path()+"python/plugins/pgversion/"
-        create_version_path = '%s/docs/create_pgversion_schema.sql' % (user_plugin_path)
-        upgrade_version_path = '%s/docs/upgrade_pgversion_schema.sql' % (user_plugin_path)
+        create_version_path = '%s/docs/create_pgversion_schema.sql' % (self.parent.plugin_path)
+        upgrade_version_path = '%s/docs/upgrade_pgversion_schema.sql' % (self.parent.plugin_path)
         check = pystring(myDb.runError('select pgvsrevision from versions.pgvsrevision()'))
           
         if len(check) > 1:

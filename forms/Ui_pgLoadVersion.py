@@ -166,7 +166,7 @@ class PgVersionLoadDialog(QDialog, Ui_pgLoadVersion):
 
         
         if self.tools.vectorLayerExists(vLayer.name()) or self.tools.vectorLayerExists(vLayer.name() + ' (modified)'):
-            QMessageBox.warning(None, '', QCoreApplication.translate('PgVersion', 'Layer {0} is already loaded').format(table))
+            QMessageBox.warning(None, '', self.tr('Layer {0} is already loaded').format(table))
             QApplication.restoreOverrideCursor()
             QApplication.setOverrideCursor(Qt.ArrowCursor)
             return None
