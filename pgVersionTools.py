@@ -33,7 +33,7 @@ class PgVersionTools(QObject):
 # Konstruktor 
   def __init__(self,  parent):
       QObject.__init__(self,  parent)
-      self.pgvsRevision = '2.1.2'
+      self.pgvsRevision = '2.1.3'
       self.parent = parent
       self.iface = parent.iface
       self.layer_list = parent.layer_list
@@ -432,16 +432,25 @@ functions directly with click on Install pgvs." %(create_version_path))
             return False
         else:  
             result = myDb.read('select pgvsrevision from versions.pgvsrevision()')
-            if self.pgvsRevision != result["PGVSREVISION"][0]:
-                self.vsCheck = DbVersionCheckDialog(myDb,  result["PGVSREVISION"][0],  upgrade_version_path,  'upgrade')              
-                revisionMessage =self.tr('The Plugin expects pgvs revision %s but DB-functions revision %s are installed.\n\n \
-Please contact your DB-administrator to upgrade the DB-functions from the file:\n\n %s\n\n \
-If you have appropriate DB permissions you can update the DB directly with click on DB-Update.') % (self.pgvsRevision,  result["PGVSREVISION"][0],  upgrade_version_path)
-                
-                self.vsCheck.messageTextEdit.setText(revisionMessage)
-                self.vsCheck.btnUpdate.setText(self.tr('Upgrade pgvs to Revision %s') % (self.pgvsRevision))
-                self.vsCheck.show()
-                return False       
+            
+            my_major_revision = self.pgvsRevision.split('.')[1]
+            my_minor_revision = self.pgvsRevision.split('.')[2]
+            db_major_revision = result["PGVSREVISION"][0].split('.')[1]
+            db_minor_revision = result["PGVSREVISION"][0].split('.')[2]
+            
+            for i in range(int(db_minor_revision), int(my_minor_revision)):
+            
+                if my_major_revision+"."+my_minor_revision != db_major_revision+"."+db_minor_revision:
+                    upgrade_version_path = '%s/docs/upgrade_pgversion_schema-2.%s.%s.sql' % (self.parent.plugin_path,  db_major_revision,  i)
+                    self.vsCheck = DbVersionCheckDialog(myDb,  result["PGVSREVISION"][0],  upgrade_version_path,  'upgrade')              
+                    revisionMessage =self.tr('The Plugin expects pgvs revision %s but DB-functions revision %s are installed.\n\n \
+    Please contact your DB-administrator to upgrade the DB-functions from the file:\n\n %s\n\n \
+    If you have appropriate DB permissions you can update the DB directly with click on DB-Update.') % (self.pgvsRevision,  result["PGVSREVISION"][0],  upgrade_version_path)
+                    
+                    self.vsCheck.messageTextEdit.setText(revisionMessage)
+                    self.vsCheck.btnUpdate.setText(self.tr('Upgrade pgvs to Revision %s.%s.%s') % (2,  my_major_revision,  i+1))
+                    self.vsCheck.show()
+                    return False       
         return True
 
 

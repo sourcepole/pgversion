@@ -59,11 +59,13 @@ class PgVersion(QObject):
     myLocale = myLocaleName[0:2]
     if QFileInfo(self.plugin_path).exists():
         localePath = self.plugin_path+"/i18n/pgVersion_"+myLocale+".qm"
-
+    print localePath
     if QFileInfo(localePath).exists():
-        translator = QTranslator()
-        translator.load(localePath)
-
+        self.translator = QTranslator()
+        self.translator.load(localePath)
+  
+        if qVersion() > '4.3.3':        
+            QCoreApplication.installTranslator(self.translator)  
 
     self.iface.projectRead.connect(self.layers_init)
     
