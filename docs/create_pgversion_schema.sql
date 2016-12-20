@@ -11,9 +11,9 @@ SET check_function_bodies = false;
 -- DROP ROLE IF EXISTS versions;
 CREATE ROLE versions WITH 
 	INHERIT
-	ENCRYPTED PASSWORD '********';
+	ENCRYPTED PASSWORD '********'
+	ROLE postgres;
 -- ddl-end --
-
 
 
 -- Database creation must be done outside an multicommand file.
@@ -25,6 +25,7 @@ CREATE ROLE versions WITH
 -- 	LC_COLLATE = 'de_DE.UTF-8'
 -- 	LC_CTYPE = 'de_DE.UTF-8'
 -- 	TABLESPACE = pg_default
+-- 	OWNER = versions
 -- ;
 -- -- ddl-end --
 -- 
@@ -745,7 +746,7 @@ CREATE FUNCTION versions.pgvsinit ( _param1 character varying)
     myPkeyRec record;
     testTab TEXT;
     archiveWhere TEXT;
-    
+    sql TEXT;    
 
   BEGIN	
     pos := strpos(inTable,'.');
@@ -770,7 +771,8 @@ CREATE FUNCTION versions.pgvsinit ( _param1 character varying)
         myTable = substr(inTable,pos);
     END IF;  
 
-    execute 'select * from versions._hasserial(''||mySchema||'.'||myTable)||''';
+    execute 'select * from versions._hasserial('''||mySchema||'.'||myTable||''')';
+
     versionTable := quote_ident(mySchema||'.'||myTable||'_version_t');
     versionView := quote_ident(mySchema)||'.'||quote_ident(myTable||'_version');
     versionLogTable := 'versions.'||quote_ident(mySchema||'_'||myTable||'_version_log');
@@ -813,14 +815,14 @@ CREATE FUNCTION versions.pgvsinit ( _param1 character varying)
 		
        
 -- Feststellen ob die Tabelle bereits besteht
-     testTab := 'versions.'||quote_ident(myTable||'_version_log');
+     testTab := 'versions.'||quote_ident(mySchema||'_'||myTable||'_version_log');
      select into testRec table_name
      from information_schema.tables
      where table_schema = mySchema::name
           and table_name = testTab::name;
 
      IF FOUND THEN
-       RAISE NOTICE 'Table %.% has been deleted', mySchema,testTab;
+       RAISE NOTICE 'Table versions.% has been deleted', testTab;
        execute 'drop table '||quote_ident(mySchema)||'.'||quote_ident(testTab)||' cascade';
      END IF;    
   
@@ -833,7 +835,7 @@ CREATE FUNCTION versions.pgvsinit ( _param1 character varying)
     execute 'create table '||versionLogTable||' (LIKE '||quote_ident(mySchema)||'.'||quote_ident(myTable)||');
              create sequence versions.'||quote_ident(mySchema||'_'||myTable||'_revision_seq')||' INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
              create sequence versions.'||quote_ident(mySchema||'_'||myTable||'_version_log'||'_'||myPkey||'_seq')||' INCREMENT 1 MINVALUE 1 MAXVALUE 9223372036854775807 START 1 CACHE 1;
-             alter table '||versionLogTable||' ALTER COLUMN '||myPkey||' SET DEFAULT nextval(''versions.'||quote_ident(mySchema||'_'||myTable||'_version_log'||'_'||myPkey||'_seq')||''');
+             alter table '||versionLogTable||' ALTER COLUMN '||myPkey||' SET DEFAULT nextval(''versions.'||quote_ident(mySchema||'_'||myTable||'_version_log_'||myPkey||'_seq')||''');
              alter table '||versionLogTable||' add column version_log_id bigserial;
              alter table '||versionLogTable||' add column action character varying;
              alter table '||versionLogTable||' add column project character varying default current_user;     
@@ -849,7 +851,7 @@ CREATE FUNCTION versions.pgvsinit ( _param1 character varying)
              create index '||quote_ident(mySchema||'_'||myTable||'_version_geo_idx') ||' on '||versionLogTable||' USING GIST ('||geomCol||');     
              
              insert into versions.version_tables (version_table_schema,version_table_name,version_view_schema,version_view_name,version_view_pkey,version_view_geometry_column) 
-                 values('''||mySchema||''','''||myTable||''','''||mySchema||''','''||myTable||'_version'','''||testPKey.column_name||''','''||geomCol||''');';
+                 values('''||mySchema||''','''||myTable||''','''||mySchema||''','''||myTable||'_version'','''||myPkey||''','''||geomCol||''');';
     
                  
     for attributes in select *
@@ -1244,7 +1246,7 @@ CREATE FUNCTION versions.pgvsrevision ()
 DECLARE
   revision TEXT;
   BEGIN	
-    revision := '2.1.2';
+    revision := '2.1.3';
   RETURN revision ;                             
 
   END;
@@ -1588,7 +1590,7 @@ ALTER FUNCTION versions._primarykey(IN character varying) OWNER TO versions;
 -- DROP EXTENSION IF EXISTS postgis CASCADE;
 CREATE EXTENSION postgis
       WITH SCHEMA public
-      VERSION '2.3.1';
+      VERSION '2.2.2';
 -- ddl-end --
 
 -- object: versions._hasserial | type: FUNCTION --
@@ -1628,15 +1630,14 @@ BEGIN
     where table_schema = my_schema::name
       and table_name = my_table::name
       and (position('nextval' in lower(column_default)) is NOT NULL 
-      or position('nextval' in lower(column_default)) <> 0)';	
+      or position('nextval' in lower(column_default)) <> 0);	
   
     IF FOUND THEN
        RETURN 'true';
     else
-        RAISE EXCEPTION 'Table % does not have a serial defined', my_schema||'.'||my_table;
+       RAISE EXCEPTION 'Table %.% does not has a serial defined', my_schema, my_table;
     END IF;
-BEGIN
-    qry := '
+END;
 $$;
 -- ddl-end --
 ALTER FUNCTION versions._hasserial(IN character varying) OWNER TO versions;
@@ -1656,151 +1657,151 @@ REFERENCES versions.version_tables (version_table_id) MATCH FULL
 ON DELETE CASCADE ON UPDATE CASCADE;
 -- ddl-end --
 
--- object: grant_2d1e4164b5 | type: PERMISSION --
+-- object: grant_56d69e8036 | type: PERMISSION --
 GRANT CREATE,USAGE
    ON SCHEMA versions
    TO versions;
 -- ddl-end --
 
--- object: grant_d91b38d78b | type: PERMISSION --
+-- object: grant_8e0c716864 | type: PERMISSION --
 GRANT CREATE,USAGE
    ON SCHEMA versions
    TO postgres;
 -- ddl-end --
 
--- object: grant_ff0b79c39e | type: PERMISSION --
+-- object: grant_2ced88e012 | type: PERMISSION --
 GRANT CREATE,USAGE
    ON SCHEMA versions
    TO PUBLIC;
 -- ddl-end --
 
--- object: grant_61c7503814 | type: PERMISSION --
+-- object: grant_4437715cc6 | type: PERMISSION --
 GRANT EXECUTE
    ON FUNCTION versions.pgvscheck(character varying)
    TO versions;
 -- ddl-end --
 
--- object: grant_8378db10c4 | type: PERMISSION --
+-- object: grant_8d784d6e79 | type: PERMISSION --
 GRANT EXECUTE
    ON FUNCTION versions.pgvscheckout(IN character varying,IN bigint)
    TO versions;
 -- ddl-end --
 
--- object: grant_658b1a9a08 | type: PERMISSION --
+-- object: grant_072305065f | type: PERMISSION --
 GRANT EXECUTE
    ON FUNCTION versions.pgvscommit(character varying,text)
    TO versions;
 -- ddl-end --
 
--- object: grant_197eae0f8a | type: PERMISSION --
+-- object: grant_a6ad855234 | type: PERMISSION --
 GRANT EXECUTE
    ON FUNCTION versions.pgvsdrop(character varying)
    TO versions;
 -- ddl-end --
 
--- object: grant_04ea4db37b | type: PERMISSION --
+-- object: grant_edecc33f07 | type: PERMISSION --
 GRANT EXECUTE
    ON FUNCTION versions.pgvsinit(character varying)
    TO versions;
 -- ddl-end --
 
--- object: grant_0f076eb6b6 | type: PERMISSION --
+-- object: grant_0939846cac | type: PERMISSION --
 GRANT EXECUTE
    ON FUNCTION versions.pgvslogview(character varying)
    TO versions;
 -- ddl-end --
 
--- object: grant_6f8b7748b0 | type: PERMISSION --
+-- object: grant_1b2a0e6b0b | type: PERMISSION --
 GRANT EXECUTE
    ON FUNCTION versions.pgvsmerge(character varying,integer,character varying)
    TO versions;
 -- ddl-end --
 
--- object: grant_f408024818 | type: PERMISSION --
+-- object: grant_12fe136b62 | type: PERMISSION --
 GRANT EXECUTE
    ON FUNCTION versions.pgvsrevert(character varying)
    TO versions;
 -- ddl-end --
 
--- object: grant_607b6585c7 | type: PERMISSION --
+-- object: grant_19b5574953 | type: PERMISSION --
 GRANT EXECUTE
    ON FUNCTION versions.pgvsrevision()
    TO versions;
 -- ddl-end --
 
--- object: grant_3e72071595 | type: PERMISSION --
+-- object: grant_bf30fbcbdd | type: PERMISSION --
 GRANT EXECUTE
    ON FUNCTION versions.pgvsrollback(character varying,integer)
    TO versions;
 -- ddl-end --
 
--- object: grant_b6a2a3b06e | type: PERMISSION --
+-- object: grant_8655260463 | type: PERMISSION --
 GRANT SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER
    ON TABLE versions.version_tables_logmsg
    TO versions;
 -- ddl-end --
 
--- object: grant_71510b3b27 | type: PERMISSION --
+-- object: grant_bdada30710 | type: PERMISSION --
 GRANT SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER
    ON TABLE versions.version_tables
    TO versions;
 -- ddl-end --
 
--- object: grant_aec018b41d | type: PERMISSION --
+-- object: grant_184d7dff25 | type: PERMISSION --
 GRANT SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER
    ON TABLE versions.version_tags
    TO versions;
 -- ddl-end --
 
--- object: grant_e3170db26b | type: PERMISSION --
+-- object: grant_3f87697d56 | type: PERMISSION --
 GRANT EXECUTE
    ON FUNCTION versions._primarykey(IN character varying)
    TO versions;
 -- ddl-end --
 
--- object: grant_11300a6440 | type: PERMISSION --
+-- object: grant_92840e798f | type: PERMISSION --
 GRANT EXECUTE
    ON FUNCTION versions.pgvs_version_record()
    TO versions;
 -- ddl-end --
 
--- object: grant_dc974509e6 | type: PERMISSION --
+-- object: grant_887412c5e2 | type: PERMISSION --
 GRANT EXECUTE
    ON FUNCTION versions.pgvsupdatecheck(character varying)
    TO versions;
 -- ddl-end --
 
--- object: grant_6382c33c23 | type: PERMISSION --
+-- object: grant_a8d19f9202 | type: PERMISSION --
 GRANT SELECT,UPDATE,USAGE
    ON SEQUENCE versions.version_tables_logmsg_id_seq
    TO versions;
 -- ddl-end --
 
--- object: grant_9168a4d699 | type: PERMISSION --
+-- object: grant_f667da3c34 | type: PERMISSION --
 GRANT SELECT,UPDATE,USAGE
    ON SEQUENCE versions.version_tables_version_table_id_seq
    TO versions;
 -- ddl-end --
 
--- object: grant_02818b4139 | type: PERMISSION --
+-- object: grant_9bad06163d | type: PERMISSION --
 GRANT SELECT,UPDATE,USAGE
    ON SEQUENCE versions.version_tags_tags_id_seq
    TO versions;
 -- ddl-end --
 
--- object: grant_d31004734e | type: PERMISSION --
+-- object: grant_2ba0403a5c | type: PERMISSION --
 GRANT USAGE
    ON TYPE versions.checkout
    TO versions;
 -- ddl-end --
 
--- object: grant_911aaf609e | type: PERMISSION --
+-- object: grant_addac12a7b | type: PERMISSION --
 GRANT USAGE
    ON TYPE versions.conflicts
    TO versions;
 -- ddl-end --
 
--- object: grant_01f6f14ede | type: PERMISSION --
+-- object: grant_38b55488e6 | type: PERMISSION --
 GRANT USAGE
    ON TYPE versions.logview
    TO versions;
