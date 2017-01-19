@@ -672,12 +672,3 @@ select * from checkout) as foo1 \
       
       
       
-class HelpBrowser(QWebView):
-
-    def __init__(self):
-        QWebView.__init__(self)
-        self.loadFinished.connect(self._result_available)
-
-    def _result_available(self, ok):
-        frame = self.page().mainFrame()
-        print unicode(frame.toHtml()).encode('utf-8')      
