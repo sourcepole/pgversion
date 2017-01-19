@@ -1,6 +1,22 @@
-'''
-Module implementing PgVersionLoadDialog.
-'''
+# -*- coding: utf-8 -*-
+"""
+/***************************************************************************
+Plugin for the Postgres Versioning System
+-----------------------------------------------------------------------------------------------------------------
+begin                : 2010-07-31
+copyright          : (C) 2010 by Dr. Horst Duester
+email                : horst.duester@sourcepole.ch
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+"""
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from qgis.core import *
@@ -56,7 +72,7 @@ class PgVersionLoadDialog(QDialog, Ui_pgLoadVersion):
         try:
             myDb = DbObj(pluginname = selectedServer, typ = DBTYPE, hostname = DBHOST, port = DBPORT, dbname = DBNAME, username = DBUSER, passwort = DBPASSWD)
         except:
-            QMessageBox.information(None, QCoreApplication.translate('PgVersionLoadDialog', 'Error'), QCoreApplication.translate('PgVersionLoadDialog', 'No Database Connection Established.'))
+            QMessageBox.information(None, self.tr('Error'), self.tr('No Database Connection Established.'))
             return None
 
         if not self.tools.checkPGVSRevision(myDb):
@@ -68,7 +84,6 @@ class PgVersionLoadDialog(QDialog, Ui_pgLoadVersion):
         query = 'select version_table_schema as schema, version_table_name as table \
         from versions.version_tables \
         order by version_table_schema,version_table_name'
-        
         result = myDb.read(query)
         self.cmbTables.clear()
         
@@ -154,7 +169,7 @@ class PgVersionLoadDialog(QDialog, Ui_pgLoadVersion):
         vLayer = QgsVectorLayer(uri.uri(), layerName, 'postgres')
         
         if self.tools.vectorLayerExists(vLayer.name()) or self.tools.vectorLayerExists(vLayer.name() + ' (modified)'):
-            QMessageBox.warning(None, '', QCoreApplication.translate('PgVersion', 'Layer {0} is already loaded').format(table))
+            QMessageBox.warning(None, '', self.tr('Layer {0} is already loaded').format(table))
             QApplication.restoreOverrideCursor()
             QApplication.setOverrideCursor(Qt.ArrowCursor)
             return None
@@ -166,3 +181,5 @@ class PgVersionLoadDialog(QDialog, Ui_pgLoadVersion):
         myDb.close()
         QApplication.restoreOverrideCursor()
         QApplication.setOverrideCursor(Qt.ArrowCursor)
+        self.tools.setModified()
+        

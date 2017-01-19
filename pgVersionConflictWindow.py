@@ -89,7 +89,7 @@ class ConflictWindow(QMainWindow):
     
       self.btnMerge = QPushButton()
       self.cmbMerge.currentIndexChanged.connect(self.toggleBtnMerge)
-      self.btnMerge.setText(QCoreApplication.translate('ManagerWindow','solve conflict'))
+      self.btnMerge.setText(self.tr('solve conflict'))
             
       self.toolbar.addWidget(self.cmbMerge)
       self.toolbar.addWidget(self.btnMerge)
@@ -178,6 +178,7 @@ class ConflictWindow(QMainWindow):
       if tabData <> None:
           self.tools.createGridView(self.tabView, tabData[0], tabData[1], 100, 10)
       else:
+          QApplication.restoreOverrideCursor()
           self.mergeCompleted.emit()
           
       QApplication.restoreOverrideCursor()
@@ -189,7 +190,7 @@ class ConflictWindow(QMainWindow):
         object = self.cmbMerge.currentText()
         
         if currentLayer == None:
-            QMessageBox.information(None, '', QCoreApplication.translate('ManagerWindow','Please select a versioned layer for committing'))
+            QMessageBox.information(None, self.tr('Notice'), self.tr('Please select a versioned layer for committing'))
             return
         else:
             myDb = self.tools.layerDB('Merge', currentLayer)
