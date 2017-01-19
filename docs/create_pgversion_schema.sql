@@ -4,12 +4,10 @@ $body$
 BEGIN
    IF NOT EXISTS (
       SELECT *
-      FROM   pg_catalog.pg_user
-      WHERE  usename = 'versions') THEN
-        CREATE ROLE versions WITH 
-	INHERIT
-	ENCRYPTED PASSWORD '********'
-	ROLE postgres;
+      FROM   pg_catalog.pg_group
+      WHERE  groname = 'versions') THEN
+         CREATE ROLE versions
+         NOSUPERUSER INHERIT NOCREATEDB NOCREATEROLE NOREPLICATION;
    END IF;
 END
 $body$;
