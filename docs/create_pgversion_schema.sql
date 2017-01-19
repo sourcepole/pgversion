@@ -17,7 +17,7 @@ $body$;
 
 -- Database generated with pgModeler (PostgreSQL Database Modeler).
 -- pgModeler  version: 0.9.0-alpha1
--- PostgreSQL version: 9.6
+-- PostgreSQL version: 9.1
 -- Project Site: pgmodeler.com.br
 -- Model Author: ---
 
