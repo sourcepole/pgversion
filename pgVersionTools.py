@@ -131,26 +131,6 @@ class PgVersionTools(QObject):
         result = myDb.read(sql)
         myDb.close()
 
-<<<<<<< HEAD
-        try:
-          if int(result["COUNT"][0]) == 0:
-            return False
-          else:
-            return True      
-        except:
-            pass
-
-  def setModified(self,  unset=False):
-
-    for i in range(len(self.parent.layer_list)):
-        if self.isModified(self.parent.layer_list[i]):
-            if '(modified)' not in self.parent.layer_list[i].name():
-                self.parent.layer_list[i].setLayerName(self.parent.layer_list[i].name()+' (modified)')
-        else:
-            self.parent.layer_list[i].setLayerName(self.parent.layer_list[i].name().replace(' (modified)', ''))     
-           
-        self.parent.layer_list[i].editingStopped.connect(self.setModified)
-=======
         if int(result["COUNT"][0]) == 0:
           return False
         else:
@@ -158,7 +138,6 @@ class PgVersionTools(QObject):
 
 
   def setModified(self, unsetModified=False):
->>>>>>> f1dcba95e69a973f7993f27b4277fddfd73d1a03
 
     for i in range(len(self.layer_list)):
         map_layer = QgsMapLayerRegistry.instance().mapLayer(self.layer_list[i])
@@ -320,23 +299,13 @@ class PgVersionTools(QObject):
            
 
       result = myDb.read(sql)
-<<<<<<< HEAD
-      cols = myDb.cols(sql)
-      print cols
-      try:
-=======
       try:
           cols = myDb.cols(sql)
->>>>>>> f1dcba95e69a973f7993f27b4277fddfd73d1a03
           cols.remove('action')
           cols.remove('systime')
           cols.remove('commit')
           cols.remove(geomCol)
-<<<<<<< HEAD
 
-=======
-    
->>>>>>> f1dcba95e69a973f7993f27b4277fddfd73d1a03
           cols.insert(0, cols.pop(-1))
           cols.insert(0, cols.pop(-1))
           cols.insert(0, cols.pop(-1))
@@ -344,18 +313,12 @@ class PgVersionTools(QObject):
           resultArray = []
           resultArray.append(result)
           resultArray.append(cols)
-<<<<<<< HEAD
-      except:
-          pass
-      myDb.close()
-      return resultArray
-=======
+
           
           myDb.close()
           return resultArray
       except:
           return None
->>>>>>> f1dcba95e69a973f7993f27b4277fddfd73d1a03
 
   def conflictLayer(self,  theLayer):
         provider = theLayer.dataProvider()
@@ -467,18 +430,6 @@ functions directly with click on Install pgvs." %(create_version_path))
             return False
         else:  
             result = myDb.read('select pgvsrevision from versions.pgvsrevision()')
-<<<<<<< HEAD
-            if self.pgvsRevision != result["PGVSREVISION"][0]:
-                self.vsCheck = DbVersionCheckDialog(myDb,  result["PGVSREVISION"][0],  upgrade_version_path,  'upgrade')              
-                revisionMessage =self.tr('The Plugin expects pgvs revision %s but DB-functions revision %s are installed.\n\n \
-Please contact your DB-administrator to upgrade the DB-functions from the file:\n\n %s\n\n \
-If you have appropriate DB permissions you can update the DB directly with click on DB-Update.') % (self.pgvsRevision,  result["PGVSREVISION"][0],  upgrade_version_path)
-                
-                self.vsCheck.messageTextEdit.setText(revisionMessage)
-                self.vsCheck.btnUpdate.setText(self.tr('Upgrade pgvs to Revision %s') % (self.pgvsRevision))
-                self.vsCheck.show()
-                return False       
-=======
             
             my_major_revision = self.pgvsRevision.split('.')[1]
             my_minor_revision = self.pgvsRevision.split('.')[2]
@@ -498,7 +449,6 @@ If you have appropriate DB permissions you can update the DB directly with click
                     self.vsCheck.btnUpdate.setText(self.tr('Upgrade pgvs to Revision %s.%s.%s') % (2,  my_major_revision,  i+1))
                     self.vsCheck.show()
                     return False       
->>>>>>> f1dcba95e69a973f7993f27b4277fddfd73d1a03
         return True
 
 
