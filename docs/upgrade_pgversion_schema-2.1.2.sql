@@ -1380,9 +1380,6 @@ $$;
 ALTER FUNCTION versions.pgvsrollback(character varying,integer) OWNER TO versions;
 -- ddl-end --
 
-COMMENT ON EXTENSION postgis IS '';
--- ddl-end --
-
 
 -- [ Created permissions ] --
 -- object: grant_a8d19f9202 | type: PERMISSION --
