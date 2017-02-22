@@ -30,13 +30,14 @@ import apicompat
 
 class PgVersionTools(QObject):
 
-# Konstruktor
+# Konstruktor 
   def __init__(self,  parent):
       QObject.__init__(self,  parent)
-      self.pgvsRevision = '2.1.3'
+      self.pgvsRevision = '2.1.4'
       self.parent = parent
       self.iface = parent.iface
       self.layer_list = parent.layer_list
+      pass
 
   def layerRepaint(self):
         for layer in self.iface.mapCanvas().layers():
@@ -81,33 +82,35 @@ class PgVersionTools(QObject):
 
   def hasVersion(self,  theLayer):
         
-        myLayerUri = QgsDataSourceURI(theLayer.source())
-
-        myDb = self.layerDB('hasVersion',  theLayer)
-
-        if myDb == None:
-            return None
-
-        if len(myLayerUri.schema()) == 1:
-          schema = 'public'
-        else:
-          schema = myLayerUri.schema()
-
-
-        sql = "select count(version_table_name) \
-          from versions.version_tables import \
-          where version_view_schema = '%s' and version_view_name = '%s'" % (schema,  myLayerUri.table())
-          
-        result = myDb.read(sql)
-        myDb.close()
         try:
-            if result['COUNT'][0] == '1':
-                return True
+            myLayerUri = QgsDataSourceURI(theLayer.source())
+    
+            myDb = self.layerDB('hasVersion',  theLayer)
+    
+            if myDb == None:
+                return None
+    
+            if len(myLayerUri.schema()) == 1:
+              schema = 'public'
             else:
+              schema = myLayerUri.schema()
+    
+    
+            sql = "select count(version_table_name) \
+              from versions.version_tables import \
+              where version_view_schema = '%s' and version_view_name = '%s'" % (schema,  myLayerUri.table())
+              
+            result = myDb.read(sql)
+            myDb.close()
+            try:
+                if result['COUNT'][0] == '1':
+                    return True
+                else:
+                    return False
+            except:
                 return False
         except:
-            return False
-
+            pass
       
   def isModified(self, myLayer=None):
 
@@ -125,7 +128,7 @@ class PgVersionTools(QObject):
 
 
         sql = 'select count(project) \
-          from versions.\"'+schema+'_'+myLayerUri.table()+'_log\" \
+          from versions."'+schema+'_'+myLayerUri.table()+'_log" \
           where project = \''+myDb.dbUser()+'\' and not commit'
 
         result = myDb.read(sql)
@@ -305,7 +308,7 @@ class PgVersionTools(QObject):
           cols.remove('systime')
           cols.remove('commit')
           cols.remove(geomCol)
-
+    
           cols.insert(0, cols.pop(-1))
           cols.insert(0, cols.pop(-1))
           cols.insert(0, cols.pop(-1))
@@ -313,7 +316,6 @@ class PgVersionTools(QObject):
           resultArray = []
           resultArray.append(result)
           resultArray.append(cols)
-
           
           myDb.close()
           return resultArray
@@ -411,14 +413,12 @@ class PgVersionTools(QObject):
       base_path = os.path.dirname(os.path.realpath(__file__))
     return os.path.join(base_path, name)
 
-
 # Check the revision of the DB-Functions
   def checkPGVSRevision(self,    myDb):          
         create_version_path = '%s/docs/create_pgversion_schema.sql' % (self.parent.plugin_path)
-        upgrade_version_path = '%s/docs/upgrade_pgversion_schema.sql' % (self.parent.plugin_path)
-        check = pystring(myDb.runError('select pgvsrevision from versions.pgvsrevision()'))
-          
-        if len(check) > 1:
+        upgrade_version_path = '%s/docs/upgrade_pgversion_schema.sql' % (self.parent.plugin_path)          
+        
+        if not myDb.exists('table',  'versions.version_table'):
             self.vsCheck = DbVersionCheckDialog(myDb,  '',  create_version_path,  'install')
             revisionMessage = self.tr("pgvs is not installed in the selected DB.\n\n\
 Please contact your DB-administrator to install the DB-functions from the file:\n\n%s\n\n \

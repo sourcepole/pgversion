@@ -1,15 +1,11 @@
 -- Database diff generated with pgModeler (PostgreSQL Database Modeler).
--- pgModeler  version: 0.9.0-alpha1
--- PostgreSQL version: 9.6
+-- pgModeler  version: 0.9.0-alpha
+-- PostgreSQL version: 9.4
 
 -- [ Diff summary ]
 -- Dropped objects: 1
 -- Created objects: 1
-<<<<<<< HEAD
--- Changed objects: 0
-=======
 -- Changed objects: 1
->>>>>>> temp
 -- Truncated tables: 0
 
 SET check_function_bodies = false;
@@ -77,10 +73,6 @@ ALTER FUNCTION versions._hasserial(IN character varying) OWNER TO versions;
 
 
 
-<<<<<<< HEAD
--- [ Created permissions ] --
--- object: grant_f6873826fd | type: PERMISSION --
-=======
 -- [ Changed objects ] --
 -- object: versions.pgvsrevision | type: FUNCTION --
 -- DROP FUNCTION IF EXISTS versions.pgvsrevision() CASCADE;
@@ -97,7 +89,7 @@ CREATE OR REPLACE FUNCTION versions.pgvsrevision ()
 DECLARE
   revision TEXT;
   BEGIN	
-    revision := '2.1.3';
+    revision := '2.1.4';
   RETURN revision ;                             
 
   END;
@@ -111,19 +103,19 @@ ALTER FUNCTION versions.pgvsrevision() OWNER TO versions;
 
 
 -- [ Created permissions ] --
--- object: grant_409f857e08 | type: PERMISSION --
-
+-- object: grant_709da9545a | type: PERMISSION --
 GRANT SELECT,UPDATE,USAGE
    ON SEQUENCE versions.version_tables_logmsg_id_seq
    TO versions;
 -- ddl-end --
 
+-- object: grant_9d12218cd6 | type: PERMISSION --
 GRANT SELECT,UPDATE,USAGE
    ON SEQUENCE versions.version_tables_version_table_id_seq
    TO versions;
 -- ddl-end --
 
--- object: grant_c4dab013df | type: PERMISSION --
+-- object: grant_519c1122b5 | type: PERMISSION --
 GRANT SELECT,UPDATE,USAGE
    ON SEQUENCE versions.version_tags_tags_id_seq
    TO versions;
