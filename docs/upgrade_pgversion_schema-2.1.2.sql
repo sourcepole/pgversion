@@ -5,12 +5,7 @@
 -- [ Diff summary ]
 -- Dropped objects: 1
 -- Created objects: 1
-<<<<<<< HEAD
--- Changed objects: 0
-=======
--- Changed objects: 1
->>>>>>> temp
--- Truncated tables: 0
+
 
 SET check_function_bodies = false;
 -- ddl-end --
@@ -75,12 +70,6 @@ $$;
 ALTER FUNCTION versions._hasserial(IN character varying) OWNER TO versions;
 -- ddl-end --
 
-
-
-<<<<<<< HEAD
--- [ Created permissions ] --
--- object: grant_f6873826fd | type: PERMISSION --
-=======
 -- [ Changed objects ] --
 -- object: versions.pgvsrevision | type: FUNCTION --
 -- DROP FUNCTION IF EXISTS versions.pgvsrevision() CASCADE;
