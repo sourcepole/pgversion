@@ -418,7 +418,7 @@ class PgVersionTools(QObject):
         create_version_path = '%s/docs/create_pgversion_schema.sql' % (self.parent.plugin_path)
         upgrade_version_path = '%s/docs/upgrade_pgversion_schema.sql' % (self.parent.plugin_path)          
         
-        if not myDb.exists('table',  'versions.version_table'):
+        if not myDb.exists('table',  'versions.version_tables'):
             self.vsCheck = DbVersionCheckDialog(myDb,  '',  create_version_path,  'install')
             revisionMessage = self.tr("pgvs is not installed in the selected DB.\n\n\
 Please contact your DB-administrator to install the DB-functions from the file:\n\n%s\n\n \
