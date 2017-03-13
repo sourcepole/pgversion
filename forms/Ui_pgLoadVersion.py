@@ -124,11 +124,14 @@ class PgVersionLoadDialog(QDialog, Ui_pgLoadVersion):
     on_cmbServer_currentIndexChanged = pyqtSignature('QString')(on_cmbServer_currentIndexChanged)
     
     def on_buttonBox_accepted(self):
-        versionTableList = self.cmbTables.currentText().split('.')
-        connectionName = self.cmbServer.currentText()
-        self.loadVersionLayer(connectionName, versionTableList[0], versionTableList[1])
+        if self.cmbTables.currentIndex() == 0:
+            QMessageBox.warning(None, self.tr('Error'),  self.tr('Please select a versioned layer'))
+        else:
+            versionTableList = self.cmbTables.currentText().split('.')
+            connectionName = self.cmbServer.currentText()
+            self.loadVersionLayer(connectionName, versionTableList[0], versionTableList[1])
 
-    on_buttonBox_accepted = pyqtSignature('')(on_buttonBox_accepted)
+#    on_buttonBox_accepted = pyqtSignature('')(on_buttonBox_accepted)
     
     def on_buttonBox_rejected(self):
         '''
