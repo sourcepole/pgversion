@@ -124,7 +124,7 @@ class PgVersionLoadDialog(QDialog, Ui_pgLoadVersion):
     on_cmbServer_currentIndexChanged = pyqtSignature('QString')(on_cmbServer_currentIndexChanged)
     
     def on_buttonBox_accepted(self):
-        if self.cmbTables.currentIndex() == 0:
+        if self.cmbTables.currentIndex() == 0 or self.cmbServer.currentIndex() == 0:
             QMessageBox.warning(None, self.tr('Error'),  self.tr('Please select a versioned layer'))
         else:
             versionTableList = self.cmbTables.currentText().split('.')
@@ -178,7 +178,7 @@ class PgVersionLoadDialog(QDialog, Ui_pgLoadVersion):
             return None
             
         QgsMapLayerRegistry.instance().addMapLayer(vLayer)
-        self.parent.layer_list.append(vLayer)
+        self.parent.layer_list.append(vLayer.id())
         self.tools.setModified()
         
         myDb.close()

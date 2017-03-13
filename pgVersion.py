@@ -164,15 +164,15 @@ class PgVersion(QObject):
       
     for l in layer:
         if self.tools.hasVersion(l):
+            self.layer_list = filter(lambda a: a != l.id, self.layer_list)
             self.layer_list.append(l.id())
-    
+            
     self.layers_init()
     
 
   def remove_layer(self,  id):
-      if id in self.layer_list:
-          self.layer_list.remove(id)
-          self.layers_init()
+        self.layer_list = filter(lambda a: a != id, self.layer_list)
+        self.layers_init()
       
   def layers_init(self):
       for i in range(len(self.layer_list)):
