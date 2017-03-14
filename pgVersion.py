@@ -66,9 +66,6 @@ class PgVersion(QObject):
   
         if qVersion() > '4.3.3':        
             QCoreApplication.installTranslator(self.translator)  
-
-#    self.iface.projectRead.connect(self.layers_init)
-#    self.iface.projectRead.connect(self.add_layer)
     
     QgsMapLayerRegistry.instance().layerWasAdded.connect(self.add_layer)
     QgsMapLayerRegistry.instance().layerWillBeRemoved.connect(self.remove_layer)
@@ -168,7 +165,6 @@ class PgVersion(QObject):
         if self.tools.hasVersion(l):
             if l.id not in self.layer_list:
                 l.editingStopped.connect(lambda my_list = self.layer_list: self.tools.setModified(my_list))
-#                l.layerModified.connect(self.tools.setModified)
                 self.layer_list.append(l.id())
                 self.tools.setModified(self.layer_list)
                 
@@ -177,9 +173,6 @@ class PgVersion(QObject):
         self.layer_list = list(set(self.layer_list))
         if id in set(self.layer_list):
             self.layer_list.remove(id)
-
-#        if len(self.layer_list) > 0:
-#            self.tools.setModified(self.layer_list)
 
   def unload(self):
         # remove menubar

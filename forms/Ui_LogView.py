@@ -136,5 +136,8 @@ class LogView(QDialog, Ui_LogView):
         @param index DESCRIPTION
         @type int
         """
-        # TODO: not implemented yet
-        self.checkoutTag.emit(self.cmbTags.itemData(index),  self.cmbTags.itemText(index))    
+        
+        try:
+            self.checkoutTag.emit(self.cmbTags.itemData(index),  self.cmbTags.itemText(index))    
+        except:
+            pass
