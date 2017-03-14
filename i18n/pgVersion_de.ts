@@ -15,6 +15,24 @@
     </message>
 </context>
 <context>
+    <name>ConflictWindow</name>
+    <message>
+        <location filename="../pgVersionConflictWindow.py" line="93"/>
+        <source>solve conflict</source>
+        <translation>Konflikt lösen</translation>
+    </message>
+    <message>
+        <location filename="../pgVersionConflictWindow.py" line="194"/>
+        <source>Notice</source>
+        <translation>Hinweis</translation>
+    </message>
+    <message>
+        <location filename="../pgVersionConflictWindow.py" line="194"/>
+        <source>Please select a versioned layer for committing</source>
+        <translation>Bitte wählen Sie einen versionierten Layer zum Übergeben aus</translation>
+    </message>
+</context>
+<context>
     <name>DbObj</name>
     <message>
         <location filename="../dbtools/dbTools.py" line="89"/>
@@ -68,29 +86,29 @@
 <context>
     <name>DbVersionCheckDialog</name>
     <message>
-        <location filename="../forms/Ui_dbVersionCheck.py" line="49"/>
+        <location filename="../forms/Ui_dbVersionCheck.py" line="38"/>
         <source>Error</source>
         <translation>Fehler</translation>
     </message>
     <message>
-        <location filename="../forms/Ui_dbVersionCheck.py" line="53"/>
+        <location filename="../forms/Ui_dbVersionCheck.py" line="42"/>
         <source>Installation</source>
         <translation>Installation</translation>
     </message>
     <message>
-        <location filename="../forms/Ui_dbVersionCheck.py" line="53"/>
-        <source>Installation of pgvs Revision %s was successful</source>
-        <translation>Die Installation von pgvs Version %s war erfolgreich</translation>
-    </message>
-    <message>
-        <location filename="../forms/Ui_dbVersionCheck.py" line="55"/>
+        <location filename="../forms/Ui_dbVersionCheck.py" line="44"/>
         <source>Upgrade</source>
         <translation>Aktualisieren</translation>
     </message>
     <message>
-        <location filename="../forms/Ui_dbVersionCheck.py" line="55"/>
-        <source>Upgrade was successful</source>
-        <translation>Die Aktualisierung war erfolgreich</translation>
+        <location filename="../forms/Ui_dbVersionCheck.py" line="42"/>
+        <source>Installation of pgvs was successful</source>
+        <translation>Die Installation von pgvs war erfolgreich</translation>
+    </message>
+    <message>
+        <location filename="../forms/Ui_dbVersionCheck.py" line="44"/>
+        <source>Upgrade of pgvs was successful</source>
+        <translation>Der Upgrade von pgvs war erfolgreich</translation>
     </message>
 </context>
 <context>
@@ -304,25 +322,7 @@
     </message>
 </context>
 <context>
-    <name>ManagerWindow</name>
-    <message>
-        <location filename="../pgVersionConflictWindow.py" line="92"/>
-        <source>solve conflict</source>
-        <translation>Konflikt lösen</translation>
-    </message>
-    <message>
-        <location filename="../pgVersionConflictWindow.py" line="192"/>
-        <source>Please select a versioned layer for committing</source>
-        <translation>Bitte wählen Sie einen versionierten Layer zum Übergeben aus</translation>
-    </message>
-</context>
-<context>
     <name>PgVersion</name>
-    <message>
-        <location filename="../forms/Ui_pgLoadVersion.py" line="152"/>
-        <source>Layer {0} is already loaded</source>
-        <translation>Ebene {0} ist bereits geladen</translation>
-    </message>
     <message>
         <location filename="../pgVersion.py" line="88"/>
         <source>Prepare Layer for Versioning</source>
@@ -374,47 +374,47 @@
         <translation>Löschen direkt in der Datenbank</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="185"/>
+        <location filename="../pgVersion.py" line="194"/>
         <source>Question</source>
         <translation>Frage</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="185"/>
+        <location filename="../pgVersion.py" line="194"/>
         <source>Are you sure to delete all selected features. You cannot undo this action!</source>
         <translation>Sind sie sicher, dass Sie alle ausgewählten Objekte löschen wollen? Sie können diesen Schritt nicht rückgängig machen!</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="630"/>
+        <location filename="../pgVersion.py" line="639"/>
         <source>Please select a layer for versioning</source>
         <translation>Bitte wählen Sie eine Ebene zur Versionierung aus</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="637"/>
+        <location filename="../pgVersion.py" line="646"/>
         <source>Warning</source>
         <translation>Warnung</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="228"/>
+        <location filename="../pgVersion.py" line="237"/>
         <source>The selected layer is already under versioning!</source>
         <translation>Die ausgewählte Ebene ist bereits versioniert!</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="238"/>
+        <location filename="../pgVersion.py" line="247"/>
         <source>Do you want to create the version environment for the table {0}</source>
         <translation>Wollen Sie die Versionierung für die Tabelle {0} erstellen?</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="633"/>
+        <location filename="../pgVersion.py" line="642"/>
         <source>Yes</source>
         <translation>Ja</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="633"/>
+        <location filename="../pgVersion.py" line="642"/>
         <source>No</source>
         <translation>Nein</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="243"/>
+        <location filename="../pgVersion.py" line="252"/>
         <source>Init was successful!
 
 Please set the user permissions for table {0} and reload it via Database -&gt; PG Version!</source>
@@ -423,109 +423,114 @@ Please set the user permissions for table {0} and reload it via Database -&gt; P
 Bitte setzen Sie die gewünschten Benutzerrechte für die Tabelle {0} laden Sie diese über Database --&gt; Pg Version neu!</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="250"/>
+        <location filename="../pgVersion.py" line="259"/>
         <source>Init Error</source>
         <translation>Initialisierungsfehler</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="250"/>
+        <location filename="../pgVersion.py" line="259"/>
         <source>Versioning envoronment for table {0} already exsists!</source>
         <translation>Die Versionierung für die Tabelle {0} existiert bereits!</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="354"/>
+        <location filename="../pgVersion.py" line="364"/>
         <source>Error</source>
         <translation>Fehler</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="354"/>
+        <location filename="../pgVersion.py" line="364"/>
         <source>Please select a valid revision</source>
         <translation>Bitte wählen Sie eine gültige Revision</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="532"/>
+        <location filename="../pgVersion.py" line="543"/>
         <source>Please select a versioned layer</source>
         <translation>Bitte wählen Sie eine versionierte Ebene aus</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="273"/>
+        <location filename="../pgVersion.py" line="282"/>
         <source>Are you sure to rollback to revision {0}?</source>
         <translation>Sind Sie sicher, dass Sie auf die Revision {0} zurücksetzen wollen?</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="276"/>
+        <location filename="../pgVersion.py" line="285"/>
         <source>Layer {0} has modifications which will be lost after rollback! If you want to keep this modifications please commit them. Are you sure to rollback to revision {1}?</source>
         <translation>Die Ebene {0} enthält Änderungen, die nach dem Zurücksetzen verloren gehen werden! Wenn Sie diese Änderungen behalten möchten pflegen Sie bitte die Änderungen zuerst in die Datenbank ein. Sind Sie sicher, dass Sie auf Revision {1} zurücksetzen wollen?</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="303"/>
+        <location filename="../pgVersion.py" line="312"/>
         <source>Rollback to revision {0} was successful!</source>
         <translation>Zurücksetzen auf Revision {0} war erfolgreich!</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="310"/>
+        <location filename="../pgVersion.py" line="319"/>
         <source>Please select a versioned layer for committing</source>
         <translation>Bitte wählen Sie einen versionierten Layer zum Übergeben aus</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="486"/>
+        <location filename="../pgVersion.py" line="497"/>
         <source>Please select a versioned layer!</source>
         <translation>Bitte wählen Sie eine versionierte Ebene aus</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="336"/>
+        <location filename="../pgVersion.py" line="345"/>
         <source>Commit of your changes was successful</source>
         <translation>Übertragen der Änderungen war erfolgreich!</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="348"/>
+        <location filename="../pgVersion.py" line="357"/>
         <source>No layer changes for committing, everything is OK</source>
         <translation>Keine Änderungen zum Übergeben vorhanden, alles ist OK</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="367"/>
+        <location filename="../pgVersion.py" line="377"/>
         <source>Are you sure to checkout the layer to revision {0}?</source>
         <translation>Sind Sie sicher, dass Sie die Revision {0} auschecken wollen?</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="405"/>
+        <location filename="../pgVersion.py" line="415"/>
         <source>Checkout to revision {0} was successful!</source>
         <translation>Auschecken auf Revision {0} war erfolgreich!</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="408"/>
+        <location filename="../pgVersion.py" line="418"/>
         <source>Something went wrong during checkout to revision {0}!</source>
         <translation>Es ist beim Auschecken auf Revision {0} etwas schief gegangen!</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="428"/>
+        <location filename="../pgVersion.py" line="438"/>
         <source>are you sure to revert to the HEAD revision?</source>
         <translation>Sind Sie sicher, dass Sie auf die HEAD Revision zurücksetzen wollen?</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="437"/>
+        <location filename="../pgVersion.py" line="447"/>
         <source>All changes are set back to the HEAD revision: {0}</source>
         <translation>Alle Änderungen sind auf die HEAD Revision {0} zurückgesetzt worden</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="597"/>
+        <location filename="../pgVersion.py" line="606"/>
         <source>No diffs to HEAD detected! Layer could not be loaded.</source>
         <translation>Es konnten keine Unterschiede zur HEAD Revision gefunden werden! Die Ebene wurde nicht geladen.</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="611"/>
+        <location filename="../pgVersion.py" line="620"/>
         <source>Diff to HEAD revision was successful!</source>
         <translation>Auswerten der Unterschiede zur HEAD Revision war erfolgreich!</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="633"/>
+        <location filename="../pgVersion.py" line="642"/>
         <source>are you sure to to drop pgvs from the table {0}?</source>
         <translation>Sind Sie sicher, dass Sie die Versionierung von der Tabelle {0} löschen wollen?</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="647"/>
+        <location filename="../pgVersion.py" line="656"/>
         <source>Versioning for layer {0} dropped!</source>
         <translation>Versionierung der Ebene {0} gelöscht!</translation>
+    </message>
+    <message>
+        <location filename="../pgVersion.py" line="646"/>
+        <source>Layer %s has uncommited changes, please commit them or revert to HEAD revision</source>
+        <translation>Die Ebene %s hat unübergebene Änderungen. Bitte übergeben Sie diese Änderungen oder setzen Sie auf die HEAD Version zurück</translation>
     </message>
 </context>
 <context>
@@ -573,30 +578,40 @@ p, li { white-space: pre-wrap; }
 <context>
     <name>PgVersionLoadDialog</name>
     <message>
-        <location filename="../forms/Ui_pgLoadVersion.py" line="58"/>
+        <location filename="../forms/Ui_pgLoadVersion.py" line="128"/>
         <source>Error</source>
         <translation>Fehler</translation>
     </message>
     <message>
-        <location filename="../forms/Ui_pgLoadVersion.py" line="58"/>
+        <location filename="../forms/Ui_pgLoadVersion.py" line="75"/>
         <source>No Database Connection Established.</source>
         <translation>Keine Datenbankverbindung aufgebaut.</translation>
+    </message>
+    <message>
+        <location filename="../forms/Ui_pgLoadVersion.py" line="128"/>
+        <source>Please select a versioned layer</source>
+        <translation>Bitte wählen Sie eine versionierte Ebene aus</translation>
+    </message>
+    <message>
+        <location filename="../forms/Ui_pgLoadVersion.py" line="175"/>
+        <source>Layer {0} is already loaded</source>
+        <translation>Ebene {0} ist bereits geladen</translation>
     </message>
 </context>
 <context>
     <name>PgVersionTools</name>
     <message>
-        <location filename="../pgVersionTools.py" line="61"/>
+        <location filename="../pgVersionTools.py" line="62"/>
         <source>No Database Connection Established.</source>
         <translation>Keine Datenbankverbindung aufgebaut.</translation>
     </message>
     <message>
-        <location filename="../pgVersionTools.py" line="189"/>
+        <location filename="../pgVersionTools.py" line="191"/>
         <source>Table {schema}.{table} is already versionized</source>
         <translation>Die Tabelle {schema}.{table}  ist bereits versioniert</translation>
     </message>
     <message>
-        <location filename="../pgVersionTools.py" line="194"/>
+        <location filename="../pgVersionTools.py" line="196"/>
         <source>pgvs is not installed in your database. 
 
  Please install the pgvs functions from file 
@@ -613,44 +628,22 @@ Bitte installieren Sie die pgvs Umgebung aus der datei
 wie in der Hilfe beschrieben</translation>
     </message>
     <message>
-        <location filename="../pgVersionTools.py" line="246"/>
+        <location filename="../pgVersionTools.py" line="248"/>
         <source>Table {0} is not versionized</source>
         <translation>Die Tabelle {0}  ist nicht versioniert</translation>
     </message>
     <message>
-        <location filename="../pgVersionTools.py" line="270"/>
+        <location filename="../pgVersionTools.py" line="272"/>
         <source>select Candidate</source>
         <translation>Wählen Sie einen Kandidaten aus</translation>
     </message>
     <message>
-        <location filename="../pgVersionTools.py" line="444"/>
-        <source>The Plugin expects pgvs revision %s but DB-functions revision %s are installed.
-
- Please contact your DB-administrator to update the DB-functions from the file:
-
- %s
-
- If you have appropriate DB permissions you can update the DB directly with click on DB-Update.</source>
-        <translation>Das Plugin erwartet die pgvs Version %s, aber die pgvs Funktionen der Version %s sind installiert.
-
-Bitte fragen Sie Ihren DB-Administrator um die Aktualisierung der Funktionen aus der Datei:
-
-%s
-
-Wenn Sie Administratoren-Rechte für die DB haben können Sie die Funktionen auch direkt mit einem Klick auf upgrade aktualisieren.</translation>
-    </message>
-    <message>
-        <location filename="../pgVersionTools.py" line="447"/>
-        <source>Upgrade pgvs to Revision %s</source>
-        <translation>Auf die Version %s aktualisieren</translation>
-    </message>
-    <message>
-        <location filename="../pgVersionTools.py" line="61"/>
+        <location filename="../pgVersionTools.py" line="62"/>
         <source>Error</source>
         <translation>Fehler</translation>
     </message>
     <message>
-        <location filename="../pgVersionTools.py" line="430"/>
+        <location filename="../pgVersionTools.py" line="428"/>
         <source>pgvs is not installed in the selected DB.
 
 Please contact your DB-administrator to install the DB-functions from the file:
@@ -667,6 +660,28 @@ Bitte fragen Sie Ihren DB-Administrator die Funktionen aus der Datei
 zu installieren.
 
 Wenn Sie über DB-Administrator-Rechte verfügen können Sie die Funktionen auch direkt hier installieren. </translation>
+    </message>
+    <message>
+        <location filename="../pgVersionTools.py" line="451"/>
+        <source>The Plugin expects pgvs revision %s but DB-functions revision %s are installed.
+
+     Please contact your DB-administrator to upgrade the DB-functions from the file:
+
+ %s
+
+     If you have appropriate DB permissions you can update the DB directly with click on DB-Update.</source>
+        <translation>Das Plugin erwartet die pgvs Version %s, aber die DB-Funktionen der Version %s sind installiert.
+
+Bitte nehmen Sie Kontakt mit dem DB-Administrator auf und aktualisieren Sie die Funktionen aus der Datei:
+
+ %s
+
+Wenn Sie die nötigen DB-Rechte haben, dann können Sie die DB direkt mit einem Klick auf DB Update aktualisieren.</translation>
+    </message>
+    <message>
+        <location filename="../pgVersionTools.py" line="454"/>
+        <source>Upgrade pgvs to Revision %s.%s.%s</source>
+        <translation>Aktualisieren zur pgvs Version %s.%s.%s</translation>
     </message>
 </context>
 <context>

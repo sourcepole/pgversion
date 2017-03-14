@@ -140,11 +140,12 @@ class PgVersionTools(QObject):
           return True      
 
 
-  def setModified(self, unsetModified=False):
-    print self.layer_list
-    for i in range(len(self.layer_list)):
-#        print 'Layer-List: '+self.layer_list[i]
-        map_layer = QgsMapLayerRegistry.instance().mapLayer(self.layer_list[i])
+  def setModified(self,  layer_list):
+
+    layer_list = list(set(layer_list))
+    
+    for i in range(len(layer_list)):
+        map_layer = QgsMapLayerRegistry.instance().mapLayer(layer_list[i])
         if self.isModified(map_layer):
           if '(modified)' not in map_layer.name():
             map_layer.setLayerName(map_layer.name()+' (modified)')

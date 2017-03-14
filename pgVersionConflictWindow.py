@@ -14,9 +14,10 @@ class ConflictWindow(QMainWindow):
   def __init__(self, layer,  type='conflict',  parent=None):
     QMainWindow.__init__(self)
 
-    self.iface = iface
+    self.iface = parent.iface
     self.layer = layer
     self.parent = parent
+    self.layer_list = parent.layer_list
     settings = QSettings()
     self.tools = PgVersionTools(self)    
           
@@ -222,7 +223,7 @@ class ConflictWindow(QMainWindow):
         
         if self.tools.confRecords(self.layer) == None:
             self.tabView.clear()
-            self.tools.setModified()
+            self.tools.setModified(self.parent.layer_list)
             self.close()
             
         else:

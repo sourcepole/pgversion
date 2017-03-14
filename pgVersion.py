@@ -68,10 +68,11 @@ class PgVersion(QObject):
             QCoreApplication.installTranslator(self.translator)  
 
 #    self.iface.projectRead.connect(self.layers_init)
-    self.iface.projectRead.connect(self.add_layer)
+#    self.iface.projectRead.connect(self.add_layer)
     
-    QgsMapLayerRegistry.instance().layerRemoved.connect(self.remove_layer)
-    QgsMapLayerRegistry.instance().layersAdded.connect(self.add_layer)
+    QgsMapLayerRegistry.instance().layerWasAdded.connect(self.add_layer)
+    QgsMapLayerRegistry.instance().layerWillBeRemoved.connect(self.remove_layer)
+    
     
 
 
@@ -162,33 +163,22 @@ class PgVersion(QObject):
                 self.actionDelete.setEnabled(False) # true
       
       
-  def add_layer(self,  layer):
-      
-    for l in layer:
+  def add_layer(self,  l):
+
         if self.tools.hasVersion(l):
             if l.id not in self.layer_list:
-                l.editingStopped.connect(self.tools.setModified)
-                l.layerModified.connect(self.tools.setModified)
+                l.editingStopped.connect(lambda my_list = self.layer_list: self.tools.setModified(my_list))
+#                l.layerModified.connect(self.tools.setModified)
                 self.layer_list.append(l.id())
-                self.tools.setModified(l)
-            
-    self.layers_init()
-    
+                self.tools.setModified(self.layer_list)
+                
 
   def remove_layer(self,  id):
-        self.layer_list = filter(lambda a: a != id, self.layer_list)
+        self.layer_list = list(set(self.layer_list))
+        self.layer_list.remove(id)
+
         if len(self.layer_list) > 0:
-#            self.layers_init()
-            self.tools.setModified(map_layer)
-      
-  def layers_init(self):
-      for i in range(len(self.layer_list)):
-          map_layer = QgsMapLayerRegistry.instance().mapLayer(self.layer_list[i])
-          
-          if map_layer.type() == QgsMapLayer.VectorLayer and map_layer.providerType() == 'postgres':
-              self.tools.setModified(map_layer)
-
-
+            self.tools.setModified(self.layer_list)
 
   def unload(self):
         # remove menubar
@@ -232,7 +222,7 @@ class PgVersion(QObject):
                 QApplication.restoreOverrideCursor()
                 currentLayer.removeSelection()
                 currentLayer.triggerRepaint()
-                self.tools.setModified()
+                self.tools.setModified(self.layer_list)
 #                self.actionDelete.setEnabled(false)
         
 
@@ -318,7 +308,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
             self.LogViewDialog.close()
             currentLayer.triggerRepaint()
             QApplication.restoreOverrideCursor()
-            self.tools.setModified()
+            self.tools.setModified(self.layer_list)
             self.iface.messageBar().pushMessage('INFO', self.tr('Rollback to revision {0} was successful!').format(revision), level=QgsMessageBar.INFO, duration=3)
             return
 
@@ -353,19 +343,20 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
                         myDB.close()
                         self.tools.layerRepaint()
                         self.iface.messageBar().pushMessage("Info", self.tr('Commit of your changes was successful'), level=QgsMessageBar.INFO, duration=3)            
-                        self.tools.setModified()
+                        self.tools.setModified(self.layer_list)
                         QApplication.restoreOverrideCursor()
               else:
                 if self.w != None:
                     self.w = None
-                self.w = ConflictWindow(self.iface,  theLayer,  'conflict',  self)
+                self.w = ConflictWindow(theLayer,  'conflict',  self)
                 self.w.mergeCompleted.connect(self.doCommit)
                 self.w.show()
     
-              self.tools.setModified()
+              self.tools.setModified(self.layer_list)
           else:
               self.iface.messageBar().pushMessage('INFO', self.tr('No layer changes for committing, everything is OK'), level=QgsMessageBar.INFO, duration=3)
-
+              
+      self.tools.setModified(self.layer_list)
 
   def doCheckout(self,  revision,  tag=None):
       print "Revision: %s" % (revision)
@@ -455,7 +446,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
             else:
                 self.iface.messageBar().pushMessage("Info", self.tr('All changes are set back to the HEAD revision: {0}').format(str(result["PGVSREVERT"][0])), level=QgsMessageBar.INFO, duration=3)            
                 
-        self.tools.setModified()
+        self.tools.setModified(self.layer_list)
         theLayer.triggerRepaint()
         myDb.close()
     pass
