@@ -67,10 +67,12 @@ class PgVersion(QObject):
         if qVersion() > '4.3.3':        
             QCoreApplication.installTranslator(self.translator)  
 
-    self.iface.projectRead.connect(self.layers_init)
+#    self.iface.projectRead.connect(self.layers_init)
+    self.iface.projectRead.connect(self.add_layer)
     
     QgsMapLayerRegistry.instance().layerRemoved.connect(self.remove_layer)
     QgsMapLayerRegistry.instance().layersAdded.connect(self.add_layer)
+    
 
 
   def initGui(self):  
@@ -158,28 +160,32 @@ class PgVersion(QObject):
                     self.actionDelete.setEnabled(False)
             else:
                 self.actionDelete.setEnabled(False) # true
-
-
+      
+      
   def add_layer(self,  layer):
       
     for l in layer:
         if self.tools.hasVersion(l):
-            self.layer_list = filter(lambda a: a != l.id, self.layer_list)
-            self.layer_list.append(l.id())
+            if l.id not in self.layer_list:
+                l.editingStopped.connect(self.tools.setModified)
+                l.layerModified.connect(self.tools.setModified)
+                self.layer_list.append(l.id())
+                self.tools.setModified(l)
             
     self.layers_init()
     
 
   def remove_layer(self,  id):
         self.layer_list = filter(lambda a: a != id, self.layer_list)
-        self.layers_init()
+        if len(self.layer_list) > 0:
+#            self.layers_init()
+            self.tools.setModified(map_layer)
       
   def layers_init(self):
       for i in range(len(self.layer_list)):
           map_layer = QgsMapLayerRegistry.instance().mapLayer(self.layer_list[i])
           
           if map_layer.type() == QgsMapLayer.VectorLayer and map_layer.providerType() == 'postgres':
-              map_layer.editingStopped.connect(self.tools.setModified)
               self.tools.setModified(map_layer)
 
 
@@ -448,7 +454,8 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
                 QMessageBox.information(None, '',result)
             else:
                 self.iface.messageBar().pushMessage("Info", self.tr('All changes are set back to the HEAD revision: {0}').format(str(result["PGVSREVERT"][0])), level=QgsMessageBar.INFO, duration=3)            
-            self.tools.setModified()
+                
+        self.tools.setModified()
         theLayer.triggerRepaint()
         myDb.close()
     pass

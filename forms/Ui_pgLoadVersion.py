@@ -179,7 +179,6 @@ class PgVersionLoadDialog(QDialog, Ui_pgLoadVersion):
             
         QgsMapLayerRegistry.instance().addMapLayer(vLayer)
         self.parent.layer_list.append(vLayer.id())
-        self.tools.setModified()
         
         myDb.close()
         QApplication.restoreOverrideCursor()

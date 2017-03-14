@@ -128,8 +128,8 @@ class PgVersionTools(QObject):
 
 
         sql = 'select count(project) \
-          from versions."'+schema+'_'+myLayerUri.table()+'_log" \
-          where project = \''+myDb.dbUser()+'\' and not commit'
+          from versions."%s_%s_log" \
+          where project = \'%s\' and not commit' % (schema,  myLayerUri.table(),  myDb.dbUser())
 
         result = myDb.read(sql)
         myDb.close()
@@ -141,14 +141,15 @@ class PgVersionTools(QObject):
 
 
   def setModified(self, unsetModified=False):
-
+    print self.layer_list
     for i in range(len(self.layer_list)):
+#        print 'Layer-List: '+self.layer_list[i]
         map_layer = QgsMapLayerRegistry.instance().mapLayer(self.layer_list[i])
         if self.isModified(map_layer):
           if '(modified)' not in map_layer.name():
             map_layer.setLayerName(map_layer.name()+' (modified)')
         else:
-          map_layer.setLayerName(map_layer.name().replace(' (modified)', ''))      
+            map_layer.setLayerName(map_layer.name().replace(' (modified)', ''))      
     
     
     
