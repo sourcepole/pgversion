@@ -70,7 +70,6 @@ class PgVersion(QObject):
     QgsMapLayerRegistry.instance().layerWasAdded.connect(self.add_layer)
     QgsMapLayerRegistry.instance().layerWillBeRemoved.connect(self.remove_layer)
     
-    
 
 
   def initGui(self):  
@@ -588,13 +587,6 @@ select * from checkout) as foo1 \
             myUri = QgsDataSourceURI(self.tools.layerUri(currentLayer))
             myUri.setDataSource("", u"(%s\n)" % sql, geomCol, "", "rownum")
             layer = QgsVectorLayer(myUri.uri(), myTable+" (Diff to HEAD Revision)", "postgres")       
-            
-#            defult_tmp_dir = tempfile._get_default_tempdir()
-#            temp_name = defult_tmp_dir+"/"+next(tempfile._get_candidate_names())+".shp"
-#            
-#            QgsVectorFileWriter.writeAsVectorFormat(QgsVectorLayer(myUri.uri(), myTable+" (Diff to HEAD Revision)", "postgres") , temp_name, "utf-8", None, "ESRI Shapefile")  
-#            layer_ = QgsVectorLayer(temp_name,  myTable+" (Diff to HEAD Revision)",  "ogr")
-#            
             
             if not layer.isValid():
                 self.iface.messageBar().pushMessage('WARNING', self.tr('No diffs to HEAD detected! Layer could not be loaded.'), level=QgsMessageBar.INFO, duration=3)

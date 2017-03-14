@@ -148,9 +148,15 @@ class PgVersionTools(QObject):
         map_layer = QgsMapLayerRegistry.instance().mapLayer(layer_list[i])
         if self.isModified(map_layer):
           if '(modified)' not in map_layer.name():
-            map_layer.setLayerName(map_layer.name()+' (modified)')
+            if QGis.QGIS_VERSION_INT >= 21600:
+                map_layer.setName(map_layer.name()+' (modified)')
+            else:
+                map_layer.setLayerName(map_layer.name()+' (modified)')
         else:
-            map_layer.setLayerName(map_layer.name().replace(' (modified)', ''))      
+            if QGis.QGIS_VERSION_INT >= 21600:
+                map_layer.setName(map_layer.name().replace(' (modified)', ''))      
+            else:
+                map_layer.setLayerName(map_layer.name().replace(' (modified)', ''))      
     
     
     
