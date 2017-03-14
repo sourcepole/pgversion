@@ -175,10 +175,11 @@ class PgVersion(QObject):
 
   def remove_layer(self,  id):
         self.layer_list = list(set(self.layer_list))
-        self.layer_list.remove(id)
+        if id in set(self.layer_list):
+            self.layer_list.remove(id)
 
-        if len(self.layer_list) > 0:
-            self.tools.setModified(self.layer_list)
+#        if len(self.layer_list) > 0:
+#            self.tools.setModified(self.layer_list)
 
   def unload(self):
         # remove menubar

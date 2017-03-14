@@ -104,8 +104,11 @@ class LogView(QDialog, Ui_LogView):
     
     @pyqtSignature("")
     def on_btnRollback_clicked(self):
-       self.rollbackLayer.emit(self.treeWidget.currentItem())    
-       self.close()
+        try:
+            self.rollbackLayer.emit(self.treeWidget.currentItem())    
+            self.close()
+        except:
+            QMessageBox.information(None, self.tr('Warning'),  self.tr('Please select a revision for checkout'))
     
     @pyqtSignature("")
     def on_btnDiff_clicked(self):
