@@ -209,7 +209,7 @@ class PgVersion(QObject):
                 
                 delete_list = delete_list[:-2]
                 delete_list += ")"
-                sql = "delete from %s.%s where %s in %s" % (mySchema,  myTable,  myPkey,  delete_list)
+                sql = "delete from \"%s\".\"%s\" where \"%s\" in %s" % (mySchema,  myTable,  myPkey,  delete_list)
                 QApplication.setOverrideCursor(Qt.WaitCursor)
                 myDb.run(sql)
                 QApplication.restoreOverrideCursor()
@@ -600,6 +600,8 @@ from \
 select * from delete \
 union  \
 select * from insert) as foo").format(schema = mySchema,  table=myTable,  origin=myTable.replace('_version', ''),  geo_idx = geo_idx)
+
+#            QMessageBox.information(None, '',  sql)
 
             myUri = QgsDataSourceURI(self.tools.layerUri(currentLayer))
             myUri.setDataSource("", u"(%s\n)" % sql, geomCol, "", "rownum")
