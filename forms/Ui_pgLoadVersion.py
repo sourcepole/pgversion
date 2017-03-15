@@ -75,7 +75,7 @@ class PgVersionLoadDialog(QDialog, Ui_pgLoadVersion):
             QMessageBox.information(None, self.tr('Error'), self.tr('No Database Connection Established.'))
             return None
 
-        if not self.tools.checkPGVSRevision(myDb):
+        if not self.tools.check_PGVS_revision(myDb):
             self.cmbServer.setCurrentIndex(0)
             return None
         query = 'select 4 as count,  1 as table'
