@@ -33,7 +33,7 @@ class PgVersionTools(QObject):
 # Konstruktor 
   def __init__(self,  parent):
       QObject.__init__(self,  parent)
-      self.pgvsRevision = '2.1.4'
+      self.pgvsRevision = '2.1.5'
       self.parent = parent
       self.iface = parent.iface
       self.layer_list = parent.layer_list
@@ -375,6 +375,7 @@ class PgVersionTools(QObject):
 
 
   def create_memory_layer(self,  layer,  name):
+      
       
         feats = [feat for feat in layer.getFeatures()]
         if layer.geometryType() ==QGis.Point:
