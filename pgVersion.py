@@ -233,7 +233,7 @@ class PgVersion(QObject):
       mySchema = self.tools.layerSchema(currentLayer)
       myTable = self.tools.layerTable(currentLayer)
       myDb = self.tools.layerDB('doInit',currentLayer)
-      if not self.tools.checkPGVSRevision(myDb):
+      if not self.tools.check_PGVS_revision(myDb):
         return
 
       if not self.tools.versionExists(currentLayer):
@@ -286,7 +286,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
             provider = currentLayer.dataProvider()
             uri = provider.dataSourceUri()    
             myDb = self.tools.layerDB('doRollback',currentLayer)
-            if not self.tools.checkPGVSRevision(myDb):
+            if not self.tools.check_PGVS_revision(myDb):
                 return
             mySchema = QgsDataSourceURI(uri).schema()
 
@@ -558,51 +558,77 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
             authority,  crs = currentLayer.crs().authid().split(':')
             geo_idx = '%s && ST_MakeEnvelope(%s,%s)' %  (geomCol,  extent,  crs)
 
-            sql = ("with \
-head as (select max(revision) as head from versions.\"{schema}_{table}_log\"), \
-checkout as (select v.{cols} \
-from versions.pgvscheckout('{schema}.{origin}', (select * from head)) as c, versions.\"{schema}_{table}_log\" as v \
-where {geo_idx} \
-and c.log_id = v.{uniqueCol}  \
-and c.systime = v.systime), \
-\
-version as (select v.{cols}  \
-from \"{schema}\".\"{table}\" as v \
-where {geo_idx}) \
-\
-select row_number() OVER () AS rownum, *  \
-from (select *, 'delete'::varchar as action, head as revision from head, ( \
-(select * from checkout \
-except \
-select * from version) \
-) as foo \
-union all \
-select *, 'insert'::varchar as action, head.head as revision \
-from head, ( \
-select * from version \
-except \
-select * from checkout) as foo1 \
-) as foo ").format(schema = mySchema,  table=myTable,  origin=myTable.replace('_version', ''), cols = myCols,  uniqueCol = uniqueCol,  geo_idx = geo_idx )
+#            sql = ("with \
+#head as (select max(revision) as head from versions.\"{schema}_{table}_log\"), \
+#checkout as (select v.{cols} \
+#from versions.pgvscheckout(NULL::{schema}.{origin}, (select * from head)) as c, versions.\"{schema}_{table}_log\" as v \
+#where {geo_idx} \
+#and c.log_id = v.{uniqueCol}  \
+#and c.systime = v.systime), \
+#\
+#version as (select v.{cols}  \
+#from \"{schema}\".\"{table}\" as v \
+#where {geo_idx}) \
+#\
+#select row_number() OVER () AS rownum, *  \
+#from (select *, 'delete'::varchar as action, head as revision from head, ( \
+#(select * from checkout \
+#except \
+#select * from version) \
+#) as foo \
+#union all \
+#select *, 'insert'::varchar as action, head.head as revision \
+#from head, ( \
+#select * from version \
+#except \
+#select * from checkout) as foo1 \
+#) as foo ").format(schema = mySchema,  table=myTable,  origin=myTable.replace('_version', ''), cols = myCols,  uniqueCol = uniqueCol,  geo_idx = geo_idx )
             
+            sql = ("with \
+head as (select max(revision) as head from versions.\"{schema}_{origin}_version_log\"), \
+            delete as (\
+select *, 'delete'::varchar as action from (\
+  select * from versions.pgvscheckout(NULL::\"{schema}\".\"{origin}\",(select * from head), \'{geo_idx}\') \
+  except \
+  select * from \"{schema}\".\"{origin}_version\" where {geo_idx}\
+  ) as foo \
+), \
+insert as (select *, 'insert'::varchar as action \
+  from ( \
+    select * from \"{schema}\".\"{origin}_version\" where {geo_idx} \
+except \
+    select * from versions.pgvscheckout(NULL::\"{schema}\".\"{origin}\",(select * from head), \'{geo_idx}\') \
+   ) as foo) \
+\
+select row_number() OVER () AS rownum, * \
+from \
+(\
+select * from delete \
+union  \
+select * from insert) as foo").format(schema = mySchema,  table=myTable,  origin=myTable.replace('_version', ''),  geo_idx = geo_idx)
+
             myUri = QgsDataSourceURI(self.tools.layerUri(currentLayer))
             myUri.setDataSource("", u"(%s\n)" % sql, geomCol, "", "rownum")
-            layer = QgsVectorLayer(myUri.uri(), myTable+" (Diff to HEAD Revision)", "postgres")       
+            layer_name = myTable+" (Diff to HEAD Revision)"
+            layer = QgsVectorLayer(myUri.uri(), layer_name, "postgres")       
             
-            if not layer.isValid():
+            mem_layer = self.tools.create_memory_layer(layer, layer_name )
+            
+            if not mem_layer.isValid():
                 self.iface.messageBar().pushMessage('WARNING', self.tr('No diffs to HEAD detected! Layer could not be loaded.'), level=QgsMessageBar.INFO, duration=3)
 
             else:                
                 userPluginPath = QFileInfo(QgsApplication.qgisUserDbFilePath()).path()+"/python/plugins/pgversion"  
-                layer.setRendererV2(None)
+                mem_layer.setRendererV2(None)
     
                 if geometryType == 0:
-                    layer.loadNamedStyle(userPluginPath+"/legends/diff_point.qml")             
+                    mem_layer.loadNamedStyle(userPluginPath+"/legends/diff_point.qml")             
                 elif geometryType == 1:
-                    layer.loadNamedStyle(userPluginPath+"/legends/diff_linestring.qml")             
+                    mem_layer.loadNamedStyle(userPluginPath+"/legends/diff_linestring.qml")             
                 elif geometryType == 2:
-                    layer.loadNamedStyle(userPluginPath+"/legends/diff_polygon.qml")             
+                    mem_layer.loadNamedStyle(userPluginPath+"/legends/diff_polygon.qml")             
     
-                QgsMapLayerRegistry.instance().addMapLayer(layer)
+                QgsMapLayerRegistry.instance().addMapLayer(mem_layer)
                 self.iface.messageBar().pushMessage('INFO', self.tr('Diff to HEAD revision was successful!'), level=QgsMessageBar.INFO, duration=3)
                 
             QApplication.restoreOverrideCursor()
@@ -653,6 +679,8 @@ select * from checkout) as foo1 \
   def doAbout(self):
       self.about = DlgAbout(self.plugin_path)
       self.about.show()
+      
+      
       
       
       

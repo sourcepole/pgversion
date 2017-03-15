@@ -62,7 +62,7 @@ class PgVersionTools(QObject):
           QMessageBox.information(None, self.tr('Error'), self.tr('No Database Connection Established.'))
           return None
 
-      if not self.tools.checkPGVSRevision(myDb):
+      if not self.tools.check_PGVS_revision(myDb):
         return
 
 
@@ -374,46 +374,25 @@ class PgVersionTools(QObject):
                return None
 
 
-  def createPolygon(self, geometry, geometryType):      
-
-    self.mRubberBand.reset()
-#    project = QgsProject.instance()
-
-    color = QColor(255,0,0)
-    self.mRubberBand.setColor(color)
-    self.mRubberBand.setWidth(5)
-    self.mRubberBand.show()
-
-    g = QgsGeometry.fromWkt(geometry)
-
-#    self.mRubberBand.setToGeometry(g,  None)
-
-    if geometryType == "MULTIPOLYGON":
-      for i in g.asMultiPolygon():
-        index = 0
-        for n in i:
-          for k in n: 
-            self.mRubberBand.addPoint(k,  False,  index)
-          index = index + 1
-
-#    if geometryType == "MULTILINESTRING":
-#      for i in g.asPolyline():
-#        for k in i: 
-#          self.mRubberBand.addPoint(k)
-
-    elif geometryType == "POLYGON":
-      for i in g.asPolygon():
-        for k in i: 
-          self.mRubberBand.addPoint(k,  False)
-
-
-    elif geometryType == "POINT":
-      gBuffer = g.buffer(25, 100)
-      for i in gBuffer.asPolygon():
-        for k in i: 
-          self.mRubberBand.addPoint(k)
-
-    return 0                      
+  def create_memory_layer(self,  layer,  name):
+      
+        feats = [feat for feat in layer.getFeatures()]
+        if layer.geometryType() ==QGis.Point:
+            layer_type = 'Point?crs='+layer.crs().authid()
+        if layer.geometryType() ==QGis.Line:
+            layer_type = 'LineString?crs='+layer.crs().authid()
+        if layer.geometryType() ==QGis.Polygon:
+            layer_type = 'Polygon?crs='+layer.crs().authid()
+            
+        mem_layer = QgsVectorLayer(layer_type, name, "memory")
+        
+        mem_layer_data = mem_layer.dataProvider()
+        attr = layer.dataProvider().fields().toList()
+        mem_layer_data.addAttributes(attr)
+        mem_layer.updateFields()
+        mem_layer_data.addFeatures(feats)
+        
+        return mem_layer
 
 
   def file_path(name, base_path=None):
@@ -422,7 +401,7 @@ class PgVersionTools(QObject):
     return os.path.join(base_path, name)
 
 # Check the revision of the DB-Functions
-  def checkPGVSRevision(self,    myDb):          
+  def check_PGVS_revision(self,    myDb):          
         create_version_path = '%s/docs/create_pgversion_schema.sql' % (self.parent.plugin_path)
         upgrade_version_path = '%s/docs/upgrade_pgversion_schema.sql' % (self.parent.plugin_path)          
         
