@@ -1,6 +1,6 @@
 -- Database diff generated with pgModeler (PostgreSQL Database Modeler).
 -- pgModeler  version: 0.9.0-alpha1
--- PostgreSQL version: 9.4
+-- PostgreSQL version: 9.6
 
 -- [ Diff summary ]
 -- Dropped objects: 1
@@ -1389,6 +1389,11 @@ $$;
 
 -- object: versions.pgvscheckout | type: FUNCTION --
 -- DROP FUNCTION IF EXISTS versions.pgvscheckout(anyelement,bigint,text) CASCADE;
+
+-- Prepended SQL commands --
+DROP FUNCTION IF EXISTS versions.pgvscheckout(anyelement,bigint,text);
+-- ddl-end --
+
 CREATE OR REPLACE FUNCTION versions.pgvscheckout ( _in_table anyelement,  revision bigint,  extent text)
 	RETURNS SETOF anyelement
 	LANGUAGE plpgsql
