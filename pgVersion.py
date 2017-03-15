@@ -561,7 +561,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
 #            sql = ("with \
 #head as (select max(revision) as head from versions.\"{schema}_{table}_log\"), \
 #checkout as (select v.{cols} \
-#from versions.pgvscheckout(NULL::{schema}.{origin}, (select * from head)) as c, versions.\"{schema}_{table}_log\" as v \
+#from versions.pgvscheckout(NULL::{schema}.{origin}, (select * from head), \'{geo_idx}\') as c, versions.\"{schema}_{table}_log\" as v \
 #where {geo_idx} \
 #and c.log_id = v.{uniqueCol}  \
 #and c.systime = v.systime), \
@@ -583,10 +583,10 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
 #except \
 #select * from checkout) as foo1 \
 #) as foo ").format(schema = mySchema,  table=myTable,  origin=myTable.replace('_version', ''), cols = myCols,  uniqueCol = uniqueCol,  geo_idx = geo_idx )
-            
+#            
             sql = ("with \
 head as (select max(revision) as head from versions.\"{schema}_{origin}_version_log\"), \
-            delete as (\
+delete as (\
 select *, 'delete'::varchar as action from (\
   select * from versions.pgvscheckout(NULL::\"{schema}\".\"{origin}\",(select * from head), \'{geo_idx}\') \
   except \
