@@ -383,13 +383,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
             if len(mySchema) == 0:
                 mySchema = 'public'
 
-
-            sql = "select v.* \
-            from versions.pgvscheckout('"+mySchema+"."+myTable.replace('_version', '')+"', "+revision+") as c,  \
-                 versions."+mySchema+"_"+myTable+"_log as v \
-            where c.log_id = v."+uniqueCol+"  \
-                         and c.systime = v.systime "
-            
+            sql = "select * from versions.pgvscheckout(NULL::"+mySchema+"."+myTable.replace('_version', '')+", "+revision+")"
             myUri = QgsDataSourceURI(uri)
             myUri.setDataSource("", u"(%s\n)" % (sql), geomCol, "", uniqueCol)
 

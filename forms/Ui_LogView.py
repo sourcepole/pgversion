@@ -128,16 +128,7 @@ class LogView(QDialog, Ui_LogView):
         """
         self.close()
     
-    @pyqtSignature("int")
-    def on_cmbTags_activated(self, index):
-        """
-        Slot documentation goes here.
-        
-        @param index DESCRIPTION
-        @type int
-        """
-        
-        try:
-            self.checkoutTag.emit(self.cmbTags.itemData(index),  self.cmbTags.itemText(index))    
-        except:
-            pass
+    @pyqtSignature("")
+    def on_btnTag_clicked(self):
+        if self.cmbTags.currentIndex() > 0:
+            self.checkoutTag.emit(self.cmbTags.itemData(self.cmbTags.currentIndex()),  self.cmbTags.itemText(self.cmbTags.currentIndex()))    
