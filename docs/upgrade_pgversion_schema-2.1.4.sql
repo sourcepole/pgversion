@@ -1390,12 +1390,13 @@ $$;
 -- object: versions.pgvscheckout | type: FUNCTION --
 -- DROP FUNCTION IF EXISTS versions.pgvscheckout(anyelement,bigint,text) CASCADE;
 CREATE OR REPLACE FUNCTION versions.pgvscheckout ( _in_table anyelement,  revision bigint,  extent text)
-	RETURNS smallint
+	RETURNS SETOF anyelement
 	LANGUAGE plpgsql
 	VOLATILE 
 	CALLED ON NULL INPUT
 	SECURITY INVOKER
 	COST 100
+	ROWS 1000
 	AS $$
   DECLARE
     mySchema TEXT;
