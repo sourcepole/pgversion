@@ -70,6 +70,7 @@ pgvsrevert()
 pgvsrevision()
 pgvslogview()
 pgvsrollback()
+pgvscheckout()
 ```
 
 This schema contains all information which are neccessary to manage the versioned tables. I highly advise that you should not make any changes in the schema ``versions``. Now your database is ready for versioning.
@@ -153,8 +154,13 @@ The pgvsrollback function will push a revision into HEAD revision:
 ```
 select * from versions.pgvsrollback('<tablename>',revision integer);
 ```
-This function will work reliable since pgvs db-version 1.8.0 and QGIS-Plugin version 0.9.2. All prior created revisions of the layer are not ready to rollback.
 
+== pgvscheckout ==
+The pgvscheckout function will checkout a specific revision from repository:
+
+```
+select * from versions.pgvscheckout('<tablename>',revision integer);
+```
 
 
 = QGIS Plugin =
