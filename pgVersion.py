@@ -59,7 +59,7 @@ class PgVersion(QObject):
     myLocale = myLocaleName[0:2]
     if QFileInfo(self.plugin_path).exists():
         localePath = self.plugin_path+"/i18n/pgVersion_"+myLocale+".qm"
-    print localePath
+
     if QFileInfo(localePath).exists():
         self.translator = QTranslator()
         self.translator.load(localePath)
@@ -67,8 +67,8 @@ class PgVersion(QObject):
         if qVersion() > '4.3.3':        
             QCoreApplication.installTranslator(self.translator)  
     
-    QgsMapLayerRegistry.instance().layerWasAdded.connect(self.add_layer)
-    QgsMapLayerRegistry.instance().layerWillBeRemoved.connect(self.remove_layer)
+#    QgsMapLayerRegistry.instance().layerWasAdded.connect(self.add_layer)
+#    QgsMapLayerRegistry.instance().layerWillBeRemoved.connect(self.remove_layer)
     
 
 
@@ -143,6 +143,8 @@ class PgVersion(QObject):
             a.triggered.connect(self.onSelectionChanged)
             
     self.iface.mapCanvas().selectionChanged.connect(self.onSelectionChanged)            
+    QgsMapLayerRegistry.instance().layerWasAdded.connect(self.add_layer)
+    QgsMapLayerRegistry.instance().layerWillBeRemoved.connect(self.remove_layer)    
 
   def onSelectionChanged(self):
         current_layer = self.iface.mapCanvas().currentLayer()
