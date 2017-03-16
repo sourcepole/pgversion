@@ -354,7 +354,6 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
       self.tools.setModified(self.layer_list)
 
   def doCheckout(self,  revision,  tag=None):
-      print "Revision: %s" % (revision)
       if revision == None:
         QMessageBox.information(None, self.tr('Error'),  self.tr('Please select a valid revision'))
         return
@@ -385,7 +384,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
             if len(mySchema) == 0:
                 mySchema = 'public'
 
-            sql = "select * from versions.pgvscheckout(NULL::"+mySchema+"."+myTable.replace('_version', '')+", "+revision+")"
+            sql = "select * from versions.pgvscheckout(NULL::\""+mySchema+"\".\""+myTable.replace('_version', '')+"\", "+revision+")"
             myUri = QgsDataSourceURI(uri)
             myUri.setDataSource("", u"(%s\n)" % (sql), geomCol, "", uniqueCol)
 
