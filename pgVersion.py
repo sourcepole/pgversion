@@ -552,32 +552,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
             authority,  crs = currentLayer.crs().authid().split(':')
             geo_idx = '%s && ST_MakeEnvelope(%s,%s)' %  (geomCol,  extent,  crs)
 
-#            sql = ("with \
-#head as (select max(revision) as head from versions.\"{schema}_{table}_log\"), \
-#checkout as (select v.{cols} \
-#from versions.pgvscheckout(NULL::{schema}.{origin}, (select * from head), \'{geo_idx}\') as c, versions.\"{schema}_{table}_log\" as v \
-#where {geo_idx} \
-#and c.log_id = v.{uniqueCol}  \
-#and c.systime = v.systime), \
-#\
-#version as (select v.{cols}  \
-#from \"{schema}\".\"{table}\" as v \
-#where {geo_idx}) \
-#\
-#select row_number() OVER () AS rownum, *  \
-#from (select *, 'delete'::varchar as action, head as revision from head, ( \
-#(select * from checkout \
-#except \
-#select * from version) \
-#) as foo \
-#union all \
-#select *, 'insert'::varchar as action, head.head as revision \
-#from head, ( \
-#select * from version \
-#except \
-#select * from checkout) as foo1 \
-#) as foo ").format(schema = mySchema,  table=myTable,  origin=myTable.replace('_version', ''), cols = myCols,  uniqueCol = uniqueCol,  geo_idx = geo_idx )
-#            
+         
             sql = ("with \
 head as (select max(revision) as head from versions.\"{schema}_{origin}_version_log\"), \
 delete as (\
@@ -601,7 +576,6 @@ select * from delete \
 union  \
 select * from insert) as foo").format(schema = mySchema,  table=myTable,  origin=myTable.replace('_version', ''),  geo_idx = geo_idx)
 
-#            QMessageBox.information(None, '',  sql)
 
             myUri = QgsDataSourceURI(self.tools.layerUri(currentLayer))
             myUri.setDataSource("", u"(%s\n)" % sql, geomCol, "", "rownum")
