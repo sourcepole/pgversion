@@ -557,13 +557,15 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
             sql = ("with \
 head as (select max(revision) as head from versions.\"{schema}_{origin}_version_log\"), \
 delete as (\
-select *, 'delete'::varchar as action from (\
+select 'delete'::varchar as action, * \
+  from (\
   select * from versions.pgvscheckout(NULL::\"{schema}\".\"{origin}\",(select * from head), \'{geo_idx}\') \
   except \
   select * from \"{schema}\".\"{origin}_version\" where {geo_idx}\
   ) as foo \
 ), \
-insert as (select *, 'insert'::varchar as action \
+insert as (\
+select 'insert'::varchar as action, * \
   from ( \
     select * from \"{schema}\".\"{origin}_version\" where {geo_idx} \
 except \
