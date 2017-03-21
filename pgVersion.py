@@ -54,7 +54,7 @@ class PgVersion(QObject):
     self.tools = PgVersionTools(self)
 
     #Initialise thetranslation environment    
-    self.plugin_path = os.path.dirname(os.path.realpath(__file__))
+    self.plugin_path = QDir.cleanPath( os.path.abspath(os.path.dirname(__file__)) )
     myLocaleName = QLocale.system().name()
     myLocale = myLocaleName[0:2]
     if QFileInfo(self.plugin_path).exists():
