@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="de_CH">
+<TS version="2.0" language="de_DE">
 <context>
     <name>CommitMessage</name>
     <message>
@@ -389,12 +389,12 @@
         <translation>Sind sie sicher, dass Sie alle ausgewählten Objekte löschen wollen? Sie können diesen Schritt nicht rückgängig machen!</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="622"/>
+        <location filename="../pgVersion.py" line="624"/>
         <source>Please select a layer for versioning</source>
         <translation>Bitte wählen Sie eine Ebene zur Versionierung aus</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="629"/>
+        <location filename="../pgVersion.py" line="631"/>
         <source>Warning</source>
         <translation>Warnung</translation>
     </message>
@@ -409,12 +409,12 @@
         <translation>Wollen Sie die Versionierung für die Tabelle {0} erstellen?</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="625"/>
+        <location filename="../pgVersion.py" line="627"/>
         <source>Yes</source>
         <translation>Ja</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="625"/>
+        <location filename="../pgVersion.py" line="627"/>
         <source>No</source>
         <translation>Nein</translation>
     </message>
@@ -513,27 +513,27 @@ Bitte setzen Sie die gewünschten Benutzerrechte für die Tabelle {0} laden Sie 
         <translation>Alle Änderungen sind auf die HEAD Revision {0} zurückgesetzt worden</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="589"/>
+        <location filename="../pgVersion.py" line="591"/>
         <source>No diffs to HEAD detected! Layer could not be loaded.</source>
         <translation>Es konnten keine Unterschiede zur HEAD Revision gefunden werden! Die Ebene wurde nicht geladen.</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="603"/>
+        <location filename="../pgVersion.py" line="605"/>
         <source>Diff to HEAD revision was successful!</source>
         <translation>Auswerten der Unterschiede zur HEAD Revision war erfolgreich!</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="625"/>
+        <location filename="../pgVersion.py" line="627"/>
         <source>are you sure to to drop pgvs from the table {0}?</source>
         <translation>Sind Sie sicher, dass Sie die Versionierung von der Tabelle {0} löschen wollen?</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="639"/>
+        <location filename="../pgVersion.py" line="641"/>
         <source>Versioning for layer {0} dropped!</source>
         <translation>Versionierung der Ebene {0} gelöscht!</translation>
     </message>
     <message>
-        <location filename="../pgVersion.py" line="629"/>
+        <location filename="../pgVersion.py" line="631"/>
         <source>Layer %s has uncommited changes, please commit them or revert to HEAD revision</source>
         <translation>Die Ebene %s hat unübergebene Änderungen. Bitte übergeben Sie diese Änderungen oder setzen Sie auf die HEAD Version zurück</translation>
     </message>
