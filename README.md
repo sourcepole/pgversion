@@ -59,8 +59,6 @@
 <H1>2. TODO</H1>
 
 <UL>
-<LI>Version Diffs
-<LI>Tagged versions
 <LI>Branches 
 <LI>Merging of branches
 </UL>
