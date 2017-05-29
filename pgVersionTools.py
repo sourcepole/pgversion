@@ -47,20 +47,21 @@ class PgVersionTools(QObject):
 
       myUri = QgsDataSourceURI(layer.source())
 
+      if layer.dataProvider().name() == 'postgres':
       # If username and password are not saved in the DB settings
-      if myUri.username() == '':
-          connectionInfo = myUri.connectionInfo()
-          (success,  user,  password) =  QgsCredentials.instance().get(connectionInfo, None, None)
-          QgsCredentials.instance().put( connectionInfo, user, password )
-          myUri.setPassword(password)
-          myUri.setUsername(user)
-
-      try:
-          myDb = DbObj(pluginname=connectionName,typ='pg',hostname=myUri.host(),port=myUri.port(),dbname=myUri.database(),username=myUri.username(), passwort=myUri.password())
-          return myDb
-      except:
-          QMessageBox.information(None, self.tr('Error'), self.tr('No Database Connection Established.'))
-          return None
+          if myUri.username() == '':
+              connectionInfo = myUri.connectionInfo()
+              (success,  user,  password) =  QgsCredentials.instance().get(connectionInfo, None, None)
+              QgsCredentials.instance().put( connectionInfo, user, password )
+              myUri.setPassword(password)
+              myUri.setUsername(user)
+    
+          try:
+              myDb = DbObj(pluginname=connectionName,typ='pg',hostname=myUri.host(),port=myUri.port(),dbname=myUri.database(),username=myUri.username(), passwort=myUri.password())
+              return myDb
+          except:
+              QMessageBox.information(None, self.tr('Error'), self.tr('No Database Connection Established.'))
+              return None
 
       if not self.tools.check_PGVS_revision(myDb):
         return
@@ -81,25 +82,25 @@ class PgVersionTools(QObject):
       myDb.close()
 
   def hasVersion(self,  theLayer):
-        
+
         try:
             myLayerUri = QgsDataSourceURI(theLayer.source())
-    
+
             myDb = self.layerDB('hasVersion',  theLayer)
-    
+
             if myDb == None:
                 return None
-    
+
             if len(myLayerUri.schema()) == 1:
               schema = 'public'
             else:
               schema = myLayerUri.schema()
-    
-    
+
+
             sql = "select count(version_table_name) \
               from versions.version_tables import \
               where version_view_schema = '%s' and version_view_name = '%s'" % (schema,  myLayerUri.table())
-              
+
             result = myDb.read(sql)
             myDb.close()
             try:
@@ -111,7 +112,7 @@ class PgVersionTools(QObject):
                 return False
         except:
             pass
-      
+
   def isModified(self, myLayer=None):
 
         myLayerUri = QgsDataSourceURI(myLayer.source())
@@ -143,7 +144,7 @@ class PgVersionTools(QObject):
   def setModified(self,  layer_list):
 
     layer_list = list(set(layer_list))
-    
+
     for i in range(len(layer_list)):
         map_layer = QgsMapLayerRegistry.instance().mapLayer(layer_list[i])
         if self.isModified(map_layer):
@@ -157,9 +158,9 @@ class PgVersionTools(QObject):
                 map_layer.setName(map_layer.name().replace(' (modified)', ''))      
             else:
                 map_layer.setLayerName(map_layer.name().replace(' (modified)', ''))      
-    
-    
-    
+
+
+
     # Return QgsVectorLayer from a layer name ( as string )
   def vectorLayerExists(self,   myName ):
      layermap = QgsMapLayerRegistry.instance().mapLayers()
@@ -263,11 +264,11 @@ class PgVersionTools(QObject):
 #          QMessageBox.information(None, '',  sql)
           result = myDb.read(sql)
           myDb.close()        
-          
+
           for i in range(len(result["CONFLICT_USER"])):
               confRecords.append("Commit all changes of - %s" % (result['MYUSER'][i]))
               confRecords.append("Commit all changes of - %s" % (result['CONFLICT_USER'][i]))
-          
+
           confRecords = list(set(confRecords))
 
           for i in range(len(result["CONFLICT_USER"])):
@@ -289,10 +290,10 @@ class PgVersionTools(QObject):
       sql =   "select * from versions.version_tables \
           where version_view_schema = '%s' and version_view_name = '%s'" %(mySchema,  myTable)
       layer = myDb.read(sql)              
-            
+
       sql = "select objectkey, myversion_log_id, conflict_version_log_id \
           from versions.pgvscheck('%s.%s')" % (mySchema,  myTable.replace("_version", ""))
-                    
+
       result = myDb.read(sql)          
       timeListString = ''
       keyString = ''
@@ -307,7 +308,7 @@ class PgVersionTools(QObject):
       sql = 'select * from versions."%s_%s_log" \
            where version_log_id in (%s)\
            order by "%s"' % (mySchema,  myTable,  timeListString,  layer["VERSION_VIEW_PKEY"][0])
-           
+
 
       result = myDb.read(sql)
       try:
@@ -316,15 +317,15 @@ class PgVersionTools(QObject):
           cols.remove('systime')
           cols.remove('commit')
           cols.remove(geomCol)
-    
+
           cols.insert(0, cols.pop(-1))
           cols.insert(0, cols.pop(-1))
           cols.insert(0, cols.pop(-1))
-    
+
           resultArray = []
           resultArray.append(result)
           resultArray.append(cols)
-          
+
           myDb.close()
           return resultArray
       except:
@@ -375,8 +376,8 @@ class PgVersionTools(QObject):
 
 
   def create_memory_layer(self,  layer,  name):
-      
-      
+
+
         feats = [feat for feat in layer.getFeatures()]
         if layer.geometryType() ==QGis.Point:
             layer_type = 'Point?crs='+layer.crs().authid()
@@ -384,15 +385,15 @@ class PgVersionTools(QObject):
             layer_type = 'LineString?crs='+layer.crs().authid()
         if layer.geometryType() ==QGis.Polygon:
             layer_type = 'Polygon?crs='+layer.crs().authid()
-            
+
         mem_layer = QgsVectorLayer(layer_type, name, "memory")
-        
+
         mem_layer_data = mem_layer.dataProvider()
         attr = layer.dataProvider().fields().toList()
         mem_layer_data.addAttributes(attr)
         mem_layer.updateFields()
         mem_layer_data.addFeatures(feats)
-        
+
         return mem_layer
 
 
@@ -405,7 +406,7 @@ class PgVersionTools(QObject):
   def check_PGVS_revision(self,    myDb):          
         create_version_path = '%s/docs/create_pgversion_schema.sql' % (self.parent.plugin_path)
         upgrade_version_path = '%s/docs/upgrade_pgversion_schema.sql' % (self.parent.plugin_path)          
-        
+
         if not myDb.exists('table',  'versions.version_tables'):
             self.vsCheck = DbVersionCheckDialog(myDb,  '',  create_version_path,  'install')
             revisionMessage = self.tr("pgvs is not installed in the selected DB.\n\n\
@@ -418,21 +419,21 @@ functions directly with click on Install pgvs." %(create_version_path))
             return False
         else:  
             result = myDb.read('select pgvsrevision from versions.pgvsrevision()')
-            
+
             my_major_revision = self.pgvsRevision.split('.')[1]
             my_minor_revision = self.pgvsRevision.split('.')[2]
             db_major_revision = result["PGVSREVISION"][0].split('.')[1]
             db_minor_revision = result["PGVSREVISION"][0].split('.')[2]
-            
+
             for i in range(int(db_minor_revision), int(my_minor_revision)):
-            
+
                 if my_major_revision+"."+my_minor_revision != db_major_revision+"."+db_minor_revision:
                     upgrade_version_path = '%s/docs/upgrade_pgversion_schema-2.%s.%s.sql' % (self.parent.plugin_path,  db_major_revision,  i)
                     self.vsCheck = DbVersionCheckDialog(myDb,  result["PGVSREVISION"][0],  upgrade_version_path,  'upgrade')              
                     revisionMessage =self.tr('The Plugin expects pgvs revision %s but DB-functions revision %s are installed.\n\n \
     Please contact your DB-administrator to upgrade the DB-functions from the file:\n\n %s\n\n \
     If you have appropriate DB permissions you can update the DB directly with click on DB-Update.') % (self.pgvsRevision,  result["PGVSREVISION"][0],  upgrade_version_path)
-                    
+
                     self.vsCheck.messageTextEdit.setText(revisionMessage)
                     self.vsCheck.btnUpdate.setText(self.tr('Upgrade pgvs to Revision %s.%s.%s') % (2,  my_major_revision,  i+1))
                     self.vsCheck.show()
@@ -463,37 +464,37 @@ functions directly with click on Install pgvs." %(create_version_path))
 
   def layerGeomCol(self,  layer):
       return QgsDataSourceURI(self.layerUri(layer)).geometryColumn()
-      
+
   def layerSchema(self,  layer):
       mySchema = QgsDataSourceURI(self.layerUri(layer)).schema()
       if len(mySchema) == 0:
           mySchema = 'public'
       return mySchema
-      
+
   def layerTable(self,  layer):  
       return QgsDataSourceURI(self.layerUri(layer)).table()
-      
+
   def layerName(self,  layer):  
       return QgsDataSourceURI(layer.name())
 
   def layerKeyCol(self,  layer):
       return QgsDataSourceURI(self.layerUri(layer)).keyColumn()
-      
+
   def layerUri(self,  layer):
       provider = layer.dataProvider()
       return provider.dataSourceUri()
-      
+
   def layerGeometryType(self,  layer):
       return layer.geometryType()      
-      
+
   def layerHost(self,  layer):
       return QgsDataSourceURI(self.layerUri(layer)).host()
-      
+
   def layerPassword(self,  layer):
       return QgsDataSourceURI(self.layerUri(layer)).password()
-      
+
   def layerPort(self,  layer):
       return QgsDataSourceURI(self.layerUri(layer)).port()
-      
+
   def layerUsername(self,  layer):
       return QgsDataSourceURI(self.layerUri(layer)).username()      
