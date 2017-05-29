@@ -59,8 +59,6 @@
 <H1>2. TODO</H1>
 
 <UL>
-<LI>Version Diffs
-<LI>Tagged versions
 <LI>Branches 
 <LI>Merging of branches
 </UL>
@@ -90,7 +88,7 @@ A <A HREF="http://www.portailsig.org/content/pgversion-le-plugin-de-versionnemen
 <H1>5. Download:</H1>
 
 <P>
-Download <A HREF="https://github.com/sourcepole/pgversion/blob/master/docs/extension/pgversion--2.0.0.sql">createFunctions.sql</A>
+Download <A HREF="https://github.com/sourcepole/pgversion/blob/master/docs/create_pgversion_schema.sql">create_pgversion_schema.sql</A>
 </P>
 
 <A NAME="toc7"></A>
