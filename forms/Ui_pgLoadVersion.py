@@ -65,7 +65,8 @@ class PgVersionLoadDialog(QDialog, Ui_pgLoadVersion):
             (success, user, password) = QgsCredentials.instance().get(connectionInfo, None, None)
             if not success:
                 return None
-            self.iface.instance().put(connectionInfo, user, password)
+#            self.iface.instance().put(connectionInfo, user, password)
+            QgsCredentials.instance().put(connectionInfo, user, password)
             DBUSER = user
             DBPASSWD = password
         

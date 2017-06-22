@@ -135,10 +135,13 @@ class PgVersionTools(QObject):
         result = myDb.read(sql)
         myDb.close()
 
-        if int(result["COUNT"][0]) == 0:
-          return False
-        else:
-          return True      
+        try:
+            if int(result["COUNT"][0]) == 0:
+              return False
+            else:
+              return True      
+        except:
+            return False
 
 
   def setModified(self,  layer_list):
