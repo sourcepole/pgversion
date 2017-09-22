@@ -243,7 +243,10 @@ class PgVersion(QObject):
         QApplication.setOverrideCursor(Qt.WaitCursor)
         sql = "select * from versions.pgvsinit('%s.%s')" % (mySchema,  myTable)
         result = myDb.runError(sql)
+        
         if result == ' ':
+          sql = "GRANT ALL ON TABLE %s.%s TO versions" % (mySchema,  myTable);
+          grant_result = myDb.runError(sql)            
           QMessageBox. information(None, 'Init', self.tr( 'Init was successful!\n\n\
 Please set the user permissions for table {0} and reload it via Database -> PG Version!').format(myTable))
 
