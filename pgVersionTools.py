@@ -380,7 +380,6 @@ class PgVersionTools(QObject):
 
   def create_memory_layer(self,  layer,  name):
 
-
         feats = [feat for feat in layer.getFeatures()]
         if layer.geometryType() ==QGis.Point:
             layer_type = 'Point?crs='+layer.crs().authid()

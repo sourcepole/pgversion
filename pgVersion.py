@@ -148,17 +148,17 @@ class PgVersion(QObject):
 
   def onSelectionChanged(self):
         current_layer = self.iface.mapCanvas().currentLayer()
-        if current_layer.selectedFeatureCount() == 0:
-            self.actionDelete.setEnabled(False)
-        else:
-            if self.tools.hasVersion(current_layer):
-                print current_layer.isEditable()
-                if current_layer.isEditable():
-                    self.actionDelete.setEnabled(True) # true
-                else:
-                    self.actionDelete.setEnabled(False)
+        if current_layer is not None:
+            if (current_layer.type() == QgsMapLayer.VectorLayer) and current_layer.selectedFeatureCount() == 0:
+                self.actionDelete.setEnabled(False)
             else:
-                self.actionDelete.setEnabled(False) # true
+                if self.tools.hasVersion(current_layer):
+                    if current_layer.isEditable():
+                        self.actionDelete.setEnabled(True) # true
+                    else:
+                        self.actionDelete.setEnabled(False)
+                else:
+                    self.actionDelete.setEnabled(False) # true
       
       
   def add_layer(self,  l):
