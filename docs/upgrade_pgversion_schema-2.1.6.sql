@@ -1,11 +1,11 @@
 -- Database diff generated with pgModeler (PostgreSQL Database Modeler).
--- pgModeler  version: 0.9.0-beta
--- PostgreSQL version: 9.3
+-- pgModeler  version: 0.9.0
+-- PostgreSQL version: 9.4
 
 -- [ Diff summary ]
--- Dropped objects: 2
--- Created objects: 0
--- Changed objects: 4
+-- Dropped objects: 1
+-- Created objects: 1
+-- Changed objects: 5
 -- Truncated tables: 0
 
 SET check_function_bodies = false;
@@ -18,8 +18,59 @@ SET search_path=public,pg_catalog,versions;
 -- [ Dropped objects ] --
 DROP FUNCTION IF EXISTS versions._hasserial(character varying) CASCADE;
 -- ddl-end --
-DROP FUNCTION IF EXISTS versions.pgvscheckout(IN character varying,IN bigint) CASCADE;
+
+
+-- [ Created objects ] --
+-- object: versions._hasserial | type: FUNCTION --
+-- DROP FUNCTION IF EXISTS versions._hasserial(IN character varying) CASCADE;
+CREATE FUNCTION versions._hasserial (IN in_table character varying)
+	RETURNS boolean
+	LANGUAGE plpgsql
+	VOLATILE 
+	CALLED ON NULL INPUT
+	SECURITY INVOKER
+	COST 1
+	AS $$
+DECLARE
+  qry TEXT;
+  pos INTEGER;
+  my_schema TEXT;
+  my_table TEXT;
+  my_serial_rec RECORD;
+
+
+BEGIN
+    pos := strpos(in_table,'.');
+  
+    if pos=0 then 
+      my_schema := 'public';
+  	  my_table := in_table; 
+    else 
+        my_schema := substr(in_table,0,pos);
+        pos := pos + 1; 
+        my_table := substr(in_table,pos);
+    END IF;  
+
+  -- Check if SERIAL exists and which column represents it 
+    select into my_serial_rec column_name as att, 
+               data_type as typ, column_default
+    from information_schema.columns as col
+    where table_schema = my_schema::name
+      and table_name = my_table::name
+      and (position('nextval' in lower(column_default)) is NOT NULL 
+      or position('nextval' in lower(column_default)) <> 0);	
+  
+    IF FOUND THEN
+       RETURN 'true';
+    else
+       RAISE EXCEPTION 'Table %.% does not has a serial defined', my_schema, my_table;
+    END IF;
+END;
+$$;
 -- ddl-end --
+ALTER FUNCTION versions._hasserial(IN character varying) OWNER TO versions;
+-- ddl-end --
+
 
 
 -- [ Changed objects ] --
@@ -266,6 +317,32 @@ CREATE OR REPLACE FUNCTION versions.pgvsinit ( _param1 character varying)
 $$;
 -- ddl-end --
 ALTER FUNCTION versions.pgvsinit(character varying) OWNER TO versions;
+-- ddl-end --
+
+-- object: versions.pgvsrevision | type: FUNCTION --
+-- DROP FUNCTION IF EXISTS versions.pgvsrevision() CASCADE;
+CREATE OR REPLACE FUNCTION versions.pgvsrevision ()
+	RETURNS text
+	LANGUAGE plpgsql
+	VOLATILE 
+	CALLED ON NULL INPUT
+	SECURITY INVOKER
+	COST 100
+	AS $$
+
+    
+DECLARE
+  revision TEXT;
+  BEGIN	
+    revision := '2.1.7';
+  RETURN revision ;                             
+
+  END;
+
+
+$$;
+-- ddl-end --
+ALTER FUNCTION versions.pgvsrevision() OWNER TO versions;
 -- ddl-end --
 
 -- object: versions.pgvsrollback | type: FUNCTION --
@@ -592,19 +669,19 @@ $$;
 
 
 -- [ Created permissions ] --
--- object: grant_4ae2a3f7ff | type: PERMISSION --
+-- object: grant_d2c1412992 | type: PERMISSION --
 GRANT SELECT,UPDATE,USAGE
    ON SEQUENCE versions.version_tables_logmsg_id_seq
    TO versions;
 -- ddl-end --
 
--- object: grant_7c3c8ee8ce | type: PERMISSION --
+-- object: grant_4e0de5b52c | type: PERMISSION --
 GRANT SELECT,UPDATE,USAGE
    ON SEQUENCE versions.version_tables_version_table_id_seq
    TO versions;
 -- ddl-end --
 
--- object: grant_e588865f33 | type: PERMISSION --
+-- object: grant_1d6f94aa73 | type: PERMISSION --
 GRANT SELECT,UPDATE,USAGE
    ON SEQUENCE versions.version_tags_tags_id_seq
    TO versions;
