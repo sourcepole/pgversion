@@ -9,7 +9,7 @@ from PyQt4.QtCore import *
 from qgis.core import *
 from qgis.gui import *
 from ..dbtools.dbTools import *
-from ..pgVersionTools import PgVersionTools
+from ..pgversion_tools import PgVersionTools
 from Ui_Ui_diff import Ui_DiffDlg
 
 class DiffDlg(QDialog, Ui_DiffDlg):

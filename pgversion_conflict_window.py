@@ -2,7 +2,7 @@ from qgis.gui import *
 from qgis.core import *
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
-from pgVersionTools import PgVersionTools
+from pgversion_tools import PgVersionTools
 import apicompat
 
 import resources_rc,  sys
@@ -45,10 +45,10 @@ class ConflictWindow(QMainWindow):
     self.setCentralWidget(self.canvas)
     
 
-    actionZoomIn = QAction(QIcon(":/plugins/pgversion/icons/ZoomIn.png"), pystring("Zoom in"), self)
-    actionZoomOut = QAction(QIcon(":/plugins/pgversion/icons/ZoomOut.png"),pystring("Zoom out"), self)
-    actionZoomFull = QAction(QIcon(":/plugins/pgversion/icons/ZoomFullExtent.png"),pystring("Fullextent"), self)
-    actionPan = QAction(QIcon(":/plugins/pgversion/icons/Pan.png"),pystring("Pan"), self)
+    actionZoomIn = QAction(QIcon(":/plugins/pgversion/icons/mActionZoomIn.png"), pystring("Zoom in"), self)
+    actionZoomOut = QAction(QIcon(":/plugins/pgversion/icons/mActionZoomOut.png"),pystring("Zoom out"), self)
+    actionZoomFull = QAction(QIcon(":/plugins/pgversion/icons/mActionZoomFullExtent.png"),pystring("Fullextent"), self)
+    actionPan = QAction(QIcon(":/plugins/pgversion/icons/mActionPan.png"),pystring("Pan"), self)
 
     actionZoomIn.setCheckable(True)
     actionZoomOut.setCheckable(True)

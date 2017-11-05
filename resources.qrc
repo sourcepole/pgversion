@@ -1,8 +1,9 @@
 <RCC> 
   <qresource prefix="/plugins/pgversion" > 
-    <file>icons/ZoomIn.png</file> 
-    <file>icons/ZoomOut.png</file> 
-    <file>icons/Pan.png</file> 
+    <file>icons/mActionZoomIn.png</file> 
+    <file>icons/mActionZoomOut.png</file> 
+    <file>icons/mActionPan.png</file> 
+    <file>icons/mActionZoomFullExtent.png</file> 
     <file>icons/pgversion-init.png</file>
     <file>icons/pgversion-load.png</file>
     <file>icons/pgversion-commit.png</file>
@@ -10,6 +11,7 @@
     <file>icons/pgversion-revert.png</file>
     <file>icons/pgversion-diff.png</file>
     <file>icons/pgversion-logview.png</file>
+    <file>icons/pgversion-feature-info.png</file>
   </qresource> 
 </RCC> 
 

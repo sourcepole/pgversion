@@ -1,10 +1,10 @@
 -- Database diff generated with pgModeler (PostgreSQL Database Modeler).
--- pgModeler  version: 0.9.0
+-- pgModeler  version: 0.9.1-alpha
 -- PostgreSQL version: 9.4
 
 -- [ Diff summary ]
--- Dropped objects: 1
--- Created objects: 1
+-- Dropped objects: 2
+-- Created objects: 6
 -- Changed objects: 5
 -- Truncated tables: 0
 
@@ -16,13 +16,20 @@ SET search_path=public,pg_catalog,versions;
 
 
 -- [ Dropped objects ] --
-DROP FUNCTION IF EXISTS versions._hasserial(character varying) CASCADE;
+ALTER TABLE versions.version_tags DROP CONSTRAINT IF EXISTS version_tables_fk CASCADE;
+-- ddl-end --
+ALTER TABLE versions.version_tags DROP CONSTRAINT IF EXISTS version_tags_pkey CASCADE;
 -- ddl-end --
 
 
 -- [ Created objects ] --
 -- object: versions._hasserial | type: FUNCTION --
 -- DROP FUNCTION IF EXISTS versions._hasserial(IN character varying) CASCADE;
+
+-- Prepended SQL commands --
+drop function IF EXISTS versions._hasserial(IN character varying);
+-- ddl-end --
+
 CREATE FUNCTION versions._hasserial (IN in_table character varying)
 	RETURNS boolean
 	LANGUAGE plpgsql
@@ -71,6 +78,72 @@ $$;
 ALTER FUNCTION versions._hasserial(IN character varying) OWNER TO versions;
 -- ddl-end --
 
+-- object: versions.version_branch | type: TABLE --
+-- DROP TABLE IF EXISTS versions.version_branch CASCADE;
+CREATE TABLE versions.version_branch(
+	branch_id bigserial NOT NULL,
+	version_table_id bigint NOT NULL,
+	branch_text character varying NOT NULL,
+	CONSTRAINT version_tags_pkey_1 PRIMARY KEY (branch_id,version_table_id,branch_text)
+
+);
+-- ddl-end --
+ALTER TABLE versions.version_branch OWNER TO versions;
+-- ddl-end --
+
+-- object: versions.pgvsmakebranch | type: FUNCTION --
+-- DROP FUNCTION IF EXISTS versions.pgvsmakebranch(IN character varying,IN varchar) CASCADE;
+
+-- Prepended SQL commands --
+drop function IF EXISTS versions.pgvsmakebranch(IN character varying,IN varchar)
+-- ddl-end --
+
+CREATE FUNCTION versions.pgvsmakebranch (IN in_table character varying, IN branch_name varchar)
+	RETURNS bigint
+	LANGUAGE plpgsql
+	VOLATILE 
+	CALLED ON NULL INPUT
+	SECURITY INVOKER
+	COST 100
+	AS $$
+
+  DECLARE
+    mySchema TEXT;
+    myTable TEXT;
+    myPkey TEXT;
+    pos integer;
+    versionLogTable TEXT;
+
+  BEGIN	
+    pos := strpos(in_table,'.');
+  
+    if pos=0 then 
+        mySchema := 'public';
+  	    myTable := in_table; 
+    else 
+        mySchema := substr(in_table,0,pos);
+        pos := pos + 1; 
+        myTable := substr(in_table,pos);
+    END IF;  
+    
+    versionLogTable := 'versions.'||quote_ident(mySchema||'_'||myTable||'_version_log');   
+
+    execute format('INSERT INTO versions.version_branch(version_table_id, revision, branch_text) 
+                      SELECT version_table_id, 0 as revision, ''%3$s'' as branch_text 
+                      FROM versions.version_tables 
+                      where version_table_schema = ''%1$s'' 
+                        and version_table_name = ''%2$s''', mySchema, myTable, branch_name); 
+
+  
+    RETURN (select last_value from versions.version_branch_branch_id_seq);
+  
+  END;
+
+$$;
+-- ddl-end --
+ALTER FUNCTION versions.pgvsmakebranch(IN character varying,IN varchar) OWNER TO versions;
+-- ddl-end --
+
 
 
 -- [ Changed objects ] --
@@ -112,7 +185,8 @@ CREATE OR REPLACE FUNCTION versions.pgvsinit ( _param1 character varying)
     myPkeyRec record;
     testTab TEXT;
     archiveWhere TEXT;
-    sql TEXT;    
+    sql TEXT;   
+    last_value BIGINT; 
     
 
   BEGIN	
@@ -214,6 +288,8 @@ CREATE OR REPLACE FUNCTION versions.pgvsinit ( _param1 character varying)
              alter table '||versionLogTable||' add column project character varying default current_user;     
              alter table '||versionLogTable||' add column systime bigint default extract(epoch from now()::timestamp)*1000;    
              alter table '||versionLogTable||' add column revision bigint;
+             alter table '||versionLogTable||' add column parent_branch bigint;
+             alter table '||versionLogTable||' add column child_branch bigint;
              alter table '||versionLogTable||' add column logmsg text;        
              alter table '||versionLogTable||' add column commit boolean DEFAULT False;
              alter table '||versionLogTable||' add constraint '||myTable||'_pkey primary key ('||myPkey||',project,systime,action);
@@ -300,13 +376,20 @@ CREATE OR REPLACE FUNCTION versions.pgvsinit ( _param1 character varying)
                 select '||myPkey||','||fields||', ''insert'' as action, 0 as revision, ''initial commit revision 0'' as logmsg, ''t'' as commit 
                 from '||quote_ident(mySchema)||'.'||quote_ident(myTable);                          
 
-     execute 'INSERT INTO versions.version_tables_logmsg(
+     execute format('INSERT INTO versions.version_tables_logmsg(
                 version_table_id, revision, logmsg) 
-              SELECT version_table_id, 0 as revision, ''initial commit revision 0'' as logmsg FROM versions.version_tables where version_table_schema = '''||mySchema||''' and version_table_name = '''|| myTable||''''; 
+              SELECT version_table_id, 0 as revision, ''initial commit revision 0'' as logmsg FROM versions.version_tables where version_table_schema = ''%1$s'' and version_table_name = ''%2$s''', mySchema, myTable); 
 
-     execute 'INSERT INTO versions.version_tags(
+     execute format('INSERT INTO versions.version_tags(
                 version_table_id, revision, tag_text) 
-              SELECT version_table_id, 0 as revision, ''initial commit revision 0'' as tag_text FROM versions.version_tables where version_table_schema = '''||mySchema||''' and version_table_name = '''|| myTable||''''; 
+              SELECT version_table_id, 0 as revision, ''initial commit revision 0'' as tag_text FROM versions.version_tables where version_table_schema = ''%1$s'' and version_table_name = ''%2$s''', mySchema, myTable); 
+
+     execute format('INSERT INTO versions.version_branch(
+                version_table_id, branch_text) 
+              SELECT version_table_id, ''master'' as branch_text FROM versions.version_tables where version_table_schema = ''%1$s'' and version_table_name = ''%2$s''', mySchema, myTable); 
+
+     execute format('update %1$s set parent_branch = CURRVAL(''versions.version_branch_branch_id_seq'')',versionLogTable);
+     execute format('update %1$s set child_branch = CURRVAL(''versions.version_branch_branch_id_seq'')',versionLogTable);
 
                 
   RETURN true ;                             
@@ -334,7 +417,7 @@ CREATE OR REPLACE FUNCTION versions.pgvsrevision ()
 DECLARE
   revision TEXT;
   BEGIN	
-    revision := '2.1.8';
+    revision := '218';
   RETURN revision ;                             
 
   END;
@@ -668,20 +751,45 @@ $$;
 
 
 
+-- [ Created constraints ] --
+-- object: version_tags_pkey | type: CONSTRAINT --
+-- ALTER TABLE versions.version_tags DROP CONSTRAINT IF EXISTS version_tags_pkey CASCADE;
+ALTER TABLE versions.version_tags ADD CONSTRAINT version_tags_pkey PRIMARY KEY (tags_id,version_table_id,revision,tag_text);
+-- ddl-end --
+
+
+
+-- [ Created foreign keys ] --
+-- object: version_tables_fk_cp | type: CONSTRAINT --
+-- ALTER TABLE versions.version_branch DROP CONSTRAINT IF EXISTS version_tables_fk_cp CASCADE;
+ALTER TABLE versions.version_branch ADD CONSTRAINT version_tables_fk_cp FOREIGN KEY (version_table_id)
+REFERENCES versions.version_tables (version_table_id) MATCH FULL
+ON DELETE CASCADE ON UPDATE CASCADE;
+-- ddl-end --
+
+-- object: version_tables_fk | type: CONSTRAINT --
+-- ALTER TABLE versions.version_tags DROP CONSTRAINT IF EXISTS version_tables_fk CASCADE;
+ALTER TABLE versions.version_tags ADD CONSTRAINT version_tables_fk FOREIGN KEY (version_table_id)
+REFERENCES versions.version_tables (version_table_id) MATCH FULL
+ON DELETE CASCADE ON UPDATE CASCADE;
+-- ddl-end --
+
+
+
 -- [ Created permissions ] --
--- object: grant_d2c1412992 | type: PERMISSION --
+-- object: grant_7b6f035226 | type: PERMISSION --
 GRANT SELECT,UPDATE,USAGE
    ON SEQUENCE versions.version_tables_logmsg_id_seq
    TO versions;
 -- ddl-end --
 
--- object: grant_4e0de5b52c | type: PERMISSION --
+-- object: grant_14e32fb692 | type: PERMISSION --
 GRANT SELECT,UPDATE,USAGE
    ON SEQUENCE versions.version_tables_version_table_id_seq
    TO versions;
 -- ddl-end --
 
--- object: grant_1d6f94aa73 | type: PERMISSION --
+-- object: grant_514df00181 | type: PERMISSION --
 GRANT SELECT,UPDATE,USAGE
    ON SEQUENCE versions.version_tags_tags_id_seq
    TO versions;

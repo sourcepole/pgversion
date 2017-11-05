@@ -17,15 +17,20 @@ email                : horst.duester@sourcepole.ch
  *                                                                         *
  ***************************************************************************/
 """
+from PyQt4 import uic
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from qgis.core import *
 from pgversion.dbtools.dbTools import *
-from pgversion.pgVersionTools import *
-from Ui_Ui_pgLoadVersion import Ui_pgLoadVersion
+from pgversion.pgversion_tools import *
 import pgversion.apicompat as pgversion
 
-class PgVersionLoadDialog(QDialog, Ui_pgLoadVersion):
+import os
+
+FORM_CLASS, _ = uic.loadUiType(os.path.join(
+    os.path.dirname(__file__), 'load_version.ui'))
+
+class PgVersionLoadDialog(QDialog, FORM_CLASS):
     
     def __init__(self, parent):
         QDialog.__init__(self)

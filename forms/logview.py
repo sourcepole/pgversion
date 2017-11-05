@@ -3,15 +3,16 @@
 """
 Module implementing LogView.
 """
-
+from PyQt4 import uic
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
+from pgversion.pgversion_tools import PgVersionTools
+import os
 
-from Ui_Ui_LogView import Ui_LogView
-#from pgversion.dbtools.dbTools import *
-from pgversion.pgVersionTools import PgVersionTools
+FORM_CLASS, _ = uic.loadUiType(os.path.join(
+    os.path.dirname(__file__), 'logview.ui'))
 
-class LogView(QDialog, Ui_LogView):
+class LogView(QDialog, FORM_CLASS):
     """
     Class documentation goes here.
     """
@@ -29,15 +30,17 @@ class LogView(QDialog, Ui_LogView):
         
         self.iface = parent.iface
         self.tools = PgVersionTools(parent)
+        self.parent = parent
     
         self.myAction = QAction(QIcon(""), self.tr("Set Tag for current revision"),  self)
         self.myAction.setStatusTip(self.tr("Set Tag for current revision"))
         self.myAction.triggered.connect(self.setTag)
         self.treeWidget.addAction(self.myAction)
-        self.treeWidget.setContextMenuPolicy(Qt.ActionsContextMenu);    
-                
+        self.treeWidget.setContextMenuPolicy(Qt.ActionsContextMenu)
+                        
     def setLayer(self,  theLayer):
         self.theLayer = theLayer
+        self.setWindowTitle(self.tr('Logview for layer %s' % (self.theLayer.name())))
         
     def createTagList(self):
         
@@ -132,3 +135,10 @@ class LogView(QDialog, Ui_LogView):
     def on_btnTag_clicked(self):
         if self.cmbTags.currentIndex() > 0:
             self.checkoutTag.emit(self.cmbTags.itemData(self.cmbTags.currentIndex()),  self.cmbTags.itemText(self.cmbTags.currentIndex()))    
+    
+    @pyqtSignature("")
+    def on_btn_create_branch_clicked(self):
+        """
+        Slot documentation goes here.
+        """
+        pass

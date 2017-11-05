@@ -19,14 +19,16 @@
  *                                                                         *
  ***************************************************************************/
 """
-
+from PyQt4 import uic
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from qgis.core import *
-from Ui_ui_about import Ui_dlgAbout
 import webbrowser, os
 
-class DlgAbout( QDialog, Ui_dlgAbout ):
+FORM_CLASS, _ = uic.loadUiType(os.path.join(
+    os.path.dirname(__file__), 'about.ui'))
+
+class DlgAbout( QDialog, FORM_CLASS ):
     def __init__( self,  plugindir ):
         QDialog.__init__( self)
         self.setupUi( self )
@@ -47,10 +49,10 @@ class DlgAbout( QDialog, Ui_dlgAbout ):
         contribString = self.tr("<p><center><b>Author(s):</b></center></p>") 
         contribString += self.tr(u"<p>")+result['author']+"<br><br>"
         
-        sponsorString = self.tr(u"<b>The development of PgVersion was funded by:</b><br><br>")  
-        sponsorString += self.tr(u"- Sourcepole AG, Weberstrasse 5, CH-8004 Zurich<br>")        
-        sponsorString += self.tr(u"- Canton of Glarus / Switzerland<br>")
-        sponsorString += self.tr(u"- Lower Saxony Ministry of Food, Agriculture and consumer protection / Germany<br>" )
+#        sponsorString = self.tr(u"<b>The development of PgVersion was funded by:</b><br><br>")  
+#        sponsorString += self.tr(u"- Sourcepole AG, Weberstrasse 5, CH-8004 Zurich<br>")        
+#        sponsorString += self.tr(u"- Canton of Glarus / Switzerland<br>")
+#        sponsorString += self.tr(u"- Lower Saxony Ministry of Food, Agriculture and consumer protection / Germany<br>" )
          
         licenseString = pystring(self.tr(u"Sourcepole AG - Linux & Open Source Solutions\n"))
         licenseString += self.tr(u"Weberstrasse 5, 8004 Zürich, Switzerland\n")
@@ -67,7 +69,7 @@ class DlgAbout( QDialog, Ui_dlgAbout ):
         # write texts
         self.memAbout.setText( aboutString )
         self.memContrib.setText(contribString )
-        self.memSponsor.setText(sponsorString)
+#        self.memSponsor.setText(sponsorString)
         self.memAcknowl.setText( licenseString )
         self.memChangeLog.setText( result['changelog'] )
                 

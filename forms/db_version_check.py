@@ -3,13 +3,17 @@
 """
 Module implementing DbVersionCheck.
 """
+from PyQt4 import uic
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from qgis.core import *
 
-from Ui_Ui_dbVersionCheck import Ui_DbVersionCheck
+import os
 
-class DbVersionCheckDialog(QDialog, Ui_DbVersionCheck):
+FORM_CLASS, _ = uic.loadUiType(os.path.join(
+    os.path.dirname(__file__), 'db_version_check.ui'))
+    
+class DbVersionCheckDialog(QDialog, FORM_CLASS):
     """
     Class documentation goes here.
     """

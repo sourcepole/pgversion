@@ -25,21 +25,15 @@ from PyQt4.QtWebKit import QWebView
 from qgis.core import *
 from qgis.gui import *
 from dbtools.dbTools import *
-from forms.Ui_CommitMessage import CommitMessageDialog
-from forms.Ui_diff import DiffDlg
-from pgVersionConflictWindow import ConflictWindow
-    
-# Initialize Qt resources from file resources.py
-import resources_rc,  traceback,  string
-# Import the code for the dialog
-
-from forms.Ui_pgLoadVersion import PgVersionLoadDialog
-from forms.Ui_help import HelpDialog
-from forms.Ui_LogView import LogView
-from pgVersionTools import PgVersionTools
+from forms.commit_message import CommitMessageDialog
+from pgversion_conflict_window import ConflictWindow
+from pgversion_featureinfo import FeatureHistory
+from forms.load_version import PgVersionLoadDialog
+from forms.help import HelpDialog
+from forms.logview import LogView
+from pgversion_tools import PgVersionTools
 from about.doAbout import  DlgAbout
-
-import apicompat,  tempfile,  os
+import resources_rc,  traceback,  string,  apicompat,  tempfile,  os
 
 
 class PgVersion(QObject): 
@@ -51,7 +45,6 @@ class PgVersion(QObject):
     self.w = None
     self.vsCheck = None
     self.layer_list = []
-    self.tools = PgVersionTools(self)
 
     #Initialise thetranslation environment    
     self.plugin_path = QDir.cleanPath( os.path.abspath(os.path.dirname(__file__)) )
@@ -76,10 +69,11 @@ class PgVersion(QObject):
 
     self.helpDialog = HelpDialog()
     self.LogViewDialog = LogView(self)
+    self.feature_history = FeatureHistory( self.iface )
+    self.tools = PgVersionTools(self)
 
     self.toolBar = self.iface.addToolBar("PG Version")
     self.toolBar.setObjectName("PG Version")
-
 
     self.actionInit = QAction(QIcon(":/plugins/pgversion/icons/pgversion-init.png"), self.tr("Prepare Layer for Versioning"), self.iface.mainWindow())
     self.actionLoad = QAction(QIcon(":/plugins/pgversion/icons/pgversion-commit.png"), self.tr("Load Versioned Layer"), self.iface.mainWindow())
@@ -87,25 +81,24 @@ class PgVersion(QObject):
     self.actionRevert = QAction(QIcon(":/plugins/pgversion/icons/pgversion-revert.png"), self.tr("Revert to HEAD Revision"), self.iface.mainWindow())
     self.actionLogView = QAction(QIcon(":/plugins/pgversion/icons/pgversion-logview.png"), self.tr("Show Logs"), self.iface.mainWindow())
     self.actionDiff = QAction(QIcon(":/plugins/pgversion/icons/pgversion-diff.png"), self.tr("Show Diffs"), self.iface.mainWindow())
-#    self.actionCommit.setEnabled(False)
+    self.actionFeatureInfo = QAction(QIcon(":/plugins/pgversion/icons/pgversion-feature-info.png"), self.tr("Feature History"), self.iface.mainWindow())
+    self.actionFeatureInfo.setCheckable(True)
+    
     self.actionDrop = QAction(QIcon(":/plugins/pgversion/icons/pgversion-drop.png"), self.tr("Drop Versioning from Layer"), self.iface.mainWindow())    
     self.actionHelp = QAction(QIcon(""), self.tr("Help"), self.iface.mainWindow())       
     self.actionAbout = QAction(QIcon(""), self.tr("About"), self.iface.mainWindow())       
     self.actionDelete = QAction(QIcon(":/plugins/pgversion/icons/pgversion-drop.png"), self.tr("Bulk delete directly in the database"), self.iface.mainWindow())       
     self.actionDelete.setEnabled(False)
     
-
-    self.actionList =  [ self.actionInit,self.actionLoad, self.actionCommit, self.actionDiff, self.actionRevert,  self.actionLogView, self.actionDrop, self.actionLogView,  self.actionDelete, self.actionHelp,  self.actionAbout]         
+    self.actionList =  [ self.actionInit,self.actionLoad, self.actionCommit, self.actionDiff, self.actionRevert,  self.actionFeatureInfo,  self.actionLogView, self.actionDrop,  self.actionDelete, self.actionHelp,  self.actionAbout]         
  
-
-#    self.actionList =  [ self.actionInit,self.actionLoad,self.actionCommit,self.actionRevert, self.actionLogView, self.actionDrop, self.actionLogView,  self.actionHelp,  self.actionAbout]         
-
     self.toolBar.addAction(self.actionInit)
     self.toolBar.addAction(self.actionLoad)
     self.toolBar.addAction(self.actionCommit)
     self.toolBar.addAction(self.actionRevert)
-    self.toolBar.addAction(self.actionDiff)
+    self.toolBar.addAction(self.actionFeatureInfo)
     self.toolBar.addAction(self.actionLogView)
+    self.toolBar.addAction(self.actionDiff)
     self.toolBar.addAction(self.actionDelete)
 
 
@@ -120,8 +113,7 @@ class PgVersion(QObject):
        self.menu.addActions(self.actionList)    
        self.menuBar = self.iface.mainWindow().menuBar()
        self.menuBar.addMenu(self.menu)  
-
-    # connect the action to the run method
+    
     self.actionInit.triggered.connect(self.doInit) 
     self.actionLoad.triggered.connect(self.doLoad) 
     self.actionDiff.triggered.connect(self.doDiff)     
@@ -132,7 +124,8 @@ class PgVersion(QObject):
     self.actionHelp.triggered.connect(self.doHelp) 
     self.actionAbout.triggered.connect(self.doAbout) 
     self.actionDelete.triggered.connect(self.doDelete) 
-
+    self.actionFeatureInfo.triggered.connect(self.doFeatureInfo) 
+    
     self.LogViewDialog.diffLayer.connect(self.doDiff) 
     self.LogViewDialog.rollbackLayer.connect(self.doRollback) 
     self.LogViewDialog.checkoutLayer.connect(self.doCheckout) 
@@ -183,9 +176,14 @@ class PgVersion(QObject):
       except:
           del self.menuBar
       del self.toolBar
+      
+  def toggle_feature_info_cursor(self):
+      pass
+      
+  def doFeatureInfo(self): 
+        self.iface.mapCanvas().setMapTool( self.feature_history )
 
   def doDelete(self):
-      
         res = QMessageBox.question(
          None,
          self.tr("Question"),
@@ -478,9 +476,8 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
                     myItem.setText(3, result["LOGMSG"][i])
                     itemList.append(myItem)
         
-                self.LogViewDialog.treeWidget.addTopLevelItems(itemList)
-        
-                self.LogViewDialog.show()        
+                self.logview_dialog.treeWidget.addTopLevelItems(itemList)
+                self.logview_dialog.show()        
                 myDb.close()
                 canvas.refresh()
 
@@ -501,9 +498,9 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
     
             logHTML = "<html><head></head><body><Table>"
             
-            self.LogViewDialog.setLayer(theLayer)
-            self.LogViewDialog.createTagList()
-            self.LogViewDialog.treeWidget.clear()
+            self.logview_dialog.setLayer(theLayer)
+            self.logview_dialog.createTagList()
+            self.logview_dialog.treeWidget.clear()
     
             itemList = []
     
@@ -515,9 +512,9 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
                 myItem.setText(3, result["LOGMSG"][i])
                 itemList.append(myItem)
     
-            self.LogViewDialog.treeWidget.addTopLevelItems(itemList)
+            self.logview_dialog.treeWidget.addTopLevelItems(itemList)
     
-            self.LogViewDialog.show()        
+            self.logview_dialog.show()        
             myDb.close()
             canvas.refresh()
 
@@ -608,7 +605,7 @@ select * from insert) as foo").format(schema = mySchema,  table=myTable,  origin
                 self.iface.messageBar().pushMessage('INFO', self.tr('Diff to HEAD revision was successful!'), level=QgsMessageBar.INFO, duration=3)
                 
             QApplication.restoreOverrideCursor()
-            self.LogViewDialog.close()            
+            self.logview_dialog.close()            
             return
 
 

@@ -3,13 +3,16 @@
 """
 Module implementing CommitMessageDialog.
 """
-
+from PyQt4 import uic
 from PyQt4.QtGui import QDialog
 from PyQt4.QtCore import pyqtSignature,  QSettings
 
-from Ui_Ui_CommitMessage import Ui_CommitMessage
+import os
 
-class CommitMessageDialog(QDialog, Ui_CommitMessage):
+FORM_CLASS, _ = uic.loadUiType(os.path.join(
+    os.path.dirname(__file__), 'commit_message.ui'))
+
+class CommitMessageDialog(QDialog, FORM_CLASS):
     """
     Class documentation goes here.
     """

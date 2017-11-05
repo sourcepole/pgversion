@@ -3,13 +3,15 @@
 """
 Module implementing Ui_Help.
 """
-
+from PyQt4 import uic
 from PyQt4.QtGui import QDialog
 from PyQt4.QtCore import pyqtSignature
+import os
 
-from Ui_Ui_help import Ui_Ui_Help
+FORM_CLASS, _ = uic.loadUiType(os.path.join(
+    os.path.dirname(__file__), 'help.ui'))
 
-class HelpDialog(QDialog, Ui_Ui_Help):
+class HelpDialog(QDialog, FORM_CLASS):
     """
     Class documentation goes here.
     """
