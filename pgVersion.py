@@ -259,18 +259,15 @@ Please set the user permissions for table {0} and reload it via Database -> PG V
 
 
   def doLoad(self): 
-
      self.dlg = PgVersionLoadDialog(self)
      self.dlg.show()
 
   def doRollback(self,  item):
-
       if item == None:
         QMessageBox.information(None, self.tr('Error'),  self.tr('Please select a valid revision'))
         return
 
       revision = item.text(0)
-
       canvas = self.iface.mapCanvas()
       currentLayer = canvas.currentLayer()
 
@@ -362,8 +359,6 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
         QMessageBox.information(None, self.tr('Error'),  self.tr('Please select a valid revision'))
         return
 
-#      revision = item.text(0)
-
       canvas = self.iface.mapCanvas()
       currentLayer = canvas.currentLayer()
 
@@ -374,14 +369,11 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
       else:
         answer = QMessageBox.question(None, '', self.tr('Are you sure to checkout the layer to revision {0}?').format(revision), self.tr('Yes'),  self.tr('No'))
         if answer == 0:
-
             QApplication.setOverrideCursor(Qt.WaitCursor)
             provider = currentLayer.dataProvider()
             uri = provider.dataSourceUri()    
             uniqueCol = QgsDataSourceURI(uri).keyColumn()
             geomCol = QgsDataSourceURI(uri).geometryColumn()
-#            geometryType = currentLayer.geometryType()
-
             mySchema = QgsDataSourceURI(uri).schema()
             myTable = QgsDataSourceURI(uri).table()
 
@@ -445,7 +437,6 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
         self.tools.setModified(self.layer_list)
         theLayer.triggerRepaint()
         myDb.close()
-    pass
 
   def doLogView(self):
         canvas = self.iface.mapCanvas()
@@ -494,7 +485,6 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
                 canvas.refresh()
 
   def doDiff(self):
-
       canvas = self.iface.mapCanvas()
       currentLayer = canvas.currentLayer()
       
@@ -505,12 +495,9 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
             QMessageBox.information(None, '', self.tr('Please select a versioned layer'))
             return    
           else:
-    #        answer = QMessageBox.question(None, '', self.tr('Are you sure to checkout diffs to HEAD revision?'), self.tr('Yes'),  self.tr('No'))
             answer = 0
             if answer == 0:
-    
                 QApplication.setOverrideCursor(Qt.WaitCursor)
-    #            uniqueCol = self.tools.layerKeyCol(currentLayer)
                 geomCol = self.tools.layerGeomCol(currentLayer)
                 geometryType = self.tools.layerGeometryType(currentLayer)
                 mySchema = self.tools.layerSchema(currentLayer)
@@ -522,13 +509,10 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
     
                 sql = u"select * from \"%s\".\"%s\" limit 0"  % (mySchema,  myTable)
                 cols = myDb.cols(sql)
-    #            myCols = ', '.join(cols)+', st_asewkb("'+geomCol+'")'
-                
                 extent = self.iface.mapCanvas().extent().toString().replace(':',',')
                 authority,  crs = currentLayer.crs().authid().split(':')
                 geo_idx = '%s && ST_MakeEnvelope(%s,%s)' %  (geomCol,  extent,  crs)
-    
-             
+                
                 sql = ("with \
     head as (select max(revision) as head from versions.\"{schema}_{origin}_version_log\"), \
     delete as (\
