@@ -142,7 +142,8 @@ class PgVersion(QObject):
   def onLayerChanged(self,  layer):        
         if layer != None:
             self.selected_layer = layer
-            if self.selected_layer.type() == QgsMapLayer.VectorLayer and self.selected_layer.selectedFeatureCount() == 0:
+            
+            if self.selected_layer.type() == 0 and self.selected_layer.selectedFeatureCount() == 0:
                 self.actionDelete.setEnabled(False)
             else:
                 if self.tools.hasVersion(self.selected_layer):

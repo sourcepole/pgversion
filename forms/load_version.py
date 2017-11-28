@@ -112,7 +112,7 @@ class PgVersionLoadDialog(QDialog, FORM_CLASS):
           from versions.version_branch \
           where version_table_id = %s \
           order by branch_id" % (version_id)
-        print sql
+#        print sql
         self.cmbBranch.clear()
         
         if version_id != None:
@@ -142,10 +142,10 @@ class PgVersionLoadDialog(QDialog, FORM_CLASS):
             branch_id = self.cmbBranch.itemData(self.cmbBranch.currentIndex())
             connectionName = self.cmbServer.currentText()
             
-            if selected_branch == 'master':
-                self.loadVersionLayer(connectionName, versionTableList[0], versionTableList[1],  branch_id)
-            else:               
-                self.loadVersionLayer(connectionName, versionTableList[0], versionTableList[1], branch_id, '%s - %s' % (versionTableList[1],  selected_branch))
+#            if selected_branch == 'master':
+#                self.loadVersionLayer(connectionName, versionTableList[0], versionTableList[1],  branch_id)
+#            else:               
+            self.loadVersionLayer(connectionName, versionTableList[0], versionTableList[1], branch_id, '%s - %s' % (versionTableList[1],  selected_branch))
                 
     def on_buttonBox_rejected(self):
         '''
