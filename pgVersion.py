@@ -629,17 +629,10 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
 
   def doHelp(self):
       helpUrl = QUrl()
-      helpUrl.setUrl('file://'+self.plugin_path+'/docs/help.html')
+      helpUrl.setUrl('file://%s/docs/help.html' % self.plugin_path)
       self.helpDialog.webView.load(helpUrl)
       self.helpDialog.show()
-      pass  
-
 
   def doAbout(self):
       self.about = DlgAbout(self.plugin_path)
       self.about.show()
-      
-      
-      
-      
-      
