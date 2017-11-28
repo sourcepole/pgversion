@@ -17,11 +17,11 @@ email                : horst.duester@sourcepole.ch
  *                                                                         *
  ***************************************************************************/
 """
-import sys
+#import sys
 # Import the PyQt and QGIS libraries
 from PyQt4.QtCore import * 
 from PyQt4.QtGui import *
-from PyQt4.QtWebKit import QWebView
+#from PyQt4.QtWebKit import QWebView
 from qgis.core import *
 from qgis.gui import *
 from dbtools.dbTools import *
@@ -42,6 +42,7 @@ class PgVersion(QObject):
     QObject.__init__(self)
     # Save reference to the QGIS interface
     self.iface = iface
+    self.canvas = self.iface.mapCanvas()
     self.w = None
     self.vsCheck = None
     self.layer_list = []
@@ -63,12 +64,10 @@ class PgVersion(QObject):
 #    QgsMapLayerRegistry.instance().layerWasAdded.connect(self.add_layer)
 #    QgsMapLayerRegistry.instance().layerWillBeRemoved.connect(self.remove_layer)
     
-
-
   def initGui(self):  
 
     self.helpDialog = HelpDialog()
-    self.LogViewDialog = LogView(self)
+    self.logview_dialog = LogView(self)
     self.feature_history = FeatureHistory( self.iface )
     self.tools = PgVersionTools(self)
 
@@ -126,27 +125,28 @@ class PgVersion(QObject):
     self.actionDelete.triggered.connect(self.doDelete) 
     self.actionFeatureInfo.triggered.connect(self.doFeatureInfo) 
     
-    self.LogViewDialog.diffLayer.connect(self.doDiff) 
-    self.LogViewDialog.rollbackLayer.connect(self.doRollback) 
-    self.LogViewDialog.checkoutLayer.connect(self.doCheckout) 
-    self.LogViewDialog.checkoutTag.connect(self.doCheckout) 
-    
-    for a in self.iface.digitizeToolBar().actions():
-        if a.objectName() == 'mActionToggleEditing':
-            a.triggered.connect(self.onSelectionChanged)
+    self.logview_dialog.diffLayer.connect(self.doDiff) 
+    self.logview_dialog.rollbackLayer.connect(self.doRollback) 
+    self.logview_dialog.checkoutLayer.connect(self.doCheckout) 
+    self.logview_dialog.checkoutTag.connect(self.doCheckout) 
+    self.logview_dialog.createBranch.connect(self.doMakeBranch)  
             
-    self.iface.mapCanvas().selectionChanged.connect(self.onSelectionChanged)            
     QgsMapLayerRegistry.instance().layerWasAdded.connect(self.add_layer)
     QgsMapLayerRegistry.instance().layerWillBeRemoved.connect(self.remove_layer)    
+    
+    self.handler = None
+    self.selected_layer = None
+    QObject.connect(self.iface,SIGNAL("currentLayerChanged(QgsMapLayer *)") ,self.onLayerChanged)
 
-  def onSelectionChanged(self):
-        current_layer = self.iface.mapCanvas().currentLayer()
-        if current_layer is not None:
-            if (current_layer.type() == QgsMapLayer.VectorLayer) and current_layer.selectedFeatureCount() == 0:
+
+  def onLayerChanged(self,  layer):        
+        if layer != None:
+            self.selected_layer = layer
+            if self.selected_layer.type() == QgsMapLayer.VectorLayer and self.selected_layer.selectedFeatureCount() == 0:
                 self.actionDelete.setEnabled(False)
             else:
-                if self.tools.hasVersion(current_layer):
-                    if current_layer.isEditable():
+                if self.tools.hasVersion(self.selected_layer):
+                    if self.selected_layer.isEditable():
                         self.actionDelete.setEnabled(True) # true
                     else:
                         self.actionDelete.setEnabled(False)
@@ -155,13 +155,15 @@ class PgVersion(QObject):
       
       
   def add_layer(self,  l):
-
         if self.tools.hasVersion(l):
             if l.id not in self.layer_list:
+            
                 l.editingStopped.connect(lambda my_list = self.layer_list: self.tools.setModified(my_list))
+                l.editingStopped.connect(lambda my_layer = l: self.tools.editingStopped(my_layer))
+                l.saveLayerToProject.connect(lambda my_layer = l: self.tools.editingStopped(my_layer))
+                l.selectionChanged.connect(self.onLayerChanged)
                 self.layer_list.append(l.id())
                 self.tools.setModified(self.layer_list)
-                
 
   def remove_layer(self,  id):
         self.layer_list = list(set(self.layer_list))
@@ -301,7 +303,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
 
             myDb.run(sql)
             myDb.close()
-            self.LogViewDialog.close()
+            self.logview_dialog.close()
             currentLayer.triggerRepaint()
             QApplication.restoreOverrideCursor()
             self.tools.setModified(self.layer_list)
@@ -405,7 +407,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
                 layer.triggerRepaint()
             else:
                 self.iface.messageBar().pushMessage('INFO', self.tr('Something went wrong during checkout to revision {0}!').format(revision), level=QgsMessageBar.INFO, duration=3)
-            self.LogViewDialog.close()            
+            self.logview_dialog.close()            
             return
 
 
@@ -449,7 +451,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
                 QMessageBox.warning(None,   self.tr('Warning'),   self.tr('Please select a versioned layer!'))
             else:
                 provider = theLayer.dataProvider()
-                uri = provider.dataSourceUri()    
+                uri = provider.dataSourceUri()   
                 myDb = self.tools.layerDB('logview', theLayer)
                 mySchema = QgsDataSourceURI(uri).schema()
                 myTable = QgsDataSourceURI(uri).table()
@@ -457,14 +459,12 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
                 if len(mySchema) == 0:
                    mySchema = 'public'
         
-                sql = "select * from versions.pgvslogview('"+mySchema+"."+myTable.replace('_version', '')+"') order by revision desc"
+                sql = "select * from versions.pgvslogview('%s.%s') order by revision desc" % (mySchema,  myTable.replace('_version', '').split('#')[0])
                 result = myDb.read(sql)
-        
-                logHTML = "<html><head></head><body><Table>"
                 
-                self.LogViewDialog.setLayer(theLayer)
-                self.LogViewDialog.createTagList()
-                self.LogViewDialog.treeWidget.clear()
+                self.logview_dialog.setLayer(theLayer)
+                self.logview_dialog.createTagList()
+                self.logview_dialog.treeWidget.clear()
         
                 itemList = []
         
@@ -475,50 +475,18 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
                     myItem.setText(2, result["PROJECT"][i])
                     myItem.setText(3, result["LOGMSG"][i])
                     itemList.append(myItem)
-        
+
+                sql = "select version_table_id \
+              from versions.version_tables \
+              where version_table_schema = '%s' \
+                and version_table_name = '%s'" % (mySchema,  myTable.replace('_version', '').split('#')[0])
+                
+                result = myDb.read(sql)
                 self.logview_dialog.treeWidget.addTopLevelItems(itemList)
+                self.logview_dialog.set_version_table_id(result['VERSION_TABLE_ID'][0])
                 self.logview_dialog.show()        
                 myDb.close()
                 canvas.refresh()
-
-        if not self.tools.hasVersion(theLayer):
-            QMessageBox.warning(None,   self.tr('Warning'),   self.tr('Please select a versioned layer!'))
-        else:
-            provider = theLayer.dataProvider()
-            uri = provider.dataSourceUri()    
-            myDb = self.tools.layerDB('logview', theLayer)
-            mySchema = QgsDataSourceURI(uri).schema()
-            myTable = QgsDataSourceURI(uri).table()
-    
-            if len(mySchema) == 0:
-               mySchema = 'public'
-    
-            sql = "select * from versions.pgvslogview('"+mySchema+"."+myTable.replace('_version', '')+"') order by revision desc"
-            result = myDb.read(sql)
-    
-            logHTML = "<html><head></head><body><Table>"
-            
-            self.logview_dialog.setLayer(theLayer)
-            self.logview_dialog.createTagList()
-            self.logview_dialog.treeWidget.clear()
-    
-            itemList = []
-    
-            for i in range(len(result["PROJECT"])):
-                myItem = QTreeWidgetItem()
-                myItem.setText(0, result["REVISION"][i])
-                myItem.setText(1, result["DATUM"][i])
-                myItem.setText(2, result["PROJECT"][i])
-                myItem.setText(3, result["LOGMSG"][i])
-                itemList.append(myItem)
-    
-            self.logview_dialog.treeWidget.addTopLevelItems(itemList)
-    
-            self.logview_dialog.show()        
-            myDb.close()
-            canvas.refresh()
-
-        pass
 
   def doDiff(self):
 
@@ -541,6 +509,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
             geometryType = self.tools.layerGeometryType(currentLayer)
             mySchema = self.tools.layerSchema(currentLayer)
             myTable = self.tools.layerTable(currentLayer)
+            id = self.tools.layerBranchId(currentLayer)
 
             if len(mySchema) == 0:
                 mySchema = 'public'
@@ -561,13 +530,13 @@ select 'delete'::varchar as action, * \
   from (\
   select * from versions.pgvscheckout(NULL::\"{schema}\".\"{origin}\",(select * from head), \'{geo_idx}\') \
   except \
-  select * from \"{schema}\".\"{origin}_version\" where {geo_idx}\
+  select * from \"{schema}\".\"{origin}_version#{id}\" where {geo_idx}\
   ) as foo \
 ), \
 insert as (\
 select 'insert'::varchar as action, * \
   from ( \
-    select * from \"{schema}\".\"{origin}_version\" where {geo_idx} \
+    select * from \"{schema}\".\"{origin}_version#{id}\" where {geo_idx} \
 except \
     select * from versions.pgvscheckout(NULL::\"{schema}\".\"{origin}\",(select * from head), \'{geo_idx}\') \
    ) as foo) \
@@ -577,8 +546,7 @@ from \
 (\
 select * from delete \
 union  \
-select * from insert) as foo").format(schema = mySchema,  table=myTable,  origin=myTable.replace('_version', ''),  geo_idx = geo_idx)
-
+select * from insert) as foo").format(id = id,  schema = mySchema,  table=myTable,  origin=myTable.replace('_version', '').split('#')[0],  geo_idx = geo_idx)
 
             myUri = QgsDataSourceURI(self.tools.layerUri(currentLayer))
             myUri.setDataSource("", u"(%s\n)" % sql, geomCol, "", "rownum")
@@ -587,7 +555,7 @@ select * from insert) as foo").format(schema = mySchema,  table=myTable,  origin
             
             mem_layer = self.tools.create_memory_layer(layer, layer_name )
             
-            if not mem_layer.isValid():
+            if mem_layer == None:
                 self.iface.messageBar().pushMessage('WARNING', self.tr('No diffs to HEAD detected! Layer could not be loaded.'), level=QgsMessageBar.INFO, duration=3)
 
             else:                
@@ -632,7 +600,7 @@ select * from insert) as foo").format(schema = mySchema,  table=myTable,  origin
                     self.tr('Layer %s has uncommited changes, please commit them or revert to HEAD revision' % (theLayer.name())))
             else:
                 myDb = self.tools.layerDB('doDrop',theLayer)
-                sql = "select versions.pgvsdrop('"+mySchema+"."+myTable.replace('_version', '')+"')"
+                sql = "select versions.pgvsdrop('%s.%s') " % (mySchema, myTable.replace('_version', ''))
                 result = myDb.read(sql)                
                 myDb.close()
 
@@ -640,6 +608,9 @@ select * from insert) as foo").format(schema = mySchema,  table=myTable,  origin
                 QgsMapLayerRegistry.instance().removeMapLayer(theLayer.id())      
                 self.iface.messageBar().pushMessage('INFO', self.tr('Versioning for layer {0} dropped!').format(layer_name), level=QgsMessageBar.INFO, duration=3)
   
+  def doMakeBranch(self,  name):
+      sql = "select versions.pgvsmakebranch('%s', '%s') "  % (mySchema, myTable.replace('_version', '').split('#')[0],  name)
+      QMessageBox.information(None, '',  sql)
 
   def doHelp(self):
       helpUrl = QUrl()

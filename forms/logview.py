@@ -1,12 +1,27 @@
 # -*- coding: utf-8 -*-
-
 """
-Module implementing LogView.
+/***************************************************************************
+Plugin for the Postgres Versioning System
+-----------------------------------------------------------------------------------------------------------------
+begin                : 2010-07-31
+copyright          : (C) 2010 by Dr. Horst Duester
+email                : horst.duester@sourcepole.ch
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
 """
 from PyQt4 import uic
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 from pgversion.pgversion_tools import PgVersionTools
+from create_branch import DlgCreateBranch
 import os
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
@@ -20,6 +35,8 @@ class LogView(QDialog, FORM_CLASS):
     diffLayer = pyqtSignal()
     checkoutLayer = pyqtSignal(str)
     checkoutTag = pyqtSignal(str,  str)
+    createBranch = pyqtSignal(str)    
+
       
     def __init__(self, parent):
         """
@@ -30,14 +47,22 @@ class LogView(QDialog, FORM_CLASS):
         
         self.iface = parent.iface
         self.tools = PgVersionTools(parent)
-        self.parent = parent
     
-        self.myAction = QAction(QIcon(""), self.tr("Set Tag for current revision"),  self)
-        self.myAction.setStatusTip(self.tr("Set Tag for current revision"))
-        self.myAction.triggered.connect(self.setTag)
-        self.treeWidget.addAction(self.myAction)
+        self.tagAction = QAction(QIcon(""), self.tr("Set Tag for current revision"),  self)
+        self.tagAction.setStatusTip(self.tr("Set Tag for current revision"))
+        self.tagAction.triggered.connect(self.setTag)
+        self.treeWidget.addAction(self.tagAction)
+        
+        self.branchAction = QAction(QIcon(""), self.tr("Branch the current revision"),  self)
+        self.branchAction.setStatusTip(self.tr("Create branch for current revision"))
+        self.branchAction.triggered.connect(self.create_branch)
+        self.treeWidget.addAction(self.branchAction)        
+        
         self.treeWidget.setContextMenuPolicy(Qt.ActionsContextMenu)
                         
+    def set_version_table_id(self,  id):
+        self.version_table_id = id
+        
     def setLayer(self,  theLayer):
         self.theLayer = theLayer
         self.setWindowTitle(self.tr('Logview for layer %s' % (self.theLayer.name())))
@@ -57,15 +82,11 @@ class LogView(QDialog, FORM_CLASS):
           order by vtag.tags_id desc " % (self.tools.layerSchema(self.theLayer),  self.tools.layerTable(self.theLayer))
         result = myDb.read(sql)       
         
-        try:
-            self.version_table_id = result['VERSION_TABLE_ID'][0] 
-            
-            self.cmbTags.addItem(' ------ ', -1)
-            
-            for i in range(len(result['TAG_TEXT'])):
-                self.cmbTags.addItem(result['TAG_TEXT'][i],  result['REVISION'][i])
-        except:
-            pass
+        self.version_table_id = result['VERSION_TABLE_ID'][0] 
+        self.cmbTags.addItem(' ------ ', -1)
+        for i in range(len(result['TAG_TEXT'])):
+            self.cmbTags.addItem(result['TAG_TEXT'][i],  result['REVISION'][i])
+
     
     def setTag(self):
         result, ok = QInputDialog.getText(
@@ -87,6 +108,23 @@ class LogView(QDialog, FORM_CLASS):
                 
                 self.createTagList()
 
+    def create_branch(self):
+        result, ok = QInputDialog.getText(
+            self,
+            self.tr("Create branch for Revision "),
+            self.tr(""),
+            QLineEdit.Normal)        
+            
+        if ok:
+            if self.branchExists():
+                QMessageBox.information(None,  self.tr('Warning'),  self.tr('Branch already exists'))
+            else:
+                myDb = self.tools.layerDB('tags',self.theLayer)    
+                sql = "select versions.pgvsmakebranch(%s, '%s')" % (self.version_table_id,  result)
+                myDb.run(sql)
+        
+    def branchExists(self):
+        return False
         
     def hasTag(self):
         
@@ -135,10 +173,4 @@ class LogView(QDialog, FORM_CLASS):
     def on_btnTag_clicked(self):
         if self.cmbTags.currentIndex() > 0:
             self.checkoutTag.emit(self.cmbTags.itemData(self.cmbTags.currentIndex()),  self.cmbTags.itemText(self.cmbTags.currentIndex()))    
-    
-    @pyqtSignature("")
-    def on_btn_create_branch_clicked(self):
-        """
-        Slot documentation goes here.
-        """
-        pass
+

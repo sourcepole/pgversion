@@ -24,7 +24,6 @@ from qgis.core import *
 from pgversion.dbtools.dbTools import *
 from pgversion.pgversion_tools import *
 import pgversion.apicompat as pgversion
-
 import os
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
@@ -33,8 +32,9 @@ FORM_CLASS, _ = uic.loadUiType(os.path.join(
 class PgVersionLoadDialog(QDialog, FORM_CLASS):
     
     def __init__(self, parent):
-        QDialog.__init__(self)
+        QDialog.__init__(self,  None)
         self.setupUi(self)
+        
         self.getDbSettings()
         self.tools = PgVersionTools(parent)
         self.iface = parent.iface
@@ -76,35 +76,26 @@ class PgVersionLoadDialog(QDialog, FORM_CLASS):
             DBPASSWD = password
         
         try:
-            myDb = DbObj(pluginname = selectedServer, typ = DBTYPE, hostname = DBHOST, port = DBPORT, dbname = DBNAME, username = DBUSER, passwort = DBPASSWD)
+            self.myDb = DbObj(pluginname = selectedServer, typ = DBTYPE, hostname = DBHOST, port = DBPORT, dbname = DBNAME, username = DBUSER, passwort = DBPASSWD)
         except:
             QMessageBox.information(None, self.tr('Error'), self.tr('No Database Connection Established.'))
             return None
 
-        if not self.tools.check_PGVS_revision(myDb):
+        if not self.tools.check_PGVS_revision(self.myDb):
             self.cmbServer.setCurrentIndex(0)
             return None
-        query = 'select 4 as count,  1 as table'
-        sysResult = myDb.read(query)
         
-        query = 'select version_table_schema as schema, version_table_name as table \
+        query = 'select version_table_id as id, version_table_schema as schema, version_table_name as table \
         from versions.version_tables \
         order by version_table_schema,version_table_name'
-        result = myDb.read(query)
+        result = self.myDb.read(query)
         self.cmbTables.clear()
         
-#        try:
-        if sysResult['COUNT'][0] > 3 or len(result['TABLE']) > 0:
+        if len(result['TABLE']) > 0:
             self.cmbTables.addItem('-------------')
             for i in range(len(result['TABLE'])):
-                self.cmbTables.addItem(result['SCHEMA'][i] + '.' + result['TABLE'][i])
+                self.cmbTables.addItem('%s.%s' % (result['SCHEMA'][i],  result['TABLE'][i]), result['ID'][i] )
                 
-            
-#        except:
-#            QMessageBox.information(None, QCoreApplication.translate('PgVersionLoadDialog', 'Error'), QCoreApplication.translate('PgVersionLoadDialog', 'No database connection established.\n Please define a valid database connection and try again.'))
-#            self.close()
-#            return None
-
 
     
     def setDBServer(self, dbServerName):
@@ -116,7 +107,20 @@ class PgVersionLoadDialog(QDialog, FORM_CLASS):
         '''
         Slot documentation goes here.
         '''
-        pass
+        version_id = self.cmbTables.itemData(self.cmbTables.currentIndex())
+        sql = "select branch_id as id, branch_text as text \
+          from versions.version_branch \
+          where version_table_id = %s \
+          order by branch_id" % (version_id)
+        print sql
+        self.cmbBranch.clear()
+        
+        if version_id != None:
+            result = self.myDb.read(sql)
+            for i in range(len(result['ID'])):
+                self.cmbBranch.addItem(result['TEXT'][i],  result['ID'][i])
+            
+            
 
     on_cmbTables_currentIndexChanged = pyqtSignature('QString')(on_cmbTables_currentIndexChanged)
     
@@ -134,11 +138,15 @@ class PgVersionLoadDialog(QDialog, FORM_CLASS):
             QMessageBox.warning(None, self.tr('Error'),  self.tr('Please select a versioned layer'))
         else:
             versionTableList = self.cmbTables.currentText().split('.')
+            selected_branch = self.cmbBranch.currentText()
+            branch_id = self.cmbBranch.itemData(self.cmbBranch.currentIndex())
             connectionName = self.cmbServer.currentText()
-            self.loadVersionLayer(connectionName, versionTableList[0], versionTableList[1])
-
-#    on_buttonBox_accepted = pyqtSignature('')(on_buttonBox_accepted)
-    
+            
+            if selected_branch == 'master':
+                self.loadVersionLayer(connectionName, versionTableList[0], versionTableList[1],  branch_id)
+            else:               
+                self.loadVersionLayer(connectionName, versionTableList[0], versionTableList[1], branch_id, '%s - %s' % (versionTableList[1],  selected_branch))
+                
     def on_buttonBox_rejected(self):
         '''
         Slot documentation goes here.
@@ -147,7 +155,7 @@ class PgVersionLoadDialog(QDialog, FORM_CLASS):
 
     on_buttonBox_rejected = pyqtSignature('')(on_buttonBox_rejected)
     
-    def loadVersionLayer(self, connectionName, schema, table):
+    def loadVersionLayer(self, connectionName, schema, table,  branch_id=None,  layerName=None):
         QApplication.setOverrideCursor(Qt.WaitCursor)
         settings = QSettings()
         mySettings = '/PostgreSQL/connections/' + connectionName
@@ -173,8 +181,15 @@ class PgVersionLoadDialog(QDialog, FORM_CLASS):
         layer = myDb.read(sql)
         uri = QgsDataSourceURI()
         uri.setConnection(DBHOST, DBPORT, DBNAME, DBUSER, DBPASSWD)
-        uri.setDataSource(layer['VERSION_VIEW_SCHEMA'][0], layer['VERSION_VIEW_NAME'][0], '' + layer['VERSION_VIEW_GEOMETRY_COLUMN'][0] + '', '', layer['VERSION_VIEW_PKEY'][0])
-        layerName = layer['VERSION_TABLE_NAME'][0]
+        uri.setParam('branch_id', str(branch_id))
+        
+        version_view = '%s#%s' % (layer['VERSION_VIEW_NAME'][0],  branch_id)
+            
+        uri.setDataSource(layer['VERSION_VIEW_SCHEMA'][0], version_view, '' + layer['VERSION_VIEW_GEOMETRY_COLUMN'][0] + '', '', layer['VERSION_VIEW_PKEY'][0])
+        
+        if layerName == None:
+            layerName = layer['VERSION_TABLE_NAME'][0]
+            
         vLayer = QgsVectorLayer(uri.uri(), layerName, 'postgres')
         
         if self.tools.vectorLayerExists(vLayer.name()) or self.tools.vectorLayerExists(vLayer.name() + ' (modified)'):
@@ -184,9 +199,7 @@ class PgVersionLoadDialog(QDialog, FORM_CLASS):
             return None
             
         QgsMapLayerRegistry.instance().addMapLayer(vLayer)
-        
         myDb.close()
         QApplication.restoreOverrideCursor()
         QApplication.setOverrideCursor(Qt.ArrowCursor)
-
-        
+    

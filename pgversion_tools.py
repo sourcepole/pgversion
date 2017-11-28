@@ -99,8 +99,7 @@ class PgVersionTools(QObject):
 
             sql = "select count(version_table_name) \
               from versions.version_tables import \
-              where version_view_schema = '%s' and version_view_name = '%s'" % (schema,  myLayerUri.table())
-
+              where version_view_schema = '%s' and version_view_name = split_part('%s', '#', 1)" % (schema,  myLayerUri.table())
             result = myDb.read(sql)
             myDb.close()
             try:
@@ -114,9 +113,7 @@ class PgVersionTools(QObject):
             pass
 
   def isModified(self, myLayer=None):
-
         myLayerUri = QgsDataSourceURI(myLayer.source())
-
         myDb = self.layerDB('isModified',  myLayer)
 
         if myDb == None:
@@ -127,10 +124,11 @@ class PgVersionTools(QObject):
         else:
           schema = myLayerUri.schema()
 
-
         sql = 'select count(project) \
           from versions."%s_%s_log" \
-          where project = \'%s\' and not commit' % (schema,  myLayerUri.table(),  myDb.dbUser())
+          where project = \'%s\' and not commit' % (schema,  myLayerUri.table().split('#')[0],  myDb.dbUser())
+          
+        print sql
 
         result = myDb.read(sql)
         myDb.close()
@@ -163,6 +161,10 @@ class PgVersionTools(QObject):
                 map_layer.setLayerName(map_layer.name().replace(' (modified)', ''))      
 
 
+                
+  def editingStopped(self,  layer):
+      branch_id = QgsDataSourceURI(layer.dataProvider().dataSourceUri()).param('branch_id')
+      QMessageBox.information(None, '',  '%s' % branch_id)
 
     # Return QgsVectorLayer from a layer name ( as string )
   def vectorLayerExists(self,   myName ):
@@ -383,10 +385,12 @@ class PgVersionTools(QObject):
         feats = [feat for feat in layer.getFeatures()]
         if layer.geometryType() ==QGis.Point:
             layer_type = 'Point?crs='+layer.crs().authid()
-        if layer.geometryType() ==QGis.Line:
+        elif layer.geometryType() ==QGis.Line:
             layer_type = 'LineString?crs='+layer.crs().authid()
-        if layer.geometryType() ==QGis.Polygon:
+        elif layer.geometryType() ==QGis.Polygon:
             layer_type = 'Polygon?crs='+layer.crs().authid()
+        else:
+            return None
 
         mem_layer = QgsVectorLayer(layer_type, name, "memory")
 
@@ -421,13 +425,9 @@ functions directly with click on Install pgvs." % (create_version_path))
             return False
         else:  
             result = myDb.read('select pgvsrevision from versions.pgvsrevision()')
-            print result
 
             my_revision = int(self.pgvsRevision)
             db_revision = int(result['PGVSREVISION'][0].replace('.',''))
-            
-            print my_revision
-            print db_revision
 
             for rev in range(int(db_revision), int(my_revision)):
 
@@ -465,6 +465,9 @@ functions directly with click on Install pgvs." % (create_version_path))
     myFields = fProvider.fields().toList()
 
     return myFields
+
+  def layerBranchId(self,  layer):
+      return QgsDataSourceURI(self.layerUri(layer)).param("branch_id")
 
   def layerGeomCol(self,  layer):
       return QgsDataSourceURI(self.layerUri(layer)).geometryColumn()

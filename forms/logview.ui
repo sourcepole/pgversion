@@ -17,7 +17,7 @@
    <string>LogView</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="5">
+   <item row="0" column="4">
     <widget class="QComboBox" name="cmbTags">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -33,7 +33,20 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0" rowspan="2" colspan="5">
+   <item row="2" column="4">
+    <spacer name="verticalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="1" column="0" rowspan="2" colspan="4">
     <widget class="QTreeWidget" name="treeWidget">
      <column>
       <property name="text">
@@ -57,27 +70,14 @@
      </column>
     </widget>
    </item>
-   <item row="2" column="5">
-    <spacer name="verticalSpacer_2">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="3" column="3">
+   <item row="3" column="2">
     <widget class="QPushButton" name="btnDiff">
      <property name="text">
       <string>diff to HEAD revision</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="4">
+   <item row="3" column="3">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
@@ -90,7 +90,7 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="0" colspan="5">
+   <item row="0" column="0" colspan="4">
     <widget class="QPushButton" name="btnRollback">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -116,20 +116,13 @@
     </widget>
    </item>
    <item row="3" column="1">
-    <widget class="QPushButton" name="btn_create_branch">
-     <property name="text">
-      <string>create branch</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="2">
     <widget class="QPushButton" name="btnCheckout">
      <property name="text">
       <string>checkout selected revision</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="5">
+   <item row="1" column="4">
     <widget class="QPushButton" name="btnTag">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
