@@ -380,7 +380,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
             uri = provider.dataSourceUri()    
             uniqueCol = QgsDataSourceURI(uri).keyColumn()
             geomCol = QgsDataSourceURI(uri).geometryColumn()
-            geometryType = currentLayer.geometryType()
+#            geometryType = currentLayer.geometryType()
 
             mySchema = QgsDataSourceURI(uri).schema()
             myTable = QgsDataSourceURI(uri).table()
@@ -388,7 +388,11 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
             if len(mySchema) == 0:
                 mySchema = 'public'
 
-            sql = "select * from versions.pgvscheckout(NULL::\""+mySchema+"\".\""+myTable.replace('_version', '')+"\", "+revision+")"
+            sql = 'select * from versions.pgvscheckout(NULL::"%s"."%s", %s)' % (
+                        mySchema,  
+                        myTable.replace('_version', ''),  
+                        revision)
+                        
             myUri = QgsDataSourceURI(uri)
             myUri.setDataSource("", u"(%s\n)" % (sql), geomCol, "", uniqueCol)
 
@@ -493,89 +497,99 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
 
       canvas = self.iface.mapCanvas()
       currentLayer = canvas.currentLayer()
-
-      myDb = self.tools.layerDB('logview', currentLayer)
-
-      if currentLayer == None:
-        QMessageBox.information(None, '', self.tr('Please select a versioned layer'))
-        return    
-      else:
-#        answer = QMessageBox.question(None, '', self.tr('Are you sure to checkout diffs to HEAD revision?'), self.tr('Yes'),  self.tr('No'))
-        answer = 0
-        if answer == 0:
-
-            QApplication.setOverrideCursor(Qt.WaitCursor)
-            uniqueCol = self.tools.layerKeyCol(currentLayer)
-            geomCol = self.tools.layerGeomCol(currentLayer)
-            geometryType = self.tools.layerGeometryType(currentLayer)
-            mySchema = self.tools.layerSchema(currentLayer)
-            myTable = self.tools.layerTable(currentLayer)
-            id = self.tools.layerBranchId(currentLayer)
-
-            if len(mySchema) == 0:
-                mySchema = 'public'
-
-            sql = u"select * from \"%s\".\"%s\" limit 0"  % (mySchema,  myTable)
-            cols = myDb.cols(sql)
-            myCols = ', '.join(cols)+', st_asewkb("'+geomCol+'")'
-            
-            extent = self.iface.mapCanvas().extent().toString().replace(':',',')
-            authority,  crs = currentLayer.crs().authid().split(':')
-            geo_idx = '%s && ST_MakeEnvelope(%s,%s)' %  (geomCol,  extent,  crs)
-
-         
-            sql = ("with \
-head as (select max(revision) as head from versions.\"{schema}_{origin}_version_log\"), \
-delete as (\
-select 'delete'::varchar as action, * \
-  from (\
-  select * from versions.pgvscheckout(NULL::\"{schema}\".\"{origin}\",(select * from head), \'{geo_idx}\') \
-  except \
-  select * from \"{schema}\".\"{origin}_version#{id}\" where {geo_idx}\
-  ) as foo \
-), \
-insert as (\
-select 'insert'::varchar as action, * \
-  from ( \
-    select * from \"{schema}\".\"{origin}_version#{id}\" where {geo_idx} \
-except \
-    select * from versions.pgvscheckout(NULL::\"{schema}\".\"{origin}\",(select * from head), \'{geo_idx}\') \
-   ) as foo) \
-\
-select row_number() OVER () AS rownum, * \
-from \
-(\
-select * from delete \
-union  \
-select * from insert) as foo").format(id = id,  schema = mySchema,  table=myTable,  origin=myTable.replace('_version', '').split('#')[0],  geo_idx = geo_idx)
-
-            myUri = QgsDataSourceURI(self.tools.layerUri(currentLayer))
-            myUri.setDataSource("", u"(%s\n)" % sql, geomCol, "", "rownum")
-            layer_name = myTable+" (Diff to HEAD Revision)"
-            layer = QgsVectorLayer(myUri.uri(), layer_name, "postgres")       
-            
-            mem_layer = self.tools.create_memory_layer(layer, layer_name )
-            
-            if mem_layer == None:
-                self.iface.messageBar().pushMessage('WARNING', self.tr('No diffs to HEAD detected! Layer could not be loaded.'), level=QgsMessageBar.INFO, duration=3)
-
-            else:                
-                userPluginPath = QFileInfo(QgsApplication.qgisUserDbFilePath()).path()+"/python/plugins/pgversion"  
-                mem_layer.setRendererV2(None)
+      
+      if self.tools.isModified(currentLayer):
+          myDb = self.tools.layerDB('logview', currentLayer)
     
-                if geometryType == 0:
-                    mem_layer.loadNamedStyle(userPluginPath+"/legends/diff_point.qml")             
-                elif geometryType == 1:
-                    mem_layer.loadNamedStyle(userPluginPath+"/legends/diff_linestring.qml")             
-                elif geometryType == 2:
-                    mem_layer.loadNamedStyle(userPluginPath+"/legends/diff_polygon.qml")             
+          if currentLayer == None:
+            QMessageBox.information(None, '', self.tr('Please select a versioned layer'))
+            return    
+          else:
+    #        answer = QMessageBox.question(None, '', self.tr('Are you sure to checkout diffs to HEAD revision?'), self.tr('Yes'),  self.tr('No'))
+            answer = 0
+            if answer == 0:
     
-                QgsMapLayerRegistry.instance().addMapLayer(mem_layer)
-                self.iface.messageBar().pushMessage('INFO', self.tr('Diff to HEAD revision was successful!'), level=QgsMessageBar.INFO, duration=3)
+                QApplication.setOverrideCursor(Qt.WaitCursor)
+    #            uniqueCol = self.tools.layerKeyCol(currentLayer)
+                geomCol = self.tools.layerGeomCol(currentLayer)
+                geometryType = self.tools.layerGeometryType(currentLayer)
+                mySchema = self.tools.layerSchema(currentLayer)
+                myTable = self.tools.layerTable(currentLayer)
+                id = self.tools.layerBranchId(currentLayer)
+    
+                if len(mySchema) == 0:
+                    mySchema = 'public'
+    
+                sql = u"select * from \"%s\".\"%s\" limit 0"  % (mySchema,  myTable)
+                cols = myDb.cols(sql)
+    #            myCols = ', '.join(cols)+', st_asewkb("'+geomCol+'")'
                 
-            QApplication.restoreOverrideCursor()
-            self.logview_dialog.close()            
-            return
+                extent = self.iface.mapCanvas().extent().toString().replace(':',',')
+                authority,  crs = currentLayer.crs().authid().split(':')
+                geo_idx = '%s && ST_MakeEnvelope(%s,%s)' %  (geomCol,  extent,  crs)
+    
+             
+                sql = ("with \
+    head as (select max(revision) as head from versions.\"{schema}_{origin}_version_log\"), \
+    delete as (\
+    select 'delete'::varchar as action, * \
+      from (\
+      select * from versions.pgvscheckout(NULL::\"{schema}\".\"{origin}\",(select * from head), \'{geo_idx}\') \
+      except \
+      select * from \"{schema}\".\"{origin}_version#{id}\" where {geo_idx}\
+      ) as foo \
+    ), \
+    insert as (\
+    select 'insert'::varchar as action, * \
+      from ( \
+        select * from \"{schema}\".\"{origin}_version#{id}\" where {geo_idx} \
+    except \
+        select * from versions.pgvscheckout(NULL::\"{schema}\".\"{origin}\",(select * from head), \'{geo_idx}\') \
+       ) as foo) \
+    \
+    select row_number() OVER () AS rownum, * \
+    from \
+    (\
+    select * from delete \
+    union  \
+    select * from insert) as foo").format(id = id,  schema = mySchema,  table=myTable,  origin=myTable.replace('_version', '').split('#')[0],  geo_idx = geo_idx)
+    
+                branch_name_sql = "select branch_text \
+                           from versions.version_branch \
+                           where branch_id = %s" % (myTable.split('#')[1])
+                           
+                branch_name = myDb.read(branch_name_sql)
+                           
+                myUri = QgsDataSourceURI(self.tools.layerUri(currentLayer))
+                myUri.setDataSource("", u"(%s\n)" % sql, geomCol, "", "rownum")
+                layer_name = "%s - %s (Diff to HEAD Revision)" % (myTable.split('#')[0], branch_name['BRANCH_TEXT'][0])
+                layer = QgsVectorLayer(myUri.uri(), layer_name, "postgres")       
+                
+                mem_layer = self.tools.create_memory_layer(layer, layer_name )
+                
+                if mem_layer == None:
+                    self.iface.messageBar().pushMessage('WARNING', self.tr('Layer could not be loaded.'), level=QgsMessageBar.INFO, duration=3)
+    
+                else:                
+                    userPluginPath = QFileInfo(QgsApplication.qgisUserDbFilePath()).path()+"/python/plugins/pgversion"  
+                    mem_layer.setRendererV2(None)
+        
+                    if geometryType == 0:
+                        mem_layer.loadNamedStyle(userPluginPath+"/legends/diff_point.qml")             
+                    elif geometryType == 1:
+                        mem_layer.loadNamedStyle(userPluginPath+"/legends/diff_linestring.qml")             
+                    elif geometryType == 2:
+                        mem_layer.loadNamedStyle(userPluginPath+"/legends/diff_polygon.qml")             
+        
+                    QgsMapLayerRegistry.instance().addMapLayer(mem_layer)
+                    self.iface.messageBar().pushMessage('INFO', self.tr('Diff to HEAD revision was successful!'), level=QgsMessageBar.INFO, duration=3)
+                    
+                QApplication.restoreOverrideCursor()
+                self.logview_dialog.close()            
+                return
+      else:
+          self.iface.messageBar().pushMessage('INFO', self.tr('No differences to HEAD revision detected!'), level=QgsMessageBar.INFO, duration=3)
+          return
 
 
   def doDrop(self): 
