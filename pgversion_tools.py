@@ -128,9 +128,10 @@ class PgVersionTools(QObject):
           from versions."%s_%s_log" \
           where project = \'%s\' \
             and parent_branch = %s \
-            and not commit' % (schema,  myLayerUri.table().split('#')[0],  myDb.dbUser(), myLayerUri.table().split('#')[1])
-          
-        print sql
+            and not commit' % (schema,  
+                                                          myLayerUri.table().split('#')[0],  
+                                                          myDb.dbUser(), 
+                                                          myLayerUri.table().split('#')[1])
 
         result = myDb.read(sql)
         myDb.close()

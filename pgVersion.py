@@ -411,7 +411,7 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
                 self.iface.messageBar().pushMessage('INFO', self.tr('Checkout to revision {0} was successful!').format(revision), level=QgsMessageBar.INFO, duration=3)
                 layer.triggerRepaint()
             else:
-                self.iface.messageBar().pushMessage('INFO', self.tr('Something went wrong during checkout to revision {0}!').format(revision), level=QgsMessageBar.INFO, duration=3)
+                self.iface.messageBar().pushMessage('CRITICAL', self.tr('Something went wrong during checkout to revision {0}!').format(revision), level=QgsMessageBar.CRITICAL, duration=3)
             self.logview_dialog.close()            
             return
 
