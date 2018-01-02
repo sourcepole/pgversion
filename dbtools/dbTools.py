@@ -8,12 +8,8 @@ copyright            : (C) 2013 by Dr. Horst Duester / Sourcepole AG
 email                : horst.duester@sourcepole.ch
  ***************************************************************************/
 """
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-from PyQt4.QtSql import *
-from qgis.gui import *
-from qgis.core import *
-
+from PyQt4.QtGui import QDialog, QMessageBox
+from PyQt4.QtSql import QSqlDatabase, QSqlQuery
 
 class DbObj(QDialog):
   MSG_BOX_TITLE = "Class dbObj"

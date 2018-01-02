@@ -20,7 +20,6 @@
  ***************************************************************************/
 """
 # Import the PyQt and QGIS libraries
-from PyQt4.QtCore import *
 from qgis.core import *
 
 

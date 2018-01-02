@@ -18,8 +18,8 @@ email                : horst.duester@sourcepole.ch
  ***************************************************************************/
 """
 from PyQt4 import uic
-from PyQt4.QtGui import QDialog
 from PyQt4.QtCore import pyqtSignature,  QSettings
+from PyQt4.QtGui import QDialog
 
 import os
 

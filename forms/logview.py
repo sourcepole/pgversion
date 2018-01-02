@@ -18,8 +18,8 @@ email                : horst.duester@sourcepole.ch
  ***************************************************************************/
 """
 from PyQt4 import uic
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
+from PyQt4.QtCore import pyqtSignal,  pyqtSlot, Qt
+from PyQt4.QtGui import QDialog,  QAction,  QIcon, QTreeWidgetItem, QInputDialog, QLineEdit,  QMessageBox
 from pgversion.pgversion_tools import PgVersionTools
 from create_branch import DlgCreateBranch
 import os
@@ -143,7 +143,7 @@ class LogView(QDialog, FORM_CLASS):
         except:
             pass
     
-    @pyqtSignature("")
+    @pyqtSlot()
     def on_btnRollback_clicked(self):
         try:
             self.rollbackLayer.emit(self.treeWidget.currentItem())    
@@ -151,25 +151,25 @@ class LogView(QDialog, FORM_CLASS):
         except:
             QMessageBox.information(None, self.tr('Warning'),  self.tr('Please select a revision for checkout'))
     
-    @pyqtSignature("")
+    @pyqtSlot()
     def on_btnDiff_clicked(self):
        self.diffLayer.emit()    
        self.close()
     
-    @pyqtSignature("")
+    @pyqtSlot()
     def on_btnCheckout_clicked(self):
        self.checkoutLayer.emit(self.treeWidget.currentItem().text(0) )   
        self.close()
 
     
-    @pyqtSignature("")
+    @pyqtSlot()
     def on_buttonBox_rejected(self):
         """
         Slot documentation goes here.
         """
         self.close()
     
-    @pyqtSignature("")
+    @pyqtSlot()
     def on_btnTag_clicked(self):
         if self.cmbTags.currentIndex() > 0:
             self.checkoutTag.emit(self.cmbTags.itemData(self.cmbTags.currentIndex()),  self.cmbTags.itemText(self.cmbTags.currentIndex()))    

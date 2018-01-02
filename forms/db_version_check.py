@@ -18,8 +18,8 @@ email                : horst.duester@sourcepole.ch
  ***************************************************************************/
 """
 from PyQt4 import uic
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt4.QtCore import pyqtSlot
+from PyQt4.QtGui import QDialog, QMessageBox
 from qgis.core import *
 
 import os
@@ -43,7 +43,7 @@ class DbVersionCheckDialog(QDialog, FORM_CLASS):
         self.type = type
         self.pgvs_revision = pgvs_revision
         
-    @pyqtSignature("bool")
+    @pyqtSlot()
     def on_btnUpdate_clicked(self, checked):
 
         
@@ -64,7 +64,7 @@ class DbVersionCheckDialog(QDialog, FORM_CLASS):
             return True
         
     
-    @pyqtSignature("bool")
+    @pyqtSlot()
     def on_btnClose_clicked(self, checked):
         self.close()
 

@@ -17,10 +17,10 @@ email                : horst.duester@sourcepole.ch
  *                                                                         *
  ***************************************************************************/
 """
+from PyQt4.QtCore import Qt, QSettings,  pyqtSignal
+from PyQt4.QtGui import QMainWindow,  QAction,  QIcon,  QDockWidget,  QTableWidget,  QComboBox,  QPushButton, QApplication, QMessageBox
 from qgis.gui import *
 from qgis.core import *
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
 from pgversion_tools import PgVersionTools
 import apicompat
 

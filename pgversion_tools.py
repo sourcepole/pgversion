@@ -17,9 +17,8 @@ email                : horst.duester@sourcepole.ch
  *                                                                         *
  ***************************************************************************/
 """
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-from PyQt4.QtSql import *
+from PyQt4.QtCore import Qt,  QObject, QFileInfo
+from PyQt4.QtGui import QMessageBox, QTableWidgetItem
 from qgis.gui import *
 from qgis.core import *
 from forms.db_version_check import DbVersionCheckDialog 

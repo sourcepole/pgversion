@@ -18,7 +18,7 @@ email                : horst.duester@sourcepole.ch
  ***************************************************************************/
 """
 from PyQt4 import uic
-from PyQt4.QtCore import pyqtSignature,  pyqtSignal
+from PyQt4.QtCore import pyqtSlot
 from PyQt4.QtGui import QDialog
 import os
 
@@ -41,7 +41,7 @@ class DlgCreateBranch(QDialog, FORM_CLASS):
         QDialog.__init__(self, parent)
         self.setupUi(self)
     
-    @pyqtSignature("")
+    @pyqtSlot()
     def on_btn_box_create_branch_accepted(self):
         """
         Slot documentation goes here.
@@ -49,7 +49,7 @@ class DlgCreateBranch(QDialog, FORM_CLASS):
         self.setResult(1)
         self.close()
     
-    @pyqtSignature("")
+    @pyqtSlot()
     def on_btn_box_create_branch_rejected(self):
         """
         Slot documentation goes here.

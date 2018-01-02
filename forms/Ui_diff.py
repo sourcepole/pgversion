@@ -4,8 +4,8 @@
 Module implementing DiffDlg.
 """
 
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
+from PyQt4.QtCore import Qt,  QDate
+from PyQt4.QtGui import QDialog,  QMessageBox
 from qgis.core import *
 from qgis.gui import *
 from ..dbtools.dbTools import *

@@ -17,11 +17,9 @@ email                : horst.duester@sourcepole.ch
  *                                                                         *
  ***************************************************************************/
 """
-#import sys
 # Import the PyQt and QGIS libraries
-from PyQt4.QtCore import * 
-from PyQt4.QtGui import *
-#from PyQt4.QtWebKit import QWebView
+from PyQt4.QtCore import Qt, QObject, QDir, QFileInfo, QLocale,  QCoreApplication,  QUrl, QTranslator, qVersion
+from PyQt4.QtGui import QDialog, QAction,  QIcon, QMenu,  QMessageBox, QTreeWidgetItem,  QApplication
 from qgis.core import *
 from qgis.gui import *
 from dbtools.dbTools import *
@@ -32,8 +30,8 @@ from forms.load_version import PgVersionLoadDialog
 from forms.help import HelpDialog
 from forms.logview import LogView
 from pgversion_tools import PgVersionTools
-from about.doAbout import  DlgAbout
-import resources_rc,  traceback,  string,  apicompat,  tempfile,  os
+from about.do_about import About
+import resources_rc,  apicompat,  os
 
 
 class PgVersion(QObject): 
@@ -136,7 +134,7 @@ class PgVersion(QObject):
     
     self.handler = None
     self.selected_layer = None
-    QObject.connect(self.iface,SIGNAL("currentLayerChanged(QgsMapLayer *)") ,self.onLayerChanged)
+    self.iface.currentLayerChanged.connect(self.onLayerChanged)
 
 
   def onLayerChanged(self,  layer):        
@@ -618,5 +616,5 @@ Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revisio
       self.helpDialog.show()
 
   def doAbout(self):
-      self.about = DlgAbout(self.plugin_path)
+      self.about = About()
       self.about.show()

@@ -18,8 +18,8 @@ email                : horst.duester@sourcepole.ch
  ***************************************************************************/
 """
 from PyQt4 import uic
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt4.QtCore import Qt, QSettings, pyqtSignature
+from PyQt4.QtGui import QDialog, QMessageBox, QApplication
 from qgis.core import *
 from pgversion.dbtools.dbTools import *
 from pgversion.pgversion_tools import *
