@@ -245,6 +245,7 @@ with a listing of the conflicting objects.
                    b.max as conflict_version_log_id
                                   from a, b
                                   where a.systime < b.systime
+                                    and b.action <> ''delete''
                                     and a.'||myPkey||' = b.'||myPkey;
 
 --RAISE EXCEPTION '%',myDebug;           
@@ -1157,7 +1158,7 @@ CREATE FUNCTION versions.pgvsrevision ()
 DECLARE
   revision TEXT;
   BEGIN	
-    revision := '2.1.8';
+    revision := '2.1.7';
   RETURN revision ;                             
 
   END;
