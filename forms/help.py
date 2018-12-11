@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 """
 /***************************************************************************
 Plugin for the Postgres Versioning System
@@ -16,22 +17,25 @@ email                : horst.duester@sourcepole.ch
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+ This script initializes the plugin, making it known to QGIS.
 """
-from PyQt4 import uic
-from PyQt4.QtGui import QDialog
+
+from qgis.PyQt.QtWidgets import QDialog
 import os
+from qgis.PyQt import uic
+
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'help.ui'))
+
 
 class HelpDialog(QDialog, FORM_CLASS):
     """
     Class documentation goes here.
     """
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         """
         Constructor
         """
         QDialog.__init__(self, parent)
         self.setupUi(self)
- 

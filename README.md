@@ -2,6 +2,8 @@
 <HEAD>
 <META NAME="generator" CONTENT="http://txt2tags.org">
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<TITLE>PostGIS Versioning - pgVersion 2.0.0</TITLE>
+
 <!-- CSS include failed for style.css -->
 
 </HEAD>
@@ -9,7 +11,7 @@
 
 <DIV CLASS="header" ID="header">
 <H1>PostGIS Versioning - pgVersion 2.1</H1>
-<H3>Dr. Horst Duester, 2017, horst.duester@sourcepole.ch</H3>
+<H3>Dr. Horst Duester, 2015, horst.duester@sourcepole.ch</H3>
 </DIV>
 
 <DIV CLASS="toc">

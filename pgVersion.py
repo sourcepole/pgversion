@@ -17,604 +17,766 @@ email                : horst.duester@sourcepole.ch
  *                                                                         *
  ***************************************************************************/
 """
-# Import the PyQt and QGIS libraries
-from PyQt4.QtCore import Qt, QObject, QDir, QFileInfo, QLocale,  QCoreApplication,  QUrl, QTranslator, qVersion
-from PyQt4.QtGui import QDialog, QAction,  QIcon, QMenu,  QMessageBox, QTreeWidgetItem,  QApplication
+from qgis.PyQt.QtCore import *
+from qgis.PyQt.QtGui import *
+from qgis.PyQt.QtWidgets import *
 from qgis.core import *
 from qgis.gui import *
-from dbtools.dbTools import *
-from forms.commit_message import CommitMessageDialog
-from pgversion_conflict_window import ConflictWindow
-from pgversion_featureinfo import FeatureHistory
-from forms.load_version import PgVersionLoadDialog
-from forms.help import HelpDialog
-from forms.logview import LogView
-from pgversion_tools import PgVersionTools
-from about.do_about import About
-import resources_rc,  apicompat,  os
+from .dbtools.dbtools import *
+from .forms.CommitMessage import CommitMessageDialog
+from .pgVersionConflictWindow import ConflictWindow
+
+from .forms.pgLoadVersion import PgVersionLoadDialog
+from .forms.help import HelpDialog
+from .forms.LogView import LogView
+from .pgVersionTools import PgVersionTools
+from .about.doAbout import DlgAbout
+import os
 
 
-class PgVersion(QObject): 
+class PgVersion(QObject):
 
-  def __init__(self, iface):
-    QObject.__init__(self)
-    # Save reference to the QGIS interface
-    self.iface = iface
-    self.canvas = self.iface.mapCanvas()
-    self.w = None
-    self.vsCheck = None
-    self.layer_list = []
+    def __init__(self, iface):
+        QObject.__init__(self)
+        # Save reference to the QGIS interface
+        self.iface = iface
+        self.w = None
+        self.vsCheck = None
+        self.layer_list = []
+        self.tools = PgVersionTools(self)
 
-    #Initialise thetranslation environment    
-    self.plugin_path = QDir.cleanPath( os.path.abspath(os.path.dirname(__file__)) )
-    myLocaleName = QLocale.system().name()
-    myLocale = myLocaleName[0:2]
-    if QFileInfo(self.plugin_path).exists():
-        localePath = self.plugin_path+"/i18n/pgVersion_"+myLocale+".qm"
+        # Initialise thetranslation environment
+        self.plugin_path = os.path.dirname(__file__)
+        self.locale = QSettings().value('locale/userLocale')[0:2]
+        locale_path = os.path.join(
+            self.plugin_path,
+            'i18n',
+            'pgVersion_{}.qm'.format(self.locale))
 
-    if QFileInfo(localePath).exists():
-        self.translator = QTranslator()
-        self.translator.load(localePath)
-  
-        if qVersion() > '4.3.3':        
-            QCoreApplication.installTranslator(self.translator)  
-    
-#    QgsMapLayerRegistry.instance().layerWasAdded.connect(self.add_layer)
-#    QgsMapLayerRegistry.instance().layerWillBeRemoved.connect(self.remove_layer)
-    
-  def initGui(self):  
+        if os.path.exists(locale_path):
+            self.translator = QTranslator()
+            self.translator.load(locale_path)
 
-    self.helpDialog = HelpDialog()
-    self.logview_dialog = LogView(self)
-    self.feature_history = FeatureHistory( self.iface )
-    self.tools = PgVersionTools(self)
+            if qVersion() > '4.3.3':
+                QCoreApplication.installTranslator(self.translator)
 
-    self.toolBar = self.iface.addToolBar("PG Version")
-    self.toolBar.setObjectName("PG Version")
+    def initGui(self):
 
-    self.actionInit = QAction(QIcon(":/plugins/pgversion/icons/pgversion-init.png"), self.tr("Prepare Layer for Versioning"), self.iface.mainWindow())
-    self.actionLoad = QAction(QIcon(":/plugins/pgversion/icons/pgversion-commit.png"), self.tr("Load Versioned Layer"), self.iface.mainWindow())
-    self.actionCommit = QAction(QIcon(":/plugins/pgversion/icons/pgversion-load.png"), self.tr("Commit Changes"), self.iface.mainWindow())
-    self.actionRevert = QAction(QIcon(":/plugins/pgversion/icons/pgversion-revert.png"), self.tr("Revert to HEAD Revision"), self.iface.mainWindow())
-    self.actionLogView = QAction(QIcon(":/plugins/pgversion/icons/pgversion-logview.png"), self.tr("Show Logs"), self.iface.mainWindow())
-    self.actionDiff = QAction(QIcon(":/plugins/pgversion/icons/pgversion-diff.png"), self.tr("Show Diffs"), self.iface.mainWindow())
-    self.actionFeatureInfo = QAction(QIcon(":/plugins/pgversion/icons/pgversion-feature-info.png"), self.tr("Feature History"), self.iface.mainWindow())
-    self.actionFeatureInfo.setCheckable(True)
-    
-    self.actionDrop = QAction(QIcon(":/plugins/pgversion/icons/pgversion-drop.png"), self.tr("Drop Versioning from Layer"), self.iface.mainWindow())    
-    self.actionHelp = QAction(QIcon(""), self.tr("Help"), self.iface.mainWindow())       
-    self.actionAbout = QAction(QIcon(""), self.tr("About"), self.iface.mainWindow())       
-    self.actionDelete = QAction(QIcon(":/plugins/pgversion/icons/pgversion-drop.png"), self.tr("Bulk delete directly in the database"), self.iface.mainWindow())       
-    self.actionDelete.setEnabled(False)
-    
-    self.actionList =  [ self.actionInit,self.actionLoad, self.actionCommit, self.actionDiff, self.actionRevert,  self.actionFeatureInfo,  self.actionLogView, self.actionDrop,  self.actionDelete, self.actionHelp,  self.actionAbout]         
- 
-    self.toolBar.addAction(self.actionInit)
-    self.toolBar.addAction(self.actionLoad)
-    self.toolBar.addAction(self.actionCommit)
-    self.toolBar.addAction(self.actionRevert)
-    self.toolBar.addAction(self.actionFeatureInfo)
-    self.toolBar.addAction(self.actionLogView)
-    self.toolBar.addAction(self.actionDiff)
-    self.toolBar.addAction(self.actionDelete)
+        self.helpDialog = HelpDialog()
+        self.LogViewDialog = LogView(self)
 
+        self.toolBar = self.iface.addToolBar("PG Version")
+        self.toolBar.setObjectName("PG Version")
 
- # Add the Menubar into the new Database Main Menue starting with QGIS1.7
-    try:
-        for a in self.actionList:
-           self.iface.addPluginToDatabaseMenu("PG Version", a)
-    except AttributeError:
-# For former QGIS Versions use the old Main Menue
-       self.menu = QMenu()
-       self.menu.setTitle( "PG Version" )  
-       self.menu.addActions(self.actionList)    
-       self.menuBar = self.iface.mainWindow().menuBar()
-       self.menuBar.addMenu(self.menu)  
-    
-    self.actionInit.triggered.connect(self.doInit) 
-    self.actionLoad.triggered.connect(self.doLoad) 
-    self.actionDiff.triggered.connect(self.doDiff)     
-    self.actionCommit.triggered.connect(self.doCommit) 
-    self.actionRevert.triggered.connect(self.doRevert) 
-    self.actionLogView.triggered.connect(self.doLogView) 
-    self.actionDrop.triggered.connect(self.doDrop) 
-    self.actionHelp.triggered.connect(self.doHelp) 
-    self.actionAbout.triggered.connect(self.doAbout) 
-    self.actionDelete.triggered.connect(self.doDelete) 
-    self.actionFeatureInfo.triggered.connect(self.doFeatureInfo) 
-    
-    self.logview_dialog.diffLayer.connect(self.doDiff) 
-    self.logview_dialog.rollbackLayer.connect(self.doRollback) 
-    self.logview_dialog.checkoutLayer.connect(self.doCheckout) 
-    self.logview_dialog.checkoutTag.connect(self.doCheckout) 
-    self.logview_dialog.createBranch.connect(self.doMakeBranch)  
-            
-    QgsMapLayerRegistry.instance().layerWasAdded.connect(self.add_layer)
-    QgsMapLayerRegistry.instance().layerWillBeRemoved.connect(self.remove_layer)    
-    
-    self.handler = None
-    self.selected_layer = None
-    self.iface.currentLayerChanged.connect(self.onLayerChanged)
+        self.actionInit = QAction(
+            QIcon(":/plugins/pgversion/icons/pgversion-init.png"),
+            self.tr("Prepare Layer for Versioning"),
+            self.iface.mainWindow())
+        self.actionLoad = QAction(
+            QIcon(":/plugins/pgversion/icons/pgversion-commit.png"),
+            self.tr("Load Versioned Layer"), self.iface.mainWindow())
+        self.actionCommit = QAction(
+            QIcon(":/plugins/pgversion/icons/pgversion-load.png"),
+            self.tr("Commit Changes"), self.iface.mainWindow())
+        self.actionRevert = QAction(
+            QIcon(":/plugins/pgversion/icons/pgversion-revert.png"),
+            self.tr("Revert to HEAD Revision"), self.iface.mainWindow())
+        self.actionLogView = QAction(
+            QIcon(":/plugins/pgversion/icons/pgversion-logview.png"),
+            self.tr("Show Logs"), self.iface.mainWindow())
+        self.actionDiff = QAction(
+            QIcon(":/plugins/pgversion/icons/pgversion-diff.png"),
+            self.tr("Show Diffs"), self.iface.mainWindow())
+        self.actionDrop = QAction(
+            QIcon(":/plugins/pgversion/icons/pgversion-drop.png"),
+            self.tr("Drop Versioning from Layer"), self.iface.mainWindow())
+        self.actionHelp = QAction(QIcon(""), self.tr("Help"),
+                                  self.iface.mainWindow())
+        self.actionAbout = QAction(QIcon(""), self.tr("About"),
+                                   self.iface.mainWindow())
+        self.actionDelete = QAction(
+            QIcon(":/plugins/pgversion/icons/pgversion-drop.png"),
+            self.tr("Bulk delete directly in the database"),
+            self.iface.mainWindow())
+        self.actionDelete.setEnabled(False)
 
+        self.actionList = [self.actionInit, self.actionLoad, self.actionCommit,
+                           self.actionDiff, self.actionRevert,
+                           self.actionLogView, self.actionDrop,
+                           self.actionLogView, self.actionDelete,
+                           self.actionHelp, self.actionAbout]
 
-  def onLayerChanged(self,  layer):        
-        if layer != None:
-            self.selected_layer = layer
-            
-            if self.selected_layer.type() == 0 and self.selected_layer.selectedFeatureCount() == 0:
+        self.toolBar.addAction(self.actionInit)
+        self.toolBar.addAction(self.actionLoad)
+        self.toolBar.addAction(self.actionCommit)
+        self.toolBar.addAction(self.actionRevert)
+        self.toolBar.addAction(self.actionDiff)
+        self.toolBar.addAction(self.actionLogView)
+        self.toolBar.addAction(self.actionDelete)
+
+        try:
+            for a in self.actionList:
+                self.iface.addPluginToDatabaseMenu("PG Version", a)
+        except AttributeError:
+            self.menu = QMenu()
+            self.menu.setTitle("PG Version")
+            self.menu.addActions(self.actionList)
+            self.menuBar = self.iface.mainWindow().menuBar()
+            self.menuBar.addMenu(self.menu)
+
+        # connect the action to the run method
+        self.actionInit.triggered.connect(self.doInit)
+        self.actionLoad.triggered.connect(self.doLoad)
+        self.actionDiff.triggered.connect(self.doDiff)
+        self.actionCommit.triggered.connect(self.doCommit)
+        self.actionRevert.triggered.connect(self.doRevert)
+        self.actionLogView.triggered.connect(self.doLogView)
+        self.actionDrop.triggered.connect(self.doDrop)
+        self.actionHelp.triggered.connect(self.doHelp)
+        self.actionAbout.triggered.connect(self.doAbout)
+        self.actionDelete.triggered.connect(self.doDelete)
+
+        self.LogViewDialog.diffLayer.connect(self.doDiff)
+        self.LogViewDialog.rollbackLayer.connect(self.doRollback)
+        self.LogViewDialog.checkoutLayer.connect(self.doCheckout)
+        self.LogViewDialog.checkoutTag.connect(self.doCheckout)
+
+        for a in self.iface.digitizeToolBar().actions():
+            if a.objectName() == 'mActionToggleEditing':
+                a.triggered.connect(self.SelectionChanged)
+
+        self.iface.mapCanvas().selectionChanged.connect(
+            self.SelectionChanged)
+        QgsProject().instance().layerWasAdded.connect(self.add_layer)
+        QgsProject().instance().layerWillBeRemoved.connect(
+            self.remove_layer)
+
+    def SelectionChanged(self):
+        current_layer = self.iface.activeLayer()
+        if current_layer is not None:
+            if (current_layer.type() == QgsMapLayer.VectorLayer) and current_layer.selectedFeatureCount() == 0:
                 self.actionDelete.setEnabled(False)
             else:
-                if self.tools.hasVersion(self.selected_layer):
-                    if self.selected_layer.isEditable():
-                        self.actionDelete.setEnabled(True) # true
+                if self.tools.hasVersion(current_layer):
+                    if current_layer.isEditable():
+                        self.actionDelete.setEnabled(True)
                     else:
                         self.actionDelete.setEnabled(False)
                 else:
-                    self.actionDelete.setEnabled(False) # true
-      
-      
-  def add_layer(self,  l):
+                    self.actionDelete.setEnabled(False)
+
+    def add_layer(self, l):
         if self.tools.hasVersion(l):
             if l.id not in self.layer_list:
-            
-                l.editingStopped.connect(lambda my_list = self.layer_list: self.tools.setModified(my_list))
-                l.editingStopped.connect(lambda my_layer = l: self.tools.editingStopped(my_layer))
-                l.saveLayerToProject.connect(lambda my_layer = l: self.tools.editingStopped(my_layer))
-                l.selectionChanged.connect(self.onLayerChanged)
+                l.editingStopped.connect(
+                    lambda my_list=self.layer_list: self.tools.setModified(
+                        my_list))
                 self.layer_list.append(l.id())
                 self.tools.setModified(self.layer_list)
 
-  def remove_layer(self,  id):
+    def remove_layer(self, id):
         self.layer_list = list(set(self.layer_list))
         if id in set(self.layer_list):
             self.layer_list.remove(id)
 
-  def unload(self):
-        # remove menubar
-      try:
-          for a in self.actionList:
-            self.iface.removePluginDatabaseMenu("PG Version", a)
-      except:
-          del self.menuBar
-      del self.toolBar
-      
-  def toggle_feature_info_cursor(self):
-      pass
-      
-  def doFeatureInfo(self): 
-        self.iface.mapCanvas().setMapTool( self.feature_history )
+    def unload(self):
+        QSettings().setValue("/pgVersion/commit_messages", "")
+        try:
+            for a in self.actionList:
+                self.iface.removePluginDatabaseMenu("PG Version", a)
+        except:
+            del self.menuBar
+        del self.toolBar
 
-  def doDelete(self):
+    def doDelete(self):
+
         res = QMessageBox.question(
-         None,
-         self.tr("Question"),
-         self.tr("Are you sure to delete all selected features. You cannot undo this action!"),
-         QMessageBox.StandardButtons(
-             QMessageBox.No |
-             QMessageBox.Yes))
-        
+            None,
+            self.tr("Question"),
+            self.tr(
+                "Are you sure to delete all selected features. "
+                "You cannot undo this action!"),
+            QMessageBox.No | QMessageBox.Yes)
+
         if res == QMessageBox.Yes:
             QApplication.restoreOverrideCursor()
             canvas = self.iface.mapCanvas()
-            currentLayer = canvas.currentLayer()      
+            currentLayer = canvas.currentLayer()
             mySchema = self.tools.layerSchema(currentLayer)
             myTable = self.tools.layerTable(currentLayer)
-            myPkey = QgsDataSourceURI(currentLayer.dataProvider().dataSourceUri()).keyColumn()
-            myDb = self.tools.layerDB('doInit',currentLayer)        
+            myPkey = QgsDataSourceUri(
+                currentLayer.dataProvider().dataSourceUri()).keyColumn()
+            myDb = self.tools.layerDB('doInit', currentLayer)
             selectedFeatures = currentLayer.selectedFeatures()
             delete_list = "("
-            
+
             if currentLayer.selectedFeatureCount() > 0:
                 for feature in selectedFeatures:
-                      delete_list += str(feature.attributes()[0])+", "
-                
+                    delete_list += str(feature.attributes()[0]) + ", "
+
                 delete_list = delete_list[:-2]
                 delete_list += ")"
-                sql = "delete from \"%s\".\"%s\" where \"%s\" in %s" % (mySchema,  myTable,  myPkey,  delete_list)
+                sql = "delete from \"%s\".\"%s\" where \"%s\" in %s" % (
+                    mySchema, myTable, myPkey, delete_list)
                 QApplication.setOverrideCursor(Qt.WaitCursor)
-                myDb.run(sql)
+                success,  error = myDb.run(sql)
                 QApplication.restoreOverrideCursor()
                 currentLayer.removeSelection()
                 currentLayer.triggerRepaint()
                 self.tools.setModified(self.layer_list)
-#                self.actionDelete.setEnabled(false)
-        
 
-  def doInit(self):
-    canvas = self.iface.mapCanvas()
-    currentLayer = canvas.currentLayer()
+    def doInit(self):
+        currentLayer = self.iface.activeLayer()
+        if currentLayer is None:
+            QMessageBox.warning(
+                None, '', self.tr('Please select a layer for versioning'))
+            return
+        elif currentLayer.dataProvider().name() != 'postgres':
+                QMessageBox.warning(
+                    None, '', self.tr('Please select a postgres layer '
+                                      'for versioning'))
+                return
+        elif self.tools.hasVersion(currentLayer):
+            QMessageBox.warning(
+                None, self.tr('Warning'),
+                self.tr('The selected layer is already under versioning!'))
+            return
+        else:
+            mySchema = self.tools.layerSchema(currentLayer)
+            myTable = self.tools.layerTable(currentLayer)
+            myDb = self.tools.layerDB('doInit', currentLayer)
+            if not self.tools.check_PGVS_revision(myDb):
+                return
 
-    if currentLayer == None:
-      QMessageBox.information(None, '', self.tr('Please select a layer for versioning'))
-      return    
-    elif self.tools.hasVersion(currentLayer):
-      QMessageBox.warning(None,   self.tr('Warning'),   self.tr('The selected layer is already under versioning!'))
-      return
-    else:
-      mySchema = self.tools.layerSchema(currentLayer)
-      myTable = self.tools.layerTable(currentLayer)
-      myDb = self.tools.layerDB('doInit',currentLayer)
-      if not self.tools.check_PGVS_revision(myDb):
-        return
+            if not self.tools.versionExists(currentLayer):
+                answer = QMessageBox.question(
+                    None, '', self.tr(
+                        'Do you want to create the version environment\
+                         for the table {0}?').format(
+                            mySchema + '.' + myTable),
+                    QMessageBox.Yes | QMessageBox.No)
+                if answer == QMessageBox.No:
+                    return
+                QApplication.setOverrideCursor(Qt.WaitCursor)
+                sql = "select * from versions.pgvsinit('%s.%s')" % (
+                    mySchema, myTable)
+                result, error = myDb.run(sql)
 
-      if not self.tools.versionExists(currentLayer):
-        answer = QMessageBox.question(None, '', self.tr('Do you want to create the version environment for the table {0}').format(mySchema+'.'+myTable), self.tr('Yes'), self.tr('No'))
-        QApplication.setOverrideCursor(Qt.WaitCursor)
-        sql = "select * from versions.pgvsinit('%s.%s')" % (mySchema,  myTable)
-        result = myDb.runError(sql)
-        
-        if result == ' ':
-          sql = "GRANT ALL ON TABLE %s.%s TO versions" % (mySchema,  myTable);
-          grant_result = myDb.runError(sql)            
-          QMessageBox. information(None, 'Init', self.tr( 'Init was successful!\n\n\
-Please set the user permissions for table {0} and reload it via Database -> PG Version!').format(myTable))
+                if result is True:
+                    QApplication.restoreOverrideCursor()
+                    QMessageBox. information(None, 'Init', self.tr(
+                        'Init was successful!\n\n'
+                        'Please set the user permissions for table {0} and'
+                        ' reload it via Database -> PG Version!').format(
+                            myTable))
 
-          QgsMapLayerRegistry.instance().removeMapLayer(currentLayer.id())          
+                    QgsProject().instance().removeMapLayer(
+                        currentLayer.id())
+                    self.iface.mapCanvas().refreshAllLayers()
 
-          QApplication.restoreOverrideCursor()
-      else:
-        self.iface.messageBar().pushMessage(self.tr('Init Error'), self.tr('Versioning envoronment for table {0} already exsists!').format(mySchema+"."+myTable), level=QgsMessageBar.CRITICAL, duration=3)
+                else:
+                    QMessageBox.warning(None, 
+                        self.tr('Init Error'),
+                        self.tr("""
+Initialisation of table {0} failed!
+                              
+Error:
+{1}
+                        """).format(
+                            mySchema + "." + myTable, 
+                            error))
+            else:
+                QMessageBox.information(
+                    None,
+                    "",
+                    self.tr("The layer: {0} was already versioned.\nIf you "
+                            "want to use the versioned layer, then add the"
+                            " following table from the DB: {0}_version or "
+                            "add the layer through the Load Versioned Layer"
+                            " button".format(
+                                self.iface.activeLayer().name())))
 
+    def doLoad(self):
 
-  def doLoad(self): 
-     self.dlg = PgVersionLoadDialog(self)
-     self.dlg.show()
+        self.dlg = PgVersionLoadDialog(self)
+        self.dlg.show()
 
-  def doRollback(self,  item):
-      if item == None:
-        QMessageBox.information(None, self.tr('Error'),  self.tr('Please select a valid revision'))
-        return
+    def doRollback(self, item):
 
-      revision = item.text(0)
-      canvas = self.iface.mapCanvas()
-      currentLayer = canvas.currentLayer()
+        if item is None:
+            QMessageBox.information(None, self.tr('Error'),
+                                    self.tr('Please select a valid revision'))
+            return
 
-      if currentLayer == None:
-        QMessageBox.information(None, '', self.tr('Please select a versioned layer'))
-        return    
-      else:
-        answer = QMessageBox.question(None, '', self.tr('Are you sure to rollback to revision {0}?').format(revision), self.tr('Yes'),  self.tr('No'))
-        if answer == 0:
+        revision = item.text(0)
+
+        canvas = self.iface.mapCanvas()
+        currentLayer = canvas.currentLayer()
+
+        if currentLayer is None:
+            QMessageBox.information(
+                None, '', self.tr('Please select a versioned layer'))
+            return
+        else:
+            answer = QMessageBox.question(
+                None, '', self.tr(
+                    'Are you sure to rollback to revision {0}?').format(
+                        revision), QMessageBox.Yes | QMessageBox.Cancel)
+
+            if answer == QMessageBox.Cancel:
+                return
+
             if self.tools.isModified(currentLayer):
-                answer = QMessageBox.question(None, '', \
-                self.tr('Layer {0} has modifications which will be lost after rollback! \
-If you want to keep this modifications please commit them. \
-Are you sure to rollback to revision {1}?').format(currentLayer.name(),  revision), self.tr('Yes'),  self.tr('No'))                                
-                if answer == 1:
+                answer = QMessageBox.question(
+                    None, '',
+                    self.tr('Layer {0} has modifications which will be\
+                            lost after rollback!\
+                            If you want to keep this modifications \
+                            please commit them. \
+                            Are you sure to rollback to revision \
+                            {1}?').format(
+                        currentLayer.name(), revision),
+                    QMessageBox.Yes | QMessageBox.Cancel)
+                if answer == QMessageBox.Cancel:
                     return
 
             QApplication.setOverrideCursor(Qt.WaitCursor)
             provider = currentLayer.dataProvider()
-            uri = provider.dataSourceUri()    
-            myDb = self.tools.layerDB('doRollback',currentLayer)
+            uri = provider.dataSourceUri()
+            myDb = self.tools.layerDB('doRollback', currentLayer)
             if not self.tools.check_PGVS_revision(myDb):
                 return
-            mySchema = QgsDataSourceURI(uri).schema()
+            mySchema = QgsDataSourceUri(uri).schema()
 
             if len(mySchema) == 0:
                 mySchema = 'public'
-            myTable = QgsDataSourceURI(uri).table()
+            myTable = QgsDataSourceUri(uri).table()
 
-            sql = "select * from versions.pgvsrollback('"+mySchema+"."+myTable.replace('_version', '')+"',"+revision+")"
+            sql = "select * from versions.pgvsrollback('" + mySchema + "." + myTable.replace('_version', '') + "'," + revision + ")"
 
-            myDb.run(sql)
-            myDb.close()
-            self.logview_dialog.close()
+            success,  error = myDb.run(sql)
+            self.LogViewDialog.close()
             currentLayer.triggerRepaint()
             QApplication.restoreOverrideCursor()
             self.tools.setModified(self.layer_list)
-            self.iface.messageBar().pushMessage('INFO', self.tr('Rollback to revision {0} was successful!').format(revision), level=QgsMessageBar.INFO, duration=3)
+            self.LogViewDialog.close()
+            self.iface.messageBar().pushMessage(
+                'Info',
+                self.tr('Rollback to revision {0} was successful!').format(
+                    revision), level=Qgis.MessageLevel(0), duration=3)
+
+    def doCommit(self):
+        canvas = self.iface.mapCanvas()
+
+        if canvas.currentLayer() is None:
+            self.iface.messageBar().pushMessage(
+                'Warning', self.tr(
+                    'Please select a versioned layer for committing'),
+                level=Qgis.MessageLevel(1), duration=3)
             return
 
-  def doCommit(self):
-      canvas = self.iface.mapCanvas()
-      
-      if canvas.currentLayer() == None:
-          self.iface.messageBar().pushMessage('Error', self.tr('Please select a versioned layer for committing'), level=QgsMessageBar.CRITICAL, duration=3)
-          return
+        canvas = self.iface.mapCanvas()
+        theLayer = canvas.currentLayer()
+        mySchema = self.tools.layerSchema(theLayer)
+        myTable = self.tools.layerTable(theLayer).replace('_version', '')
 
-      canvas = self.iface.mapCanvas()
-      theLayer = canvas.currentLayer()
-      mySchema = self.tools.layerSchema(theLayer)
-      myTable = self.tools.layerTable(theLayer).replace('_version', '')
+        if not self.tools.hasVersion(theLayer):
+            QMessageBox.warning(None, self.tr('Warning'),
+                                self.tr('Please select a versioned layer!'))
+        else:
+            if self.tools.isModified(theLayer):
+                confRecords = self.tools.confRecords(theLayer)
+                if confRecords is None:
+                    self.dlgCommitMessage = CommitMessageDialog()
+                    self.dlgCommitMessage.show()
+                    result = self.dlgCommitMessage.exec_()
 
-      if not self.tools.hasVersion(theLayer):
-          QMessageBox.warning(None,   self.tr('Warning'),   self.tr('Please select a versioned layer!'))
-      else:
-          if self.tools.isModified(theLayer):
-              confRecords = self.tools.confRecords(theLayer)            
-              if  confRecords == None:
-              # show the dialog
-                  self.dlgCommitMessage = CommitMessageDialog()
-                  self.dlgCommitMessage.show()
-                  result = self.dlgCommitMessage.exec_()
-    
-                  if result == QDialog.Accepted:
-                        QApplication.setOverrideCursor(Qt.WaitCursor)                    
-                        sql = "select * from versions.pgvscommit('%s.%s','%s')" % (mySchema,  myTable,  self.dlgCommitMessage.textEdit.toPlainText())
-                        myDB = self.tools.layerDB('commit',  theLayer)
-                        myDB.run(sql)
-                        myDB.close()
+                    if result == QDialog.Accepted:
+                        QApplication.setOverrideCursor(Qt.WaitCursor)
+                        sql = "select * from versions.pgvscommit('%s.%s','%s')\
+                        " % (
+                            mySchema, myTable,
+                            self.dlgCommitMessage.textEdit.toPlainText())
+                        myDB = self.tools.layerDB('commit', theLayer)
+                        success,  error = myDB.run(sql)
                         self.tools.layerRepaint()
-                        self.iface.messageBar().pushMessage("Info", self.tr('Commit of your changes was successful'), level=QgsMessageBar.INFO, duration=3)            
+                        self.iface.messageBar().pushMessage(
+                            "Info",
+                            self.tr('Commit of your changes was successful'),
+                            level=Qgis.MessageLevel(0), duration=3)
                         self.tools.setModified(self.layer_list)
                         QApplication.restoreOverrideCursor()
-              else:
-                if self.w != None:
-                    self.w = None
-                self.w = ConflictWindow(theLayer,  'conflict',  self)
-                self.w.mergeCompleted.connect(self.doCommit)
-                self.w.show()
-    
-              self.tools.setModified(self.layer_list)
-          else:
-              self.iface.messageBar().pushMessage('INFO', self.tr('No layer changes for committing, everything is OK'), level=QgsMessageBar.INFO, duration=3)
-              
-      self.tools.setModified(self.layer_list)
+                else:
+                    if self.w is not None:
+                        self.w = None
+                    self.w = ConflictWindow(theLayer, 'conflict', self)
+                    self.w.show()
+                    self.tools.setModified(self.layer_list)
+            else:
+                self.iface.messageBar().pushMessage(
+                    'Info',
+                    self.tr('No layer changes for committing, everything is\
+                            OK'), level=Qgis.MessageLevel(0), duration=3)
 
-  def doCheckout(self,  revision,  tag=None):
-      if revision == None:
-        QMessageBox.information(None, self.tr('Error'),  self.tr('Please select a valid revision'))
-        return
+        self.tools.setModified(self.layer_list)
 
-      canvas = self.iface.mapCanvas()
-      currentLayer = canvas.currentLayer()
+    def doCheckout(self, revision, tag=None):
+        if revision is None:
+            QMessageBox.information(
+                None, self.tr('Error'),
+                self.tr('Please select a valid revision'))
+            return
 
+        canvas = self.iface.mapCanvas()
+        currentLayer = canvas.currentLayer()
 
-      if currentLayer == None:
-        QMessageBox.information(None, '', self.tr('Please select a versioned layer'))
-        return    
-      else:
-        answer = QMessageBox.question(None, '', self.tr('Are you sure to checkout the layer to revision {0}?').format(revision), self.tr('Yes'),  self.tr('No'))
-        if answer == 0:
-            QApplication.setOverrideCursor(Qt.WaitCursor)
-            provider = currentLayer.dataProvider()
-            uri = provider.dataSourceUri()    
-            uniqueCol = QgsDataSourceURI(uri).keyColumn()
-            geomCol = QgsDataSourceURI(uri).geometryColumn()
-            mySchema = QgsDataSourceURI(uri).schema()
-            myTable = QgsDataSourceURI(uri).table()
+        if currentLayer is None:
+            QMessageBox.information(
+                None, '', self.tr('Please select a versioned layer'))
+            return
+        else:
+            answer = QMessageBox.question(
+                None, '',
+                self.tr('Are you sure to checkout the layer to '
+                        'revision {0}?').format(revision),
+                QMessageBox.Yes | QMessageBox.Cancel)
+
+            if answer == QMessageBox.Yes:
+                QApplication.setOverrideCursor(Qt.WaitCursor)
+                provider = currentLayer.dataProvider()
+                uri = provider.dataSourceUri()
+                uniqueCol = QgsDataSourceUri(uri).keyColumn()
+                geomCol = QgsDataSourceUri(uri).geometryColumn()
+
+                mySchema = QgsDataSourceUri(uri).schema()
+                myTable = QgsDataSourceUri(uri).table()
+
+                if len(mySchema) == 0:
+                    mySchema = 'public'
+
+                sql = """select * from versions.pgvscheckout(NULL::"{0}"."{1}", {2})""".format(
+                            mySchema,
+                            myTable.replace('_version', ''),
+                            revision)
+
+                myUri = QgsDataSourceUri(uri)
+                myUri.setDataSource("", u"(%s\n)" % (sql), geomCol, "",
+                                    uniqueCol)
+
+                layer = None
+
+                if tag:
+                    table_ext = " (Tag: %s)" % tag
+                else:
+                    table_ext = " (Revision: %s)" % revision
+
+                layer = QgsVectorLayer(
+                    myUri.uri(), myTable + table_ext, "postgres")
+
+                QgsProject().instance().addMapLayer(layer)
+                QApplication.restoreOverrideCursor()
+                if layer.isValid():
+                    self.iface.messageBar().pushMessage(
+                        'Info', self.tr('Checkout to revision {0} was \
+                                        successful!').format(revision),
+                        level=Qgis.MessageLevel(0), duration=3)
+                    layer.triggerRepaint()
+                else:
+                    self.iface.messageBar().pushMessage(
+                        'Info', self.tr('Something went wrong during checkout \
+                                        to revision {0}!').format(
+                            revision),
+                        level=Qgis.MessageLevel(0), duration=3)
+                self.LogViewDialog.close()
+                return
+
+    def doRevert(self):
+        theLayer = self.iface.activeLayer()
+        if theLayer is None:
+            QMessageBox.warning(None,
+                                self.tr("Warning"),
+                                self.tr("No Layer was selected. "
+                                        "Please select one Layer."))
+            return
+
+        provider = theLayer.dataProvider()
+        uri = provider.dataSourceUri()
+        myDb = self.tools.layerDB('revert', theLayer)
+        mySchema = QgsDataSourceUri(uri).schema()
+        myTable = QgsDataSourceUri(uri).table()
+
+        if not self.tools.hasVersion(theLayer):
+            QMessageBox.warning(
+                None, self.tr(
+                    'Warning'), self.tr('Please select a versioned layer!'))
+        else:
+            if not self.tools.isModified(theLayer):
+                self.iface.messageBar().pushMessage(
+                    "Warning",
+                    self.tr(
+                        'The selected Layer is already at the HEAD Revision.'),
+                    level=Qgis.MessageLevel(1), duration=3)
+                return
+
+            if len(mySchema) == 1:
+                mySchema = 'public'
+
+            answer = QMessageBox.question(
+                None, '', self.tr(
+                    'Are you sure to revert to the HEAD revision?'),
+                QMessageBox.Yes | QMessageBox.Cancel)
+
+            if answer == QMessageBox.Yes:
+                sql = "select * from versions.pgvsrevert('" + mySchema + "." + myTable.replace('_version', '') + "')"
+                result,  error = myDb.read(sql)
+                success,  error = myDb.run(sql)
+                if not success:
+                    QMessageBox.information(None, '', result)
+                else:
+                    self.iface.messageBar().pushMessage(
+                        "Info",
+                        self.tr('All changes are set back to the HEAD \
+                                revision: {0}').format(
+                            str(result["PGVSREVERT"][0])),
+                        level=Qgis.MessageLevel(0), duration=3)
+
+            self.tools.setModified(self.layer_list)
+            theLayer.triggerRepaint()
+
+    def doLogView(self):
+        canvas = self.iface.mapCanvas()
+        theLayer = self.iface.activeLayer()
+
+        if not self.tools.hasVersion(theLayer):
+            QMessageBox.warning(None, self.tr('Warning'), self.tr(
+                'Please select a versioned layer!'))
+            return
+
+        if theLayer is not None:
+            provider = theLayer.dataProvider()
+            uri = provider.dataSourceUri()
+            myDb = self.tools.layerDB('logview', theLayer)
+            mySchema = QgsDataSourceUri(uri).schema()
+            myTable = QgsDataSourceUri(uri).table()
 
             if len(mySchema) == 0:
                 mySchema = 'public'
 
-            sql = 'select * from versions.pgvscheckout(NULL::"%s"."%s", %s)' % (
-                        mySchema,  
-                        myTable.replace('_version', ''),  
-                        revision)
-                        
-            myUri = QgsDataSourceURI(uri)
-            myUri.setDataSource("", u"(%s\n)" % (sql), geomCol, "", uniqueCol)
+            sql = "select * from versions.pgvslogview('" + mySchema + "." + myTable.replace(
+                '_version', '') + "') order by revision desc"
+            result,  error = myDb.read(sql)
 
-            layer = None
-            
-            if tag:
-                table_ext = " (Tag: %s)" % tag
-            else:
-                table_ext = " (Revision: %s)" % revision
-                
-            layer = QgsVectorLayer(myUri.uri(), myTable+table_ext, "postgres")         
+            self.LogViewDialog.setLayer(theLayer)
+            self.LogViewDialog.createTagList()
+            self.LogViewDialog.treeWidget.clear()
 
-            QgsMapLayerRegistry.instance().addMapLayer(layer)
-            QApplication.restoreOverrideCursor()
-            if layer.isValid():
-                self.iface.messageBar().pushMessage('INFO', self.tr('Checkout to revision {0} was successful!').format(revision), level=QgsMessageBar.INFO, duration=3)
-                layer.triggerRepaint()
-            else:
-                self.iface.messageBar().pushMessage('CRITICAL', self.tr('Something went wrong during checkout to revision {0}!').format(revision), level=QgsMessageBar.CRITICAL, duration=3)
-            self.logview_dialog.close()            
+            itemList = []
+
+            for i in range(len(result["PROJECT"])):
+                myItem = QTreeWidgetItem()
+                myItem.setText(0, str(result["REVISION"][i]))
+                myItem.setText(1, str(result["DATUM"][i]))
+                myItem.setText(2, str(result["PROJECT"][i]))
+                myItem.setText(3, str(result["LOGMSG"][i]))
+                itemList.append(myItem)
+
+            self.LogViewDialog.treeWidget.addTopLevelItems(itemList)
+
+            self.LogViewDialog.show()
+            myDb.close()
+            canvas.refresh()
+        else:
+            provider = theLayer.dataProvider()
+            uri = provider.dataSourceUri()
+            myDb = self.tools.layerDB('logview', theLayer)
+            mySchema = QgsDataSourceUri(uri).schema()
+            myTable = QgsDataSourceUri(uri).table()
+
+            if len(mySchema) == 0:
+                mySchema = 'public'
+
+            sql = "select * from versions.pgvslogview('" + mySchema + "." + myTable.replace(
+                '_version', '') + "') order by revision desc"
+            result,  error = myDb.read(sql)
+
+            self.LogViewDialog.setLayer(theLayer)
+            self.LogViewDialog.createTagList()
+            self.LogViewDialog.treeWidget.clear()
+
+            itemList = []
+
+            for i in range(len(result["PROJECT"])):
+                myItem = QTreeWidgetItem()
+                myItem.setText(0, str(result["REVISION"][i]))
+                myItem.setText(1, str(result["DATUM"][i]))
+                myItem.setText(2, str(result["PROJECT"][i]))
+                myItem.setText(3, str(result["LOGMSG"][i]))
+                itemList.append(myItem)
+
+            self.LogViewDialog.treeWidget.addTopLevelItems(itemList)
+
+            self.LogViewDialog.show()
+            myDb.close()
+            canvas.refresh()
+
+    def doDiff(self):
+
+        currentLayer = self.iface.activeLayer()
+
+        if currentLayer is None or currentLayer.dataProvider().name() == "memory":
+            self.iface.messageBar().pushMessage(
+                'Warning',
+                self.tr('Please select a versioned layer.'),
+                level=Qgis.MessageLevel(1), duration=3)
             return
 
+        if not self.tools.isModified(currentLayer):
+            self.iface.messageBar().pushMessage(
+                "Warning",
+                self.tr(
+                    'The selected Layer is at the HEAD Revision.'),
+                level=Qgis.MessageLevel(1), duration=3)
+            return
 
-  def doRevert(self):
-    canvas = self.iface.mapCanvas()
-    theLayer = self.iface.activeLayer()
-    provider = theLayer.dataProvider()
-    uri = provider.dataSourceUri()    
-    myDb = self.tools.layerDB('revert', theLayer)
-    mySchema = QgsDataSourceURI(uri).schema()
-    myTable = QgsDataSourceURI(uri).table()    
-    
-    if not self.tools.hasVersion(theLayer):
-       QMessageBox.warning(None,   self.tr('Warning'),   self.tr('Please select a versioned layer!'))
-    else:
-        if len(mySchema) == 1:
-          mySchema = 'public'
-    
-        answer = QMessageBox.question(None, '', self.tr('are you sure to revert to the HEAD revision?'), self.tr('Yes'),  self.tr('No'))
-    
-        if answer == 0:
-            sql = "select * from versions.pgvsrevert('"+mySchema+"."+myTable.replace('_version', '')+"')"
-            result = myDb.read(sql)
-    
-            if len(result)>1:
-                QMessageBox.information(None, '',result)
-            else:
-                self.iface.messageBar().pushMessage("Info", self.tr('All changes are set back to the HEAD revision: {0}').format(str(result["PGVSREVERT"][0])), level=QgsMessageBar.INFO, duration=3)            
-                
-        self.tools.setModified(self.layer_list)
-        theLayer.triggerRepaint()
-        myDb.close()
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        geomCol = self.tools.layerGeomCol(currentLayer)
+        geometryType = self.tools.layerGeometryType(currentLayer)
+        mySchema = self.tools.layerSchema(currentLayer)
+        myTable = self.tools.layerTable(currentLayer)
 
-  def doLogView(self):
-        canvas = self.iface.mapCanvas()
+        if len(mySchema) == 0:
+            mySchema = 'public'
+
+        extent = self.iface.mapCanvas().extent().toString().replace(
+            ':', ', ')
+        authority, crs = currentLayer.crs().authid().split(':')
+        geo_idx = '%s && ST_MakeEnvelope(%s,%s)' % (
+            geomCol, extent, crs)
+        sql = """with
+head as (select max(revision) as head from
+versions."{schema}_{origin}_version_log"),
+delete as (
+select 'delete'::varchar as action, *
+  from (
+  select * from versions.pgvscheckout(NULL::"{schema}"."{origin}",
+  (select * from head), '{geo_idx}')
+  except
+  select * from "{schema}"."{origin}_version" where {geo_idx}
+  ) as foo
+),
+insert as (
+select 'insert'::varchar as action, *
+  from (
+    select * from "{schema}"."{origin}_version" where {geo_idx}
+except
+    select * from versions.pgvscheckout(NULL::"{schema}"."{origin}",
+    (select * from head), '{geo_idx}')
+   ) as foo)
+
+select row_number() OVER () AS rownum, *
+from
+(
+select * from delete
+union
+select * from insert) as foo""".format(
+            schema=mySchema,
+            table=myTable,
+            origin=myTable.replace(
+                '_version', ''), geo_idx=geo_idx)
+
+        myUri = QgsDataSourceUri(self.tools.layerUri(currentLayer))
+        myUri.setDataSource("", u"(%s\n)" % sql, geomCol, "", "rownum")
+        myUri.setSrid(crs)
+        layer_name = myTable + " (Diff to HEAD Revision)"
+        layer = QgsVectorLayer(myUri.uri(), layer_name, "postgres")
+
+        mem_layer = self.tools.create_memory_layer(layer, layer_name)
+
+        if not mem_layer.isValid():
+            self.iface.messageBar().pushMessage(
+                'Warning',
+                self.tr('No diffs to HEAD detected! Layer could '
+                        'not be loaded.'),
+                level=Qgis.MessageLevel(1), duration=3)
+
+        else:
+            legends_path = os.path.dirname(__file__)
+            if geometryType == 0:
+                mem_layer.loadNamedStyle(
+                    legends_path + "/legends/diff_point.qml")
+            elif geometryType == 1:
+                mem_layer.loadNamedStyle(
+                    legends_path + "/legends/diff_linestring.qml")
+            elif geometryType == 2:
+                mem_layer.loadNamedStyle(
+                    legends_path + "/legends/diff_polygon.qml")
+            QgsProject().instance().addMapLayer(mem_layer)
+            self.iface.messageBar().pushMessage(
+                'Info',
+                self.tr('Diff to HEAD revision was successful!'),
+                level=Qgis.MessageLevel(0), duration=3)
+
+        QApplication.restoreOverrideCursor()
+        self.LogViewDialog.close()
+        return
+
+    def doDrop(self):
         theLayer = self.iface.activeLayer()
+        provider = theLayer.dataProvider()
+        uri = provider.dataSourceUri()
+        mySchema = QgsDataSourceUri(uri).schema()
+        if len(mySchema) == 0:
+            mySchema = 'public'
+        myTable = QgsDataSourceUri(uri).table()
 
-        if theLayer <> None:
-            if not self.tools.hasVersion(theLayer):
-                QMessageBox.warning(None,   self.tr('Warning'),   self.tr('Please select a versioned layer!'))
-            else:
-                provider = theLayer.dataProvider()
-                uri = provider.dataSourceUri()   
-                myDb = self.tools.layerDB('logview', theLayer)
-                mySchema = QgsDataSourceURI(uri).schema()
-                myTable = QgsDataSourceURI(uri).table()
-        
-                if len(mySchema) == 0:
-                   mySchema = 'public'
-        
-                sql = "select * from versions.pgvslogview('%s.%s') order by revision desc" % (mySchema,  myTable.replace('_version', '').split('#')[0])
-                result = myDb.read(sql)
-                
-                self.logview_dialog.setLayer(theLayer)
-                self.logview_dialog.createTagList()
-                self.logview_dialog.treeWidget.clear()
-        
-                itemList = []
-        
-                for i in range(len(result["PROJECT"])):
-                    myItem = QTreeWidgetItem()
-                    myItem.setText(0, result["REVISION"][i])
-                    myItem.setText(1, result["DATUM"][i])
-                    myItem.setText(2, result["PROJECT"][i])
-                    myItem.setText(3, result["LOGMSG"][i])
-                    itemList.append(myItem)
+        if theLayer is None:
+            QMessageBox.information(None, '', self.tr(
+                'Please select a layer for versioning'))
+            return
+        else:
+            answer = QMessageBox.question(
+                None, '',
+                self.tr('Are you sure to to drop pgvs from the table '
+                        '{0}?').format(mySchema + "." + myTable.replace(
+                            '_version', '')),
+                QMessageBox.Yes | QMessageBox.Cancel)
 
-                sql = "select version_table_id \
-              from versions.version_tables \
-              where version_table_schema = '%s' \
-                and version_table_name = '%s'" % (mySchema,  myTable.replace('_version', '').split('#')[0])
-                
-                result = myDb.read(sql)
-                self.logview_dialog.treeWidget.addTopLevelItems(itemList)
-                self.logview_dialog.set_version_table_id(result['VERSION_TABLE_ID'][0])
-                self.logview_dialog.show()        
-                myDb.close()
-                canvas.refresh()
+            if answer == QMessageBox.Yes:
+                if self.tools.isModified(theLayer):
+                    QMessageBox.warning(
+                        None,
+                        self.tr('Warning'),
+                        self.tr('Layer %s has uncommited changes, please'
+                                'commit them or revert to HEAD revision' % (
+                                    theLayer.name())))
+                else:
+                    myDb = self.tools.layerDB('doDrop', theLayer)
+                    sql = """select versions.pgvsdrop('{0}.{1}')""".format(
+                        mySchema, myTable.replace('_version', ''))
+                    myDb.read(sql)
 
-  def doDiff(self):
-      canvas = self.iface.mapCanvas()
-      currentLayer = canvas.currentLayer()
-      
-      if self.tools.isModified(currentLayer):
-          myDb = self.tools.layerDB('logview', currentLayer)
-    
-          if currentLayer == None:
-            QMessageBox.information(None, '', self.tr('Please select a versioned layer'))
-            return    
-          else:
-            answer = 0
-            if answer == 0:
-                QApplication.setOverrideCursor(Qt.WaitCursor)
-                geomCol = self.tools.layerGeomCol(currentLayer)
-                geometryType = self.tools.layerGeometryType(currentLayer)
-                mySchema = self.tools.layerSchema(currentLayer)
-                myTable = self.tools.layerTable(currentLayer)
-                id = self.tools.layerBranchId(currentLayer)
-    
-                if len(mySchema) == 0:
-                    mySchema = 'public'
-    
-                sql = u"select * from \"%s\".\"%s\" limit 0"  % (mySchema,  myTable)
-                cols = myDb.cols(sql)
-                extent = self.iface.mapCanvas().extent().toString().replace(':',',')
-                authority,  crs = currentLayer.crs().authid().split(':')
-                geo_idx = '%s && ST_MakeEnvelope(%s,%s)' %  (geomCol,  extent,  crs)
-                
-                sql = ("with \
-    head as (select max(revision) as head from versions.\"{schema}_{origin}_version_log\"), \
-    delete as (\
-    select 'delete'::varchar as action, * \
-      from (\
-      select * from versions.pgvscheckout(NULL::\"{schema}\".\"{origin}\",(select * from head), \'{geo_idx}\') \
-      except \
-      select * from \"{schema}\".\"{origin}_version#{id}\" where {geo_idx}\
-      ) as foo \
-    ), \
-    insert as (\
-    select 'insert'::varchar as action, * \
-      from ( \
-        select * from \"{schema}\".\"{origin}_version#{id}\" where {geo_idx} \
-    except \
-        select * from versions.pgvscheckout(NULL::\"{schema}\".\"{origin}\",(select * from head), \'{geo_idx}\') \
-       ) as foo) \
-    \
-    select row_number() OVER () AS rownum, * \
-    from \
-    (\
-    select * from delete \
-    union  \
-    select * from insert) as foo").format(id = id,  schema = mySchema,  table=myTable,  origin=myTable.replace('_version', '').split('#')[0],  geo_idx = geo_idx)
-    
-                branch_name_sql = "select branch_text \
-                           from versions.version_branch \
-                           where branch_id = %s" % (myTable.split('#')[1])
-                           
-                branch_name = myDb.read(branch_name_sql)
-                           
-                myUri = QgsDataSourceURI(self.tools.layerUri(currentLayer))
-                myUri.setDataSource("", u"(%s\n)" % sql, geomCol, "", "rownum")
-                layer_name = "%s - %s (Diff to HEAD Revision)" % (myTable.split('#')[0], branch_name['BRANCH_TEXT'][0])
-                layer = QgsVectorLayer(myUri.uri(), layer_name, "postgres")       
-                
-                mem_layer = self.tools.create_memory_layer(layer, layer_name )
-                
-                if mem_layer == None:
-                    self.iface.messageBar().pushMessage('WARNING', self.tr('Layer could not be loaded.'), level=QgsMessageBar.INFO, duration=3)
-    
-                else:                
-                    userPluginPath = QFileInfo(QgsApplication.qgisUserDbFilePath()).path()+"/python/plugins/pgversion"  
-                    mem_layer.setRendererV2(None)
-        
-                    if geometryType == 0:
-                        mem_layer.loadNamedStyle(userPluginPath+"/legends/diff_point.qml")             
-                    elif geometryType == 1:
-                        mem_layer.loadNamedStyle(userPluginPath+"/legends/diff_linestring.qml")             
-                    elif geometryType == 2:
-                        mem_layer.loadNamedStyle(userPluginPath+"/legends/diff_polygon.qml")             
-        
-                    QgsMapLayerRegistry.instance().addMapLayer(mem_layer)
-                    self.iface.messageBar().pushMessage('INFO', self.tr('Diff to HEAD revision was successful!'), level=QgsMessageBar.INFO, duration=3)
+                    layer_name = theLayer.name()
+                    QgsProject().instance().removeMapLayer(
+                        theLayer.id())
+                    self.iface.messageBar().pushMessage(
+                        'Info',
+                        self.tr('Versioning for layer {0} dropped!').format(
+                            layer_name), level=Qgis.MessageLevel(0),
+                        duration=3)
+                    self.iface.mapCanvas().refreshAllLayers()
                     
-                QApplication.restoreOverrideCursor()
-                self.logview_dialog.close()            
-                return
-      else:
-          self.iface.messageBar().pushMessage('INFO', self.tr('No differences to HEAD revision detected!'), level=QgsMessageBar.INFO, duration=3)
-          return
 
+    def doHelp(self):
+        helpUrl = QUrl()
+        if self.locale != 'de':
+            self.locale = 'en'
+                
+        absolut_path_string = '%s/docs/help/dokumentation_pgversion_QGIS3_%s.html' % (os.path.dirname(__file__),  self.locale)
+        helpUrl.setUrl(QUrl.fromLocalFile(absolut_path_string).toString())
 
-  def doDrop(self): 
+        self.helpDialog.webView.load(helpUrl)
+        self.helpDialog.show()
 
-#      try:
-      theLayer = self.iface.activeLayer()
-      provider = theLayer.dataProvider()
-      uri = provider.dataSourceUri()    
-      mySchema = QgsDataSourceURI(uri).schema()
-      if len(mySchema) == 0:
-        mySchema = 'public'
-      myTable = QgsDataSourceURI(uri).table()    
-
-      if theLayer == None:
-        QMessageBox.information(None, '', self.tr('Please select a layer for versioning'))
-        return    
-      else:
-        answer = QMessageBox.question(None, '', self.tr('are you sure to to drop pgvs from the table {0}?').format(mySchema+"."+myTable.replace('_version', '')), self.tr('Yes'),  self.tr('No'))
-
-        if answer == 0:
-            if self.tools.isModified(theLayer):
-                QMessageBox.warning(None, self.tr('Warning'), \
-                    self.tr('Layer %s has uncommited changes, please commit them or revert to HEAD revision' % (theLayer.name())))
-            else:
-                myDb = self.tools.layerDB('doDrop',theLayer)
-                sql = "select versions.pgvsdrop('%s.%s') " % (mySchema, myTable.replace('_version', ''))
-                result = myDb.read(sql)                
-                myDb.close()
-
-                layer_name = theLayer.name()
-                QgsMapLayerRegistry.instance().removeMapLayer(theLayer.id())      
-                self.iface.messageBar().pushMessage('INFO', self.tr('Versioning for layer {0} dropped!').format(layer_name), level=QgsMessageBar.INFO, duration=3)
-  
-  def doMakeBranch(self,  name):
-      sql = "select versions.pgvsmakebranch('%s', '%s') "  % (mySchema, myTable.replace('_version', '').split('#')[0],  name)
-      QMessageBox.information(None, '',  sql)
-
-  def doHelp(self):
-      helpUrl = QUrl()
-      helpUrl.setUrl('file://%s/docs/help.html' % self.plugin_path)
-      self.helpDialog.webView.load(helpUrl)
-      self.helpDialog.show()
-
-  def doAbout(self):
-      self.about = About()
-      self.about.show()
+    def doAbout(self):
+        self.about = DlgAbout(self.plugin_path)
+        self.about.show()

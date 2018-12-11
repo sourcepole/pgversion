@@ -37,7 +37,7 @@
         <item row="0" column="0">
          <widget class="QRadioButton" name="radioRevisionRev1">
           <property name="text">
-           <string>Number</string>
+           <string>&amp;Number</string>
           </property>
          </widget>
         </item>
@@ -47,7 +47,7 @@
         <item row="1" column="0">
          <widget class="QRadioButton" name="radioDateRev1">
           <property name="text">
-           <string>Date</string>
+           <string>&amp;Date</string>
           </property>
          </widget>
         </item>
@@ -93,7 +93,7 @@
         <item row="0" column="0" rowspan="2">
          <widget class="QRadioButton" name="radioRevisionRev2">
           <property name="text">
-           <string>Number</string>
+           <string>N&amp;umber</string>
           </property>
          </widget>
         </item>
@@ -103,7 +103,7 @@
         <item row="2" column="0">
          <widget class="QRadioButton" name="radioDateRev2">
           <property name="text">
-           <string>Date</string>
+           <string>Da&amp;te</string>
           </property>
          </widget>
         </item>

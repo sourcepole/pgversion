@@ -13,11 +13,11 @@
    width="32"
    height="32"
    id="svg5692"
-   inkscape:version="0.91 r13725"
+   inkscape:version="0.47 r22583"
    sodipodi:docname="pgversion-drop.svg"
-   inkscape:export-filename="/home/hdus/dev/qgis/pgversion-plugin/pgversion/icons/pgversion-drop.png"
-   inkscape:export-xdpi="79.595871"
-   inkscape:export-ydpi="79.595871">
+   inkscape:export-filename="/home/hdus/.qgis/python/plugins/pgversion/icons/pgversion-drop.png"
+   inkscape:export-xdpi="67.5"
+   inkscape:export-ydpi="67.5">
   <metadata
      id="metadata26">
     <rdf:RDF>
@@ -39,15 +39,15 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1136"
-     inkscape:window-height="733"
+     inkscape:window-width="640"
+     inkscape:window-height="480"
      id="namedview24"
      showgrid="false"
      inkscape:zoom="8"
      inkscape:cx="16"
      inkscape:cy="16"
-     inkscape:window-x="75"
-     inkscape:window-y="34"
+     inkscape:window-x="0"
+     inkscape:window-y="25"
      inkscape:window-maximized="0"
      inkscape:current-layer="svg5692" />
   <title

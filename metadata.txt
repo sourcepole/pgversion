@@ -9,114 +9,34 @@
 name=PgVersion
 description=Client for the Postgres Versioning System pgvs
 category=Database
-version=3.0.0
-qgisMinimumVersion=2.14
+version=3.0.6
+qgisMinimumVersion=3.0
 qgisMaximumVersion=3.99
 class_name=PgVersion
 website=http://www.sourcepole.com
-author=Dr. Horst Duester Sourcepole AG Zurich
+author=Horst Duester Sourcepole AG Zürich
 email=horst.duester@sourcepole.ch
 about=Sourcepole AG - Linux & Open Source Solutions, Weberstrasse 5, 8004 Zurich, Switzerland
 
 ; Optional items:
 
 changelog=
+    3.0.6
+    - fix of conflict management error when conflicting object was deleted
+    - help improved de/en
+    3.0.5
+    - QMessageBox string error in hasVersion fixed
+    3.0.4
+    - fix #5004
+    3.0.3
+    - Psycopg2 Error Handling Improved
+    3.0.2
+    - Translation fixed
+    - Windows compatible
+    3.0.1
+    - doDrop improved and canvas refresh after init or drop
     3.0.0
-    - Migrated to QGIS 3
-    2.2.0
-    - query of feature versions added
-    - First release with branches
-    2.1.35
-    - new initialized layer added to group versions
-    2.1.34
-    - fix issue #4
-    2.1.33
-    - fix error when deselecting while current layer is a group layer or rasterlayer
-    2.1.32
-    -  Bugfixing
-    2.1.31
-    -  Fix #3 data provider bug
-    2.1.30
-    -  Merge pull request #2 from rdbath/master - Windows compatibility
-    2.1.29
-    - reorder of column action in diff
-    2.1.28
-    - Tag checkout bug fixed
-    2.1.27
-    - Diff layer as memory layer
-    - Diff only in canvas extent
-    2.1.26
-    - Bugfixing, new DB SQL Scripts
-    2.1.25
-    - Layer management improved
-    2.1.24
-    - Layer management improved
-    2.1.23
-    - check revision bug fixed
-    2.1.22
-    - PG error message during installation process removed
-    2.1.21
-    - Changes in SQL creation scripts
-    2.1.20
-    - check of existing role 'versions' added to sql create script
-    2.1.19
-    - Set plugin check pgvs DB revision to 2.1.3
-    - incremental upgrade of minor db upgrades introduced
-    2.1.18
-    - Set plugin check pgvs DB revision to 2.1.2
-    2.1.17
-    - QGIS user and system path removed
-    - translations improved
-    2.1.16
-    - Fix path to upgrade and install script
-    2.1.15
-    - db serial check introduced
-    - set DB functions to revision 2.1.2
-    2.1.14
-    - merge bug fixed
-    - improved layer state handling
-    - set DB functions to revision 2.1.1
-    2.1.13
-    - set DB functions to revision 2.1.0
-    - Improved installation and upgrade scripts
-    2.1.12
-    - Mixed cased table name handling improved
-    2.1.11
-    - SQL creation script improvements
-    2.1.10
-    - behavior of the delete button improved
-    2.1.9
-    - case sensitive table name management improved
-    2.1.8
-    - translations improved
-    - sponsoring tab added to about
-    2.1.7
-    - diff layer stored as temp shape
-    2.1.6
-    - delete version bug fixed
-    2.1.5
-    - lost dialog recreated
-    2.1.4
-    - bugfixing
-    2.1.3
-    - DB init improved
-    2.1.2
-    - tags indtroduced
-    - bug fixes
-    2.1.0
-    - layer checkout introduced
-    - local diff to head introduced
-    - bug fixes
-    2.0.4
-    - some minor fixes
-    2.0.3
-    - Fix of doInit bug
-    2.0.2
-    - Fix of #3837
-    2.0.1
-    - More robust DB Handling
-    2.0.0
-    - First release for QGIS 2 API
+    - initial release for QGIS3
 
 homepage=https://github.com/sourcepole/pgversion
 tracker=https://github.com/sourcepole/pgversion/issues

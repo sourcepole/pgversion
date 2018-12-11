@@ -17,10 +17,8 @@ email                : horst.duester@sourcepole.ch
  ***************************************************************************/
  This script initializes the plugin, making it known to QGIS.
 """
-  
-def classFactory(iface): 
-  # load pgVersion class from file pgVersion
-  from pgVersion import PgVersion 
-  return PgVersion(iface)
 
 
+def classFactory(iface):
+    from .pgVersion import PgVersion
+    return PgVersion(iface)
