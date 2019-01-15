@@ -21,7 +21,7 @@ from qgis.PyQt.QtCore import *
 from qgis.PyQt.QtGui import *
 from qgis.PyQt.QtWidgets import *
 from qgis.core import *
-from pgversion.dbtools.dbtools import *
+from pgversion.dbtools import *
 from pgversion.pgVersionTools import *
 import os
 from qgis.PyQt import uic
