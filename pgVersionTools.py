@@ -399,25 +399,32 @@ class PgVersionTools(QObject):
             layer_type = 'MultiLineString?crs=' + layer.crs().authid()
         if layer.geometryType() == 2:
             layer_type = 'MultiPolygon?crs=' + layer.crs().authid()
-
-        mem_layer = QgsVectorLayer(layer_type, name, "memory")
-
-        mem_layer_data = mem_layer.dataProvider()
-        mem_layer.startEditing()
-
-        attr = feats[0].fields()
-        mem_layer_data.addAttributes(attr)
-        mem_layer.updateFields()
-
-        feat = QgsFeature()
-        for feature in feats:
-            feat.setGeometry(feature.geometry())
-            feat.setAttributes(feature.attributes())
-            mem_layer.addFeature(feature)
-            mem_layer.updateExtents()
-
-        mem_layer.commitChanges()
-        return mem_layer
+        
+        try:
+            mem_layer = QgsVectorLayer(layer_type, name, "memory")
+    
+            mem_layer_data = mem_layer.dataProvider()
+            mem_layer.startEditing()
+    
+            attr = feats[0].fields()
+            mem_layer_data.addAttributes(attr)
+            mem_layer.updateFields()
+    
+            feat = QgsFeature()
+            for feature in feats:
+                feat.setGeometry(feature.geometry())
+                feat.setAttributes(feature.attributes())
+                mem_layer.addFeature(feature)
+                mem_layer.updateExtents()
+    
+            mem_layer.commitChanges()
+            return mem_layer
+        except:
+            self.iface.messageBar().pushMessage(
+                'Warning',
+                self.tr('No diffs to HEAD detected!'),
+                level=Qgis.MessageLevel(1), duration=3)            
+            return None
 
     def file_path(name, base_path=None):
         if not base_path:

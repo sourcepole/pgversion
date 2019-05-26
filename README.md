@@ -2,6 +2,7 @@
 <HEAD>
 <META NAME="generator" CONTENT="http://txt2tags.org">
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<TITLE>PostGIS Versioning - pgVersion 2.0.0</TITLE>
 
 <!-- CSS include failed for style.css -->
 

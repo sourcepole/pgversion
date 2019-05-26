@@ -289,12 +289,11 @@ Error:
                 QMessageBox.information(
                     None,
                     "",
-                    self.tr("The layer: {0} was already versioned.\nIf you "
-                            "want to use the versioned layer, then add the"
-                            " following table from the DB: {0}_version or "
-                            "add the layer through the Load Versioned Layer"
-                            " button".format(
-                                self.iface.activeLayer().name())))
+                    self.tr("""
+The layer: {0} was already versioned.
+If you want to use the versioned layer, then add the
+following table from the DB: {0}_version or 
+add the layer through the Load Versioned Layer button""".format(self.iface.activeLayer().name())))
 
     def doLoad(self):
 
@@ -329,14 +328,10 @@ Error:
             if self.tools.isModified(currentLayer):
                 answer = QMessageBox.question(
                     None, '',
-                    self.tr('Layer {0} has modifications which will be\
-                            lost after rollback!\
-                            If you want to keep this modifications \
-                            please commit them. \
-                            Are you sure to rollback to revision \
-                            {1}?').format(
-                        currentLayer.name(), revision),
-                    QMessageBox.Yes | QMessageBox.Cancel)
+                    self.tr("""Layer {0} has modifications which will be lost after rollback! If you want to keep this modifications please commit them before you execute the rollback. 
+
+Are you sure to rollback to revision {1}?""").format(currentLayer.name(), revision),QMessageBox.Yes | QMessageBox.Cancel)
+
                 if answer == QMessageBox.Cancel:
                     return
 
@@ -692,29 +687,28 @@ select * from insert) as foo""".format(
 
         mem_layer = self.tools.create_memory_layer(layer, layer_name)
 
-        if not mem_layer.isValid():
-            self.iface.messageBar().pushMessage(
-                'Warning',
-                self.tr('No diffs to HEAD detected! Layer could '
-                        'not be loaded.'),
-                level=Qgis.MessageLevel(1), duration=3)
-
-        else:
-            legends_path = os.path.dirname(__file__)
-            if geometryType == 0:
-                mem_layer.loadNamedStyle(
-                    legends_path + "/legends/diff_point.qml")
-            elif geometryType == 1:
-                mem_layer.loadNamedStyle(
-                    legends_path + "/legends/diff_linestring.qml")
-            elif geometryType == 2:
-                mem_layer.loadNamedStyle(
-                    legends_path + "/legends/diff_polygon.qml")
-            QgsProject().instance().addMapLayer(mem_layer)
-            self.iface.messageBar().pushMessage(
-                'Info',
-                self.tr('Diff to HEAD revision was successful!'),
-                level=Qgis.MessageLevel(0), duration=3)
+        if mem_layer != None:
+            if not mem_layer.isValid():
+                self.iface.messageBar().pushMessage(
+                        'Warning',
+                        self.tr('No diffs to HEAD in current extend detected!'),
+                        level=Qgis.MessageLevel(1), duration=3)
+            else:
+                legends_path = os.path.dirname(__file__)
+                if geometryType == 0:
+                    mem_layer.loadNamedStyle(
+                        legends_path + "/legends/diff_point.qml")
+                elif geometryType == 1:
+                    mem_layer.loadNamedStyle(
+                        legends_path + "/legends/diff_linestring.qml")
+                elif geometryType == 2:
+                    mem_layer.loadNamedStyle(
+                        legends_path + "/legends/diff_polygon.qml")
+                QgsProject().instance().addMapLayer(mem_layer)
+                self.iface.messageBar().pushMessage(
+                    'Info',
+                    self.tr('Diff to HEAD revision was successful!'),
+                    level=Qgis.MessageLevel(0), duration=3)
 
         QApplication.restoreOverrideCursor()
         self.LogViewDialog.close()
