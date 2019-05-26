@@ -24,7 +24,7 @@ from qgis.gui import *
 from qgis.core import *
 from forms.Ui_dbVersionCheck import DbVersionCheckDialog 
 from datetime import datetime
-from .dbtools.dbTools import *
+from dbtools.dbTools import *
 import time,  sys,  os
 import apicompat
 
