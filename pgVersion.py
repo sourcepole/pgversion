@@ -98,8 +98,10 @@ class PgVersion(QObject):
             QIcon(":/plugins/pgversion/icons/pgversion-drop.png"),
             self.tr("Bulk delete directly in the database"),
             self.iface.mainWindow())
+            
         self.actionDelete.setEnabled(False)
-
+        self.set_actions(False)
+        
         self.actionList = [self.actionInit, self.actionLoad, self.actionCommit,
                            self.actionDiff, self.actionRevert,
                            self.actionLogView, self.actionDrop,
@@ -145,11 +147,17 @@ class PgVersion(QObject):
             if a.objectName() == 'mActionToggleEditing':
                 a.triggered.connect(self.SelectionChanged)
 
-        self.iface.mapCanvas().selectionChanged.connect(
-            self.SelectionChanged)
+        self.iface.mapCanvas().selectionChanged.connect(self.SelectionChanged)
+        self.iface.currentLayerChanged.connect(self.layer_changed)
         QgsProject().instance().layerWasAdded.connect(self.add_layer)
         QgsProject().instance().layerWillBeRemoved.connect(
             self.remove_layer)
+
+    def layer_changed(self):
+        if self.tools.hasVersion(self.iface.activeLayer()):
+            self.set_actions(True)
+        else:
+            self.set_actions(False)
 
     def SelectionChanged(self):
         current_layer = self.iface.activeLayer()
@@ -164,6 +172,14 @@ class PgVersion(QObject):
                         self.actionDelete.setEnabled(False)
                 else:
                     self.actionDelete.setEnabled(False)
+                    
+    def set_actions(self,  isActive):
+#        self.actionDelete.setEnabled(isActive)
+#        self.actionLoad.setEnabled(isActive)
+        self.actionCommit.setEnabled(isActive)
+        self.actionRevert.setEnabled(isActive)
+        self.actionDiff.setEnabled(isActive)
+        self.actionLogView.setEnabled(isActive)               
 
     def add_layer(self, l):
         if self.tools.hasVersion(l):
@@ -298,8 +314,12 @@ add the layer through the Load Versioned Layer button""".format(self.iface.activ
     def doLoad(self):
 
         self.dlg = PgVersionLoadDialog(self)
-        self.dlg.show()
-
+        result = self.dlg.exec_()
+        
+        if result == 1:
+            self.set_actions(True)
+            
+            
     def doRollback(self, item):
 
         if item is None:

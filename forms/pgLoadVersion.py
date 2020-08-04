@@ -134,6 +134,7 @@ class PgVersionLoadDialog(QDialog, FORM_CLASS):
         if self.cmbTables.currentIndex() == 0 or self.cmbServer.currentIndex() == 0:
             QMessageBox.warning(None, self.tr('Error'),
                                 self.tr('No Layer was selected.'))
+            return 0
         else:
             versionTableList = self.cmbTables.currentText().split('.')
             connectionName = self.cmbServer.currentText()

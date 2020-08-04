@@ -80,7 +80,13 @@ class PgVersionTools(QObject):
 
     def hasVersion(self, theLayer):
 
-            myLayerUri = QgsDataSourceUri(theLayer.source())
+            try:
+                myLayerUri = QgsDataSourceUri(theLayer.source())
+            except:
+                error = self.tr("Please select a versioned layer to display its log information.")
+                QMessageBox.warning(None,  self.tr('No versioned layer selected'),  str(error))
+                return False
+                
             myDb = self.layerDB('hasVersion', theLayer)
 
             if myDb is None:
