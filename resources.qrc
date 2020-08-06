@@ -10,6 +10,7 @@
     <file>icons/pgversion-revert.png</file>
     <file>icons/pgversion-diff.png</file>
     <file>icons/pgversion-logview.png</file>
+    <file>icons/pgversion-help.png</file>
   </qresource> 
 </RCC> 
 

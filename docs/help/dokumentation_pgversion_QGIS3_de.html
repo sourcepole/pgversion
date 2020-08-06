@@ -52,81 +52,81 @@
   <DIV CLASS="toc">
 
     <OL>
-    <A HREF="#toc1">Einführung</A>
-    <LI><A HREF="#toc2">Administration</A>
+    <A HREF="#toc0">Einführung</A>
+    <LI><A HREF="#toc1">1. Administration</A>
       <UL>
-        <LI><A HREF="#toc3">1.1 Installation der Datenbank</A>
+        <LI><A HREF="#toc11">1.1 Installation der Datenbank</A>
         <UL>
-          <LI><A HREF="#toc4">1.1.1 Login-Rollen</A>
-          <LI><A HREF="#toc5">1.1.2 Authentifizierung an der Datenbank</A>
-          <LI><A HREF="#toc6">1.1.3 Konfiguration der Datenbank</A>
-          <LI><A HREF="#toc7">1.1.4 Aktivieren der PostGIS Erweiterung für die Datenbank</A>
+          <LI><A HREF="#toc111">1.1.1 Login-Rollen</A>
+          <LI><A HREF="#toc112">1.1.2 Authentifizierung an der Datenbank</A>
+          <LI><A HREF="#toc113">1.1.3 Konfiguration der Datenbank</A>
+          <LI><A HREF="#toc114">1.1.4 Aktivieren der PostGIS Erweiterung für die Datenbank</A>
         </UL>
-        <LI><A HREF="#toc8">1.2 Installation des QGIS Plugins PgVersion</A>
-        <LI><A HREF="#toc9">1.3 Installation von PgVersion</A>
+        <LI><A HREF="#toc12">1.2 Installation des QGIS Plugins PgVersion</A>
+        <LI><A HREF="#toc13">1.3 Installation von PgVersion</A>
         <UL>
-          <LI><A HREF="#toc10">1.3.1 Installation über die Kommandozeile</A>
-          <LI><A HREF="#toc11">1.3.2 Installation mit dem QGIS Plugin</A>
-          <LI><A HREF="#toc12">1.3.3 Rechtemanagement</A>
-        </UL>
-      </UL>
-    <LI><A HREF="#toc13">Funktionalität des PgVersion Plugins</A>
-      <UL>
-        <LI><A HREF="#toc14">2.1 Enthaltene Datenbank-Funktionen</A>
-        <UL>
-          <LI><A HREF="#toc15">2.1.1 pgvsinit</A>
-          <LI><A HREF="#toc16">2.1.2 pgvscommit</A>
-          <LI><A HREF="#toc17">2.1.3 pgvsmerge</A>
-          <LI><A HREF="#toc18">2.1.4 pgvsdrop</A>
-          <LI><A HREF="#toc19">2.1.5 pgvsrevert</A>
-          <LI><A HREF="#toc20">2.1.6 pgvsrevision</A>
-          <LI><A HREF="#toc21">2.1.7 pgvslogview</A>
-          <LI><A HREF="#toc22">2.1.8 pgvsrollback</A>
+          <LI><A HREF="#toc131">1.3.1 Installation über die Kommandozeile</A>
+          <LI><A HREF="#toc132">1.3.2 Installation mit dem QGIS Plugin</A>
+          <LI><A HREF="#toc133">1.3.3 Rechtemanagement</A>
         </UL>
       </UL>
-    <LI><A HREF="#toc23">Umsetzung als PgVersion Plugin in QGIS</A>
+    <LI><A HREF="#toc2">Funktionalität des PgVersion Plugins</A>
       <UL>
-        <LI><A HREF="#toc24">3.1 Verbindung zur Datenbank </A>
-        <LI><A HREF="#toc25">3.2 Layer mit dem Versionierungssystem versehen</A>
-        <LI><A HREF="#toc26">3.3 Laden des versionierten Layers</A>
-        <LI><A HREF="#toc27">3.4 Änderungen übergeben</A>
-        <LI><A HREF="#toc28">3.5 Auf die HEAD Revision zurücksetzen</A>
-        <LI><A HREF="#toc29">3.6 Unterschiede anzeigen</A>
-        <LI><A HREF="#toc30">3.7 Logs anzeigen</A>
-        <LI><A HREF="#toc31">3.8 Löschen ausgewählter Objekte direkt in der Datenbank</A>
-        <LI><A HREF="#toc32">3.9 Versionierung der Ebene löschen</A>
+        <LI><A HREF="#toc21">2.1 Enthaltene Datenbank-Funktionen</A>
+        <UL>
+          <LI><A HREF="#toc211">2.1.1 pgvsinit</A>
+          <LI><A HREF="#toc212">2.1.2 pgvscommit</A>
+          <LI><A HREF="#toc213">2.1.3 pgvsmerge</A>
+          <LI><A HREF="#toc214">2.1.4 pgvsdrop</A>
+          <LI><A HREF="#toc215">2.1.5 pgvsrevert</A>
+          <LI><A HREF="#toc216">2.1.6 pgvsrevision</A>
+          <LI><A HREF="#toc217">2.1.7 pgvslogview</A>
+          <LI><A HREF="#toc218">2.1.8 pgvsrollback</A>
+        </UL>
       </UL>
-    <LI><A HREF="#toc34">Tipps für die Praxis:</A>
+    <LI><A HREF="#toc3">Umsetzung als PgVersion Plugin in QGIS</A>
       <UL>
-        <LI><A HREF="#toc35">4.1 Grundsätzliche Einstellungen in QGIS</A>
-        <LI><A HREF="#toc36">4.2 Historisierung eines Layers mit bigint Datentyp der ID Spalte</A>
-        <LI><A HREF="#toc37">4.3 Anpassen vorhander Objektgeometrien eines Layers</A>
-        <LI><A HREF="#toc38">4.4 Anpassen vorhandener Attribute eines Layers</A>
-        <LI><A HREF="#toc39">4.5 Ein neues Objekt zu einem Layer hinzufügen</A>
-        <LI><A HREF="#toc40">4.6 Objekte in einem Layer löschen</A>
-        <LI><A HREF="#toc41">4.7 Aktuell durchgeführte Änderungen verwerfen</A>
-        <LI><A HREF="#toc42">4.8 Auf eine vorherige Revision eines Layers zurückgehen</A>
-        <LI><A HREF="#toc43">4.9 Einen Layer aus der Versionierung entfernen</A>
-        <LI><A HREF="#toc44">4.10 Auflösen eines Konflikts bei der Bearbeitung</A>
-        <LI><A HREF="#toc45">4.11 Aktualisieren mit copy/paste am QGIS Bildschirm</A>
-        <LI><A HREF="#toc46">4.12 NULL Werte der Primary-Key Spalte nicht erlaubt</A>
+        <LI><A HREF="#toc31">3.1 Verbindung zur Datenbank </A>
+        <LI><A HREF="#toc32">3.2 Layer mit dem Versionierungssystem versehen</A>
+        <LI><A HREF="#toc33">3.3 Laden des versionierten Layers</A>
+        <LI><A HREF="#toc34">3.4 Änderungen übergeben</A>
+        <LI><A HREF="#toc35">3.5 Auf die HEAD Revision zurücksetzen</A>
+        <LI><A HREF="#toc36">3.6 Unterschiede anzeigen</A>
+        <LI><A HREF="#toc37">3.7 Logs anzeigen</A>
+        <LI><A HREF="#toc38">3.8 Löschen ausgewählter Objekte direkt in der Datenbank</A>
+        <LI><A HREF="#toc39">3.9 Versionierung der Ebene löschen</A>
+      </UL>
+    <LI><A HREF="#toc4">Tipps für die Praxis:</A>
+      <UL>
+        <LI><A HREF="#toc41">4.1 Grundsätzliche Einstellungen in QGIS</A>
+        <LI><A HREF="#toc42">4.2 Historisierung eines Layers mit bigint Datentyp der ID Spalte</A>
+        <LI><A HREF="#toc43">4.3 Anpassen vorhander Objektgeometrien eines Layers</A>
+        <LI><A HREF="#toc44">4.4 Anpassen vorhandener Attribute eines Layers</A>
+        <LI><A HREF="#toc45">4.5 Ein neues Objekt zu einem Layer hinzufügen</A>
+        <LI><A HREF="#toc46">4.6 Objekte in einem Layer löschen</A>
+        <LI><A HREF="#toc47">4.7 Aktuell durchgeführte Änderungen verwerfen</A>
+        <LI><A HREF="#toc48">4.8 Auf eine vorherige Revision eines Layers zurückgehen</A>
+        <LI><A HREF="#toc49">4.9 Einen Layer aus der Versionierung entfernen</A>
+        <LI><A HREF="#toc410">4.10 Auflösen eines Konflikts bei der Bearbeitung</A>
+        <LI><A HREF="#toc411">4.11 Aktualisieren mit copy/paste am QGIS Bildschirm</A>
+        <LI><A HREF="#toc412">4.12 NULL Werte der Primary-Key Spalte nicht erlaubt</A>
       <UL>
     </UL>
     </OL>
   </DIV>
 
 
-<A NAME="toc16"></A>
+<A NAME="toc0"></A>
 <H1>Einführung</H1>
 
 Die Anleitung bezieht sich auf PostgreSQL Version 9.6.8 und PostGIS Version 2.4.4 unter einem OpenSUSE Leap 15.0.
 
-<A NAME="toc16"></A>
+<A NAME="toc1"></A>
 <H1>1. Administration</H1>
 
 Dieser Abschnitt befasst sich mit der Installation und Administration der Datenbank als Vorbereitung für die Arbeit mit PGVersion.
 
-<A NAME="toc16"></A>
+<A NAME="toc11"></A>
 <H2>1.1 Installation der Datenbank</H2>
 
 Als Beispiel nehmen wir an, dass die Datenbank <CODE>historisierung</CODE> heißt und vom Standard-Administrator <CODE>postgres</CODE> auf dem Server mit der IP-Adresse <CODE>192.168.2.10</CODE> installiert werden soll.
@@ -139,7 +139,7 @@ Als Beispiel nehmen wir an, dass die Datenbank <CODE>historisierung</CODE> heiß
 <P>
 <CODE>createdb -U postgres -h 192.168.2.10 historisierung</CODE>
 
-<A NAME="toc16"></A>
+<A NAME="toc111"></A>
 <H3>1.1.1 Login-Rollen</H3>
 
 Zum Testen werden zwei Login-Rollen (nutzer1 und nutzer2) für die Datenbank erstellt. Dies kann entweder über das Administrations-Tool PgAdmin3 stattfinden. Zur Vereinfachung sind Benutzername und Passwort identisch.
@@ -153,7 +153,7 @@ createuser -U postgres -h 192.168.2.10 -S -D -R -e nutzer1 -W<br>
 createuser -U postgres -h 192.168.2.10 -S -D -R -e nutzer2 -W
 </CODE>
 
-<A NAME="toc16"></A>
+<A NAME="toc112"></A>
 <H3>1.1.2 Authentifizierung an der Datenbank</H3>
 
 Die Konfigurationsdatei zur Authentifizierung pg_hba.conf muss den Erfordernissen der Nutzerumgebung angepasst werden. Es werden Einträge für gültige IP-Adressbereiche und zur Authentifizierung hinzugefügt.
@@ -162,7 +162,7 @@ Die Konfigurationsdatei zur Authentifizierung pg_hba.conf muss den Erfordernisse
 Weitere Informationen finden Sie in der Hilfe des PostgreSQL-Projektes:
 <a href="https://www.postgresql.org/docs/9.6/static/auth-pg-hba-conf.html">https://www.postgresql.org/docs/9.6/static/auth-pg-hba-conf.html</a>
 
-<A NAME="toc16"></A>
+<A NAME="toc113"></A>
 <H3>1.1.3 Konfiguration der Datenbank</H3>
 
 Es erfolgt nun die Anpassung PostgeSQL Konfigurationsdatei <CODE>postgresql.conf</CODE>. Es gibt hier eine Vielzahl von Einstellungsmöglichkeiten. Notwendig sind für den Beginn aber nur die Parameter <CODE>port</CODE> und <CODE>listen_addresses</CODE>. Diese gewähren den Datenbankzugriff über das Netzwerk. Daher ändern wir den folgenden Eintrag:
@@ -176,7 +176,7 @@ port = 5432
 <P>
 Alle weiteren Parameter belassen wir an dieser Stelle wie sie sind.
 
-<A NAME="toc16"></A>
+<A NAME="toc114"></A>
 <H3>1.1.4 Aktivieren der PostGIS Erweiterung für die Datenbank</H3>
 
 Um räumliche Funktionalität in PostgreSQL nutzen zu können, muss die Datenbank um die PostGIS Erweiterungen ergänzt werden. Dies kann entweder über das Administrations-Tool PgAdmin3 stattfinden oder unter Linux in der Bash ausgeführt werden.
@@ -197,7 +197,7 @@ psql -U postgres -h 192.168.2.10 historisierung
 historisierung=# CREATE EXTENSION postgis;
 </CODE>
 
-<A NAME="toc16"></A>
+<A NAME="toc12"></A>
 <H2>1.2 Installation des QGIS Plugins PgVersion</H2>
 
 PgVersion steht als Plugin über das Repository <a href="https://pkg.sourcepole.ch/qgis/pgversions.xml">https://pkg.sourcepole.ch/qgis/pgversions.xml</a>  zur Verfügung und kann dadurch einfach über den QGIS Plugin Manager installiert werden.
@@ -222,12 +222,12 @@ unter Windows:<br>
 C:\Users\&#60;benutzer&#62;\AppData\Roaming\QGIS\QGIS3\profiles\default\python/plugins/pgversion/
 </CODE>
 
-<A NAME="toc16"></A>
+<A NAME="toc13"></A>
 <H2>1.3 Installation von PgVersion</H2>
 
 Die Erweiterung der Datenbank mit den pgvs-Funktionen von PgVersion wird normalerweise von einem Rechner aus gestartet, auf dem das entsprechende QGIS Plugin „pgversion“ installiert ist. Es gibt dabei die Möglichkeit es über die Kommandozeile oder das Plugin zu installieren.
 
-<A NAME="toc16"></A>
+<A NAME="toc131"></A>
 <H3>1.3.1 Installation über die Kommandozeile</H3>
 
 Wechseln Sie in das docs Verzeichnis des Plugins.
@@ -259,7 +259,7 @@ Die Funktionen können grundsätzlich auch direkt auf der Datenbank ausgeführt 
 <P>
 Desweiteren wird eine neue Gruppenrolle <CODE>versions</CODE> angelegt. Diese enthält bereits eine Reihe von Rechten, damit Login-Rollen, die Mitglied der Gruppenrolle <CODE>versions</CODE> sind, mit PgVersion arbeiten können.
 
-<A NAME="toc16"></A>
+<A NAME="toc132"></A>
 <H3>1.3.2 Installation mit dem QGIS Plugin</H3>
 
 Die andere Möglichkeit besteht darin, die Installation der pgvs-Funktionen in QGIS über das geladene Plugin durchzuführen. Wenn Sie einige Layer in die neue Datenbank importiert haben und mit der Historisierung des ersten Layers beginnen möchten, klicken Sie auf das Icon. Dann kommt dazu die Meldung.
@@ -277,7 +277,7 @@ Klicken Sie nun auf das Icon Install pgvs, um die Versionierung zu installieren.
   <figcaption>Abbildung 5: Die Installation von PgVs war erfolgreich.</figcaption>
 </figure>
 
-<A NAME="toc16"></A>
+<A NAME="toc133"></A>
 <H3>1.3.3 Rechtemanagement</H3>
 
 Bevor nun damit begonnen wird, erste Layer zu versionieren, sollten ein paar <CODE>DEFAULT PRIVILEGES</CODE> ergänzt werden. Dazu kann z.B. wieder PgAdmin3, der QGIS DB Manager oder die Kommandozeile genutzt werden. Je nach Bedarf können die Rechte angepasst werden – hier ein Beispiel:
@@ -328,7 +328,7 @@ Rechte auf alle Funktionen in Schemas publich und versions geben
 GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA versions, public TO versions;
 </CODE>
 
-<A NAME="toc16"></A>
+<A NAME="toc2"></A>
 <H1>2. Funktionalität des PgVersion Plugins</H1>
 
 Nachdem die Datenbank <CODE>historisierung</CODE> mit dem Schema <CODE>versions</CODE> sowie den Nutzern <CODE>nutzer1</CODE> und <CODE>nutzer2</CODE> erstellt worden ist können die pgvs-Funktionen über das PgVersion Pugin genutzt werden.
@@ -351,7 +351,7 @@ Des Weiteren gibt es den Menüeintrag „Datenbank“ → „PG Version“:
 
 Jeder Benutzer der Versionierung arbeitet in seiner eigenen Sicht. Das entspricht im weitesten Sinne dem Arbeiten mit Subversion (SVN).
 
-<A NAME="toc16"></A>
+<A NAME="toc21"></A>
 <H3>2.1 Enthaltene Datenbank-Funktionen</H3>
 
 Das bei der Initialisierung erstellte Schema <CODE>versions</CODE> enthält alle Informationen, die notwendig sind, um die versionierten Tabellen zu verwalten. Achten Sie darauf, keine Änderungen im Schema <CODE>versions</CODE> durchzuführen. Dies ist alleine den pgvs-Funktionen vorbehalten.
@@ -359,7 +359,7 @@ Das bei der Initialisierung erstellte Schema <CODE>versions</CODE> enthält alle
 <P>
 Sie haben übrigens auch die Option, die pgvs-Umgebung in der <CODE>template1</CODE> Datenbank des PostgreSQL Servers  zu installieren. In diesem Fall wird jede neu erstellte Datenbank die pgvs Umgebung automatisch enthalten.
 
-<A NAME="toc16"></A>
+<A NAME="toc211"></A>
 <H3>2.1.1 pgvsinit</H3>
 
 Die pgvsinit() Funktion initialisiert die Versionierungsumgebung für einen einzelnen Layer. Der init-Befehl lautet:
@@ -387,7 +387,7 @@ Nachdem die Änderungen für den Layer gespeichert wurden, werden sie sichtbar �
 Es ist nicht möglich, die Struktur der darunterliegenden Tabelle zu ändern. Wenn Sie dies tun wollen, müssen Sie das Versionierungssystem aus der Tabelle löschen, wie später beschrieben wird. Dann können Sie Ihre Änderungen vornehmen. Anschliessend müssen Sie wieder das Versionierungssystem für die Tabelle initialisieren.
 
 
-<A NAME="toc17"></A>
+<A NAME="toc212"></A>
 <H3>2.1.2 pgvscommit</H3>
 
 Wenn Ihre Änderungen nach einer Weile abgeschlossen sind, müssen Sie diese an die Master PostGIS-Tabelle übergeben (committen). Auf diese Weise stellen Sie Ihre Änderungen den anderen Benutzern zur Verfügung.
@@ -404,7 +404,7 @@ versions.psvscommit('&#60;schema&#62;.&#60;tabellenname&#62;',
 <P>
 Manchmal kommt es vor, dass zwei oder mehrere Benutzer an dem selben Tabellenobjekt arbeiten. In diesem Fall listet die Funktion pgvscommit() die in Konflikt stehenden Datensätze auf. Die Konflikt-Objekte werden nicht in der Datenbank gespeichert. Bitte kontaktieren Sie in diesem Fall den anderen Benutzer in der Fehlermeldung, um zu diskutieren, welche Änderung in die Datenbank übernommen werden soll.
 
-<A NAME="toc18"></A>
+<A NAME="toc213"></A>
 <H3>2.1.3 pgvsmerge</H3>
 
 Um Konflikte zu lösen dient der Befehl:
@@ -414,7 +414,7 @@ Um Konflikte zu lösen dient der Befehl:
 select * from versions.pgvsmerge('&#60;schema&#62;.&#60;tabellenname&#62;',<_record-id_>,'<_Benutzername_>');
 </CODE>
 
-<A NAME="toc19"></A>
+<A NAME="toc214"></A>
 <H3>2.1.4 pgvsdrop</H3>
 
 <P>
@@ -426,7 +426,7 @@ Damit werden alle Versionierungseinträge aus der PostGIS-Tabelle entfernt. Sie 
 <P>
 Dabei müssen Sie keine Sorge haben, denn der Befehl <CODE>pgvsdrop('&#60;tabellenname&#62;');</CODE> entfernt nur das Versionierungssystem. Die Master PostGIS-Tabelle mit allen ehemaligen Veränderungen (committs) existiert natürlich weiterhin.
 
-<A NAME="toc20"></A>
+<A NAME="toc215"></A>
 <H3>2.1.5 pgvsrevert</H3>
 
 Die pgvsrevert Funktion bietet die Möglichkeit, alle bis dato noch nicht committeten Änderungen zu entfernen und Ihre Daten auf die HEAD-Revision zurückzubringen. Die Revisionsnummer der HEAD-Revision wird dabei zurückgegeben.
@@ -436,7 +436,7 @@ Die pgvsrevert Funktion bietet die Möglichkeit, alle bis dato noch nicht commit
 select * from versions.pgvsrevert('&#60;tabellenname&#62;');
 </CODE>
 
-<A NAME="toc21"></A>
+<A NAME="toc216"></A>
 <H3>2.1.6 pgvsrevision</H3>
 
 Die pgvsrevision Funktion gibt die installierte Revison von pgvs zurück.
@@ -446,7 +446,7 @@ Die pgvsrevision Funktion gibt die installierte Revison von pgvs zurück.
 select * from versions.pgvsrevision();
 </CODE>
 
-<A NAME="toc22"></A>
+<A NAME="toc217"></A>
 <H3>2.1.7 pgvslogview</H3>
 
 Die pgvslogview Funktion gibt alle Protokolle einer bestimmten, versionierten Tabelle zurück:
@@ -456,7 +456,7 @@ Die pgvslogview Funktion gibt alle Protokolle einer bestimmten, versionierten Ta
 select * from versions.pgpslogview ('&#60;tabellenname&#62;');
 </CODE>
 
-<A NAME="toc23"></A>
+<A NAME="toc218"></A>
 <H3>2.1.8 pgvsrollback</H3>
 
 Die pgvsrollback Funktion bringt eine Revision wieder zurück auf die HEAD Revision:
@@ -470,17 +470,17 @@ Die pgvsrollback Funktion bringt eine Revision wieder zurück auf die HEAD Revis
 <P>
 Diese Funktion arbeitet zuverlässig ab der pgvs db-Version 1.8.4 und der QGIS-Plugin Version 2.0.2. Falls es vorherige Revisionen eines Layers gibt,  sind diese nicht für einen Rollback bereit.
 
-<A NAME="toc24"></A>
+<A NAME="toc3"></A>
 <H1>3. Umsetzung als PgVersion Plugin in QGIS</H1>
 
 Um das Arbeiten mit den pgvs-Funktionen zu erleichtern, sind diese als QGIS Plugin PgVersion für QGIS 3.x und PostGIS 2.x umgesetzt. Die damit zur Verfügung stehende Funktionalität umfasst folgende Arbeitsschritte:
 
-<A NAME="toc25"></A>
+<A NAME="toc31></A>
 <H2>3.1 Verbindung zur Datenbank </H2>
 
 Starten Sie QGIS und erstellen Sie über „PostGIS Layer hinzufügen“ eine Verbindung zur Datenbank <CODE>historisierung</CODE> her. Laden Sie nun einen Layer, den Sie zur Versionierung vorsehen wollen, z.B. aus dem public Schema, in Ihr QGIS Projekt.
 
-<A NAME="toc26"></A>
+<A NAME="toc32"></A>
 <H2>3.2 Layer mit dem Versionierungssystem versehen <img src="image_de/Layer_versioned_System_Icon_de.png" alt="Layer_versioned_System_Icon_de"></H2>
 
 Mit dieser Option starten Sie die Versionierung für einen PostGIS-Layer. Sie haben dies einmal zu tun für jeden Layer, der in die Versionierung integriert werden soll. Wählen Sie den Layer im Layerfenster aus und klicken Sie auf das Icon „Die Ebene zur Versionierung vorbereiten“ und das Versionierungssystem wird für diesen initialisiert.
@@ -504,7 +504,7 @@ Bestätigen Sie auch diese Meldung, indem Sie auf OK klicken. Der Layer wird nun
 <P>
 Um mit dem versionierten Layer arbeiten zu können, müssen Sie diesen nun erneut über die Plugin-Tools laden. Je nach Rechten kann jeder Benutzer Tabellen versionieren. Wir empfehlen aber, dies der Administration der Datenbank zu überlassen.
 
-<A NAME="toc27"></A>
+<A NAME="toc33"></A>
 <H2>3.3 Laden des versionierten Layers <img src="image_de/Loading_versioned_Layer_Icon_de.png" alt="Loading_versioned_Layer_Icon_de"></H2>
 
 Jetzt können Sie über das Icon „Laden des versionierten Layers“ den entsprechenden View laden.
@@ -517,7 +517,7 @@ Jetzt können Sie über das Icon „Laden des versionierten Layers“ den entspr
 <P>
 Wählen Sie Ihre Datenbankverbindung. Sie sehen dann die angeschlossenen Benutzer und können den versionierten Layer aus einer Liste auswählen, in  QGIS laden und mit der Bearbeitung beginnen. Wenn ein versionierter Layer bereits in QGIS geladen ist, bekommen Sie eine entsprechende Meldung angezeigt.
 
-<A NAME="toc28"></A>
+<A NAME="toc34"></A>
 <H2>3.4 Änderungen übergeben <img src="image_de/Commit_Changes_de.png" alt="Commit_Changes_de"></H2>
 
 Wenn Sie Ihre Bearbeitung abgeschlossen haben, können Sie Ihre Änderungen an die Datenbank übermitteln (committen). Speichern Sie dazu als erstes die Änderungen ab. Der Layer wird dann im Layerfenster mit einem (modified) Vermerk ergänzt.
@@ -572,7 +572,7 @@ Für die Bereinigung von Konflikten haben Sie zwei Möglichkeiten.
   </ul>
 
 
-<A NAME="toc29"></A>
+<A NAME="toc35"></A>
 <H2>3.5	Auf die HEAD Revision zurücksetzen <img src="image_de/Head_Revision_Resetting_Icon_de.png" alt="Head_Revision_Resetting_Icon_de"></H2>
 
 Wenn Sie eine gespeicherte, aber noch nicht committete Änderung entfernen wollen, bedeutet es, dass Sie die Ansicht zurück in die HEAD-Revision versetzen müssen, also auf die Version, die Sie zu Beginn der Arbeit ausgecheckt haben.
@@ -581,7 +581,7 @@ Wenn Sie eine gespeicherte, aber noch nicht committete Änderung entfernen wolle
 In diesem Fall werden alle Änderungen entfernt, die bis dahin durchgeführt haben. Um diese Funktion zu nutzen, wählen Sie den entsprechenden Layer aus und klicken auf das Icon „Auf die HEAD Revision zurücksetzen“.
 
 
-<A NAME="toc30"></A>
+<A NAME="toc36"></A>
 <H2>3.6	Unterschiede anzeigen <img src="image_de/Show_Changes_Icon_de.png" alt="Show_Changes_Icon_de"></H2>
 
 <figure>
@@ -597,7 +597,7 @@ Dabei wird ein Differenz-Layer für den gewählten Kartenausschnitt erstellt, de
 <P>
 Wenn Sie die Änderungen in der Attributtabelle vergleichen möchten, ist dies auch möglich, indem Sie mit dem QGIS Werkzeug „Objekte abfragen“ und dem Modus „Von oben nach unten“ auf das Objekt klicken. Dann werden Ihnen als Abfrageergebnisse die Attribute angezeigt, um sie visuell zu vergleichen.
 
-<A NAME="toc31"></A>
+<A NAME="toc37"></A>
 <H2>3.7	Logs anzeigen <img src="image_de/Show_Logs_Icon_de.png" alt="Show_Logs_Icon_de"></H2>
 
 Der Logview Dialog gibt Ihnen die Möglichkeit, einen Überblick über die Änderungen eines einzelnen Layers zu erhalten. Sie sind damit auch in der Lage zurückzukehren zu einer bestimmten Revision oder einer Markierung. Der Rollback wird dann in QGIS geladen und angezeigt.
@@ -623,7 +623,7 @@ Mögliche Vorgehensweisen sind:
   <figcaption>Abbildung 17: Markierungen (Tags) setzen.</figcaption>
 </figure>
 
-<A NAME="toc32"></A>
+<A NAME="toc38"></A>
 
 <H2>3.8	Löschen ausgewählter Objekte direkt in der Datenbank <img src="image_de/Delete_selected_objects_in_DB_Icon_de.png" alt="Delete_selected_objects_in_DB_Icon_de"></H2>
 
@@ -634,7 +634,7 @@ Diese Funktionalität ermöglicht es, zuvor in QGIS ausgewählte Objekte eines v
   <figcaption>Abbildung 18: Löschen direkt in der Datenbank.</figcaption>
 </figure>
 
-<A NAME="toc33"></A>
+<A NAME="toc39"></A>
 <H2>3.9 Versionierung der Ebene löschen <img src="image_de/Delete_selected_objects_in_DB_Icon_de.png" alt="Delete_selected_objects_in_DB_Icon_de"></H2>
 
 Diese Funktionalität ist genau wie das direkte Löschen in der Datenbank nicht direkt über die Werkzeugleiste erreichbar. Das Löschen der Versionierung eines Layers löscht nicht den Layer selbst.
@@ -645,7 +645,7 @@ Es geht dabei „nur“ um die Versionierungsumgebung des Layers. Dies ist in de
 <P>
 Aktivieren Sie den entsprechenden Layer und klicken auf "Versionierung des Layer löschen“ im Menü.
 
-<A NAME="toc34"></A>
+<A NAME="toc4"></A>
 <H1>4. Tipps für die Praxis</H1>
 
 An dieser Stelle soll anhand praktischer Tipps der Einstieg in das Arbeiten mit dem Plugin erleichtert werden. Wir gehen dabei davon aus, dass die entsprechenden Layer bereits historisiert sind.
@@ -654,7 +654,7 @@ In den Hintergrund kann für die Orientierung folgender WMS Dienst in QGIS gelad
 <a href="https://sg.geodatenzentrum.de/wms_webatlasde_grau__5729bf83-84c2-bb73-39c0-6dc02cfa13d6?">https://sg.geodatenzentrum.de/wms_webatlasde_grau__5729bf83-84c2-bb73-39c0-6dc02cfa13d6?</a>
 -->
 
-<A NAME="toc35"></A>
+<A NAME="toc41"></A>
 <H2>4.1 Grundsätzliche Einstellungen in QGIS</H2>
 
 <ul>
@@ -675,7 +675,7 @@ In den Hintergrund kann für die Orientierung folgender WMS Dienst in QGIS gelad
     </ul>
 </ul>
 
-<A NAME="toc36"></A>
+<A NAME="toc42"></A>
 <H2>4.2 Historisierung eines Layers mit bigint Datentyp der ID Spalte</H2>
 
 Bei einigen Daten ist die ID Spalte in der Attributtabelle als „bigint“ oder „Integer64“ Datentyp angelegt. Beim Import dieser Layer nach PostGIS wird der Datentyp nicht automatisch nach „bigserial“ umgewandelt. Dies ist aber notwendig für die Versionierung, wo die Spalte per Default als „Primary-Key“ Spalte fungiert. Daher muss nach dem Import und vor der Versionierung die Umwandlung vom bigint zum bigserial Datentyp manuell erfolgen, siehe Beispiel für den Layer <CODE>bauleitplanung_nds</CODE>.
@@ -708,7 +708,7 @@ Das PgVersion Plugin prüft bei der Initialisierung eines neuen Layers, ob der P
   <figcaption>Abbildung 19: Fehler bei fehlendem serial Datentyp.</figcaption>
 </figure>
 
-<A NAME="toc37"></A>
+<A NAME="to437"></A>
 <H2>4.3 Anpassen vorhander Objektgeometrien eines Layers</H2>
 
 <ul>
@@ -720,7 +720,7 @@ Das PgVersion Plugin prüft bei der Initialisierung eines neuen Layers, ob der P
   <li>Sie können diese erste Veränderung nachvollziehen, indem Sie auf das PgVersion-Tool „Logs anzeigen“ klicken.
 </ul>
 
-<A NAME="toc38"></A>
+<A NAME="toc44"></A>
 <H2>4.4 Anpassen vorhandener Attribute eines Layers</H2>
 
 <ul>
@@ -732,7 +732,7 @@ Das PgVersion Plugin prüft bei der Initialisierung eines neuen Layers, ob der P
   <li>Sie können diese Veränderung nachvollziehen, indem Sie auf das PgVersion-Tool „Logs anzeigen“ klicken.
 </ul>
 
-<A NAME="toc39"></A>
+<A NAME="toc45"></A>
 <H2>4.5 Ein neues Objekt zu einem Layer hinzufügen</H2>
 
 <ul>
@@ -744,7 +744,7 @@ Das PgVersion Plugin prüft bei der Initialisierung eines neuen Layers, ob der P
   <li>Sie können diese Veränderung nachvollziehen, indem Sie auf das PgVersion-Tool „Logs anzeigen“ klicken.
 </ul>
 
-<A NAME="toc40"></A>
+<A NAME="toc46"></A>
 <H2>4.6 Objekte in einem Layer löschen</H2>
 
 <ul>
@@ -759,7 +759,7 @@ Das PgVersion Plugin prüft bei der Initialisierung eines neuen Layers, ob der P
   <li>Klicken Sie nun auf das PgVersion-Tool „Auf die Head Revision zurücksetzten“. Dadurch gehen Ihre Änderungen verloren, sie werden verworfen.
 </ul>
 
-<A NAME="toc41"></A>
+<A NAME="toc47"></A>
 <H2>4.7 Aktuell durchgeführte Änderungen verwerfen</H2>
 
 <ul>
@@ -770,7 +770,7 @@ Das PgVersion Plugin prüft bei der Initialisierung eines neuen Layers, ob der P
   <li>Sie können diese erste Veränderung nachvollziehen, indem Sie auf das PgVersion-Tool „Logs anzeigen“ klicken.
 </ul>
 
-<A NAME="toc42"></A>
+<A NAME="toc48"></A>
 <H2>4.8 Auf eine vorherige Revision eines Layers zurückgehen</H2>
 
 
@@ -780,7 +780,7 @@ Das PgVersion Plugin prüft bei der Initialisierung eines neuen Layers, ob der P
   <li>Klicken Sie nun auf den Knopf „Auf die ausgewählte Revision zurücksetzen“. Die davor durchgeführten Schritte sind weiterhin historisiert. Sie haben aber den Stand des Layers auf den Stand der ausgewählten Revision zurückgestellt.
 </ul>
 
-<A NAME="toc43"></A>
+<A NAME="toc49"></A>
 <H2>4.9 Einen Layer aus der Versionierung entfernen</H2>
 
 <ul>
@@ -790,7 +790,7 @@ Das PgVersion Plugin prüft bei der Initialisierung eines neuen Layers, ob der P
   <li>Bitte denken Sie daran, dieser Schritt ist unwiderruflich!
 </ul>
 
-<A NAME="toc44"></A>
+<A NAME="toc410"></A>
 <H2>4.10 Auflösen eines Konflikts bei der Bearbeitung</H2>
 
 <ul>
@@ -801,7 +801,7 @@ Das PgVersion Plugin prüft bei der Initialisierung eines neuen Layers, ob der P
   <li>Es startet nun ein Fenster, das Ihnen ermöglicht, den Konflikt gemeinsam mit dem anderen Anwender zu lösen.
 </ul>
 
-<A NAME="toc45"></A>
+<A NAME="toc411"></A>
 <H2>4.11 Aktualisieren mit copy/paste am QGIS Bildschirm</H2>
 
 <ul>
@@ -810,7 +810,7 @@ Das PgVersion Plugin prüft bei der Initialisierung eines neuen Layers, ob der P
   <li>Bringen Sie beide Layer in den Bearbeitungsmodus und Ergänzen Sie dann den versionierten Datensatz mittels Copy/Paste mit den Geometrien und Attributen aus der Fortführung.
 </ul>
 
-<A NAME="toc46"></A>
+<A NAME="toc412"></A>
 <H2>4.12 NULL Werte der Primary-Key Spalte nicht erlaubt</H2>
 
 QGIS erkennt beim Editieren das Vorhandensein einer Primary-Key Spalte und erlaubt es dann nicht, diese ohne Eintrag eines Wertes zu speichern.

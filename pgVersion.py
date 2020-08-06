@@ -90,8 +90,10 @@ class PgVersion(QObject):
         self.actionDrop = QAction(
             QIcon(":/plugins/pgversion/icons/pgversion-drop.png"),
             self.tr("Drop Versioning from Layer"), self.iface.mainWindow())
-        self.actionHelp = QAction(QIcon(""), self.tr("Help"),
-                                  self.iface.mainWindow())
+        self.actionHelp = QAction(
+            QIcon(":/plugins/pgversion/icons/pgversion-help.png"), 
+            self.tr("Help"),
+            self.iface.mainWindow())
         self.actionAbout = QAction(QIcon(""), self.tr("About"),
                                    self.iface.mainWindow())
         self.actionDelete = QAction(
@@ -115,6 +117,7 @@ class PgVersion(QObject):
         self.toolBar.addAction(self.actionDiff)
         self.toolBar.addAction(self.actionLogView)
         self.toolBar.addAction(self.actionDelete)
+        self.toolBar.addAction(self.actionHelp)
 
         try:
             for a in self.actionList:
@@ -278,13 +281,16 @@ class PgVersion(QObject):
                     mySchema, myTable)
                 result, error = myDb.run(sql)
 
+                QApplication.restoreOverrideCursor()
+                
                 if result is True:
-                    QApplication.restoreOverrideCursor()
                     QMessageBox. information(None, 'Init', self.tr(
-                        'Init was successful!\n\n'
-                        'Please set the user permissions for table {0} and'
-                        ' reload it via Database -> PG Version!').format(
-                            myTable))
+                        """
+Init was successful!
+
+Please set the user permissions for table {0} and reload it via Database -> PG Version!
+
+Further information on rights management can be found in the help in section 1.3.3""").format(myTable))
 
                     QgsProject().instance().removeMapLayer(
                         currentLayer.id())
