@@ -7,88 +7,11 @@
 SET check_function_bodies = false;
 -- ddl-end --
 
--- object: hdus | type: ROLE --
--- DROP ROLE IF EXISTS hdus;
-CREATE ROLE hdus WITH 
-	SUPERUSER
-	CREATEDB
-	CREATEROLE
-	INHERIT
-	LOGIN
-	ENCRYPTED PASSWORD '********';
--- ddl-end --
-
--- object: oc_hdus | type: ROLE --
--- DROP ROLE IF EXISTS oc_hdus;
-CREATE ROLE oc_hdus WITH 
-	SUPERUSER
-	CREATEDB
-	CREATEROLE
-	INHERIT
-	LOGIN
-	ENCRYPTED PASSWORD '********';
--- ddl-end --
-
--- object: oc_hdus2 | type: ROLE --
--- DROP ROLE IF EXISTS oc_hdus2;
-CREATE ROLE oc_hdus2 WITH 
-	CREATEDB
-	INHERIT
-	LOGIN
-	ENCRYPTED PASSWORD '********';
--- ddl-end --
-
--- object: mhugent | type: ROLE --
--- DROP ROLE IF EXISTS mhugent;
-CREATE ROLE mhugent WITH 
-	INHERIT
-	LOGIN
-	ENCRYPTED PASSWORD '********';
--- ddl-end --
-
 -- object: versions | type: ROLE --
 -- DROP ROLE IF EXISTS versions;
 CREATE ROLE versions WITH 
 	INHERIT
-	ENCRYPTED PASSWORD '********'
-	ROLE hdus,mhugent;
--- ddl-end --
-
--- object: andi | type: ROLE --
--- DROP ROLE IF EXISTS andi;
-CREATE ROLE andi WITH 
-	INHERIT
-	LOGIN
 	ENCRYPTED PASSWORD '********';
--- ddl-end --
-COMMENT ON ROLE andi IS 'QGIS Kassier Andi Vonlaufen';
--- ddl-end --
-
--- object: qgis_kassier | type: ROLE --
--- DROP ROLE IF EXISTS qgis_kassier;
-CREATE ROLE qgis_kassier WITH 
-	INHERIT
-	ENCRYPTED PASSWORD '********'
-	ROLE andi,hdus;
--- ddl-end --
-
--- object: hka | type: ROLE --
--- DROP ROLE IF EXISTS hka;
-CREATE ROLE hka WITH 
-	SUPERUSER
-	CREATEDB
-	CREATEROLE
-	INHERIT
-	LOGIN
-	ENCRYPTED PASSWORD '********';
--- ddl-end --
-
--- object: hudu | type: ROLE --
--- DROP ROLE IF EXISTS hudu;
-CREATE ROLE hudu WITH 
-	INHERIT
-	ENCRYPTED PASSWORD '********'
-	ROLE hdus,mhugent;
 -- ddl-end --
 
 
@@ -101,7 +24,7 @@ CREATE ROLE hudu WITH
 -- 	LC_COLLATE = 'en_US'
 -- 	LC_CTYPE = 'en_US'
 -- 	TABLESPACE = pg_default
--- 	OWNER = hdus;
+-- 	OWNER = versions;
 -- -- ddl-end --
 -- 
 
@@ -118,8 +41,7 @@ SET search_path TO pg_catalog,public,versions;
 -- object: postgis | type: EXTENSION --
 -- DROP EXTENSION IF EXISTS postgis CASCADE;
 CREATE EXTENSION postgis
-WITH SCHEMA public
-VERSION '3.0.1';
+WITH SCHEMA public;
 -- ddl-end --
 COMMENT ON EXTENSION postgis IS 'PostGIS geometry, geography, and raster spatial types and functions';
 -- ddl-end --
@@ -158,9 +80,9 @@ ALTER TYPE versions.conflicts OWNER TO versions;
 CREATE TYPE versions.logview AS
 (
   revision integer,
+  datum timestamp,
   logmsg text,
-  project text,
-  datum timestamp
+  project text
 );
 -- ddl-end --
 ALTER TYPE versions.logview OWNER TO versions;
@@ -946,11 +868,11 @@ CREATE FUNCTION versions.pgvslogview ( _param1 character varying)
     
     versionLogTable := 'versions.'||quote_ident(mySchema||'_'||myTable||'_version_log');       
 
-    logViewQry := 'select logt.revision, to_timestamp(logt.systime/1000), logt.project,  logt.logmsg
+    logViewQry := format('select logt.revision, to_timestamp(logt.systime/1000),  logt.logmsg, logt.project
                            from  versions.version_tables as vt left join versions.version_tables_logmsg as logt on (vt.version_table_id = logt.version_table_id)
-                           where vt.version_table_schema = '''||mySchema||'''
-                             and vt.version_table_name = '''||myTable||''' 
-                           order by revision desc';
+                           where vt.version_table_schema = ''%1$s''
+                             and vt.version_table_name = ''%2$s'' 
+                           order by revision desc', mySchema, myTable);
 
 --RAISE EXCEPTION '%', logViewQry;
 
@@ -1735,7 +1657,7 @@ where rk = 1 and action != ''delete''', myPkey, versionLogTable, revision, field
 
 $$;
 -- ddl-end --
-ALTER FUNCTION versions.pgvscheckout(anyelement,bigint) OWNER TO hdus;
+ALTER FUNCTION versions.pgvscheckout(anyelement,bigint) OWNER TO versions;
 -- ddl-end --
 
 -- object: versions.pgvscheckout | type: FUNCTION --
@@ -1823,7 +1745,7 @@ where %5$s and rk = 1 and action != ''delete''', myPkey, versionLogTable, revisi
 
 $$;
 -- ddl-end --
-ALTER FUNCTION versions.pgvscheckout(anyelement,bigint,text) OWNER TO hdus;
+ALTER FUNCTION versions.pgvscheckout(anyelement,bigint,text) OWNER TO versions;
 -- ddl-end --
 
 -- object: version_tables_fkey | type: CONSTRAINT --

@@ -67,6 +67,8 @@ class LogView(QDialog, FORM_CLASS):
 
     def setLayer(self, theLayer):
         self.theLayer = theLayer
+#        self.setWindowTitle("gaga")
+        self.setWindowTitle(self.tr("Log-View for Layer: %s" % theLayer.name()))
 
     def createTagList(self):
 
@@ -74,13 +76,14 @@ class LogView(QDialog, FORM_CLASS):
 
         # Add tags into tag cmb
         myDb = self.tools.layerDB('tags', self.theLayer)
-        sql = "select vtag.tags_id, vtag.version_table_id, vtag.tag_text, vtag.revision \
-          from versions.version_tags as vtag,\
-               versions.version_tables as vtab \
-          where vtab.version_view_schema = '%s' \
-            and vtab.version_view_name = '%s' \
-            and vtab.version_table_id = vtag.version_table_id \
-          order by vtag.tags_id desc " % (
+        sql = """
+          select vtag.tags_id, vtag.version_table_id, vtag.tag_text, vtag.revision 
+          from versions.version_tags as vtag,
+               versions.version_tables as vtab 
+          where vtab.version_view_schema = '%s' 
+            and vtab.version_view_name = '%s' 
+            and vtab.version_table_id = vtag.version_table_id 
+          order by vtag.tags_id desc """ % (
               self.tools.layerSchema(self.theLayer), self.tools.layerTable(
                   self.theLayer))
         result,  error = myDb.read(sql)

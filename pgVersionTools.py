@@ -33,7 +33,7 @@ class PgVersionTools(QObject):
 
     def __init__(self, parent):
         QObject.__init__(self, parent)
-        self.pgvsRevision = '2.1.9'
+        self.pgvsRevision = '2.1.10'
         self.parent = parent
         self.iface = parent.iface
         self.layer_list = parent.layer_list
@@ -472,7 +472,9 @@ functions directly with click on Install pgvs.""" % (create_version_path))
             for i in range(int(db_minor_revision), int(my_minor_revision)):
 
                 if my_major_revision + "." + my_minor_revision != db_major_revision + "." + db_minor_revision:
-                    upgrade_version_path = '%s/docs/upgrade_pgversion_schema-2.%s.%s.sql' % (self.parent.plugin_path, db_major_revision,
+                    upgrade_version_path = '%s/docs/upgrade_pgversion_schema-2.%s.%s.sql' % (
+                                   self.parent.plugin_path, 
+                                   db_major_revision,
                                    i)
                     self.vsCheck = DbVersionCheckDialog(
                         myDb, result["PGVSREVISION"][0], upgrade_version_path,
