@@ -40,7 +40,7 @@ SET search_path TO pg_catalog,public,versions;
 
 -- object: postgis | type: EXTENSION --
 -- DROP EXTENSION IF EXISTS postgis CASCADE;
-CREATE EXTENSION postgis
+CREATE EXTENSION IF NOT EXISTS postgis
 WITH SCHEMA public;
 -- ddl-end --
 COMMENT ON EXTENSION postgis IS 'PostGIS geometry, geography, and raster spatial types and functions';
