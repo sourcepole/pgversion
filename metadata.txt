@@ -9,7 +9,7 @@
 name=PgVersion
 description=Client for the Postgres Versioning System pgvs
 category=Database
-version=3.1.2
+version=3.1.3
 qgisMinimumVersion=3.0
 qgisMaximumVersion=3.99
 class_name=PgVersion
@@ -21,6 +21,9 @@ about=Sourcepole AG - Linux & Open Source Solutions, Weberstrasse 5, 8004 Zurich
 ; Optional items:
 
 changelog=
+    3.1.3
+    - Improved permissions after creation of layer version
+    - pgvs-2.1.11 implemented
     3.1.2
     - Help improved
     3.1.1
