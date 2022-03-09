@@ -176,7 +176,12 @@ class PgVersionLoadDialog(QDialog, FORM_CLASS):
                         "\n{0}".format(error)))
             return
         uri = QgsDataSourceUri()
-        uri.setConnection(DBHOST, DBPORT, DBNAME, DBUSER, DBPASSWD)
+        
+        try:
+            uri.setConnection(DBHOST, DBPORT, DBNAME, DBUSER, DBPASSWD)
+        except:
+            uri.setConnection(DBHOST, DBPORT, DBNAME, DBUSER, '')
+            
         uri.setDataSource(layer['VERSION_VIEW_SCHEMA'][0], layer[
             'VERSION_VIEW_NAME'][0], '' + layer[
                 'VERSION_VIEW_GEOMETRY_COLUMN'][0] + '', '', layer[
