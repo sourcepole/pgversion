@@ -2,15 +2,14 @@
 
 # PostGIS Versioning - pgVersion 3.1.2
 
-### Dr. Horst Duester, 2018, horst.duester@sourcepole.ch
+### Dr. Horst Duester, 2022, horst.duester@sourcepole.ch
 
 </div>
 
 <div class="toc">
 
-[Introduction](#toc0)
 
-2.  [Administration](#toc1)
+1.  [Administration](#toc1)
     *   [1.1 Installing the database](#toc11)
         *   [1.1.1 Login roles](#toc111)
         *   [1.1.2 Authentication to the database](#toc112)
@@ -21,7 +20,7 @@
         *   [1.3.1 Installing from the command line](#toc131)
         *   [1.3.2 Installation with the QGIS plugin](#toc132)
         *   [1.3.3 Rights management](#toc133)
-3.  [PgVersion plugin functionality](#toc2)
+2.  [PgVersion plugin functionality](#toc2)
     *   [2.1 Included database features](#toc21)
         *   [2.1.1 pgvsinit](#toc211)
         *   [2.1.2 pgvscommit](#toc212)
@@ -31,7 +30,7 @@
         *   [2.1.6 pgvsrevision](#toc216)
         *   [2.1.7 pgvslogview](#toc217)
         *   [2.1.8 pgvsrollback](#toc218)
-4.  [Implementation as a PgVersion plugin in QGIS](#toc3)
+3.  [Implementation as a PgVersion plugin in QGIS](#toc3)
     *   [3.1 Connecting to the database](#toc31)
     *   [3.2 Layer with the versioning system](#toc32)
     *   [3.3 Loading the versioned layer](#toc33)
@@ -41,7 +40,7 @@
     *   [3.7 Logs show](#toc37)
     *   [3.8 Deleting selected objects directly in the database](#toc38)
     *   [3.9 Delete layer versioning](#toc39)
-5.  [Practical tips:](#toc4)
+4.  [Practical tips:](#toc4)
     *   [4.1 Basic settings in QGIS](#toc41)
     *   [4.2 Historizing a layer with bigint data type of ID column](#toc42)
     *   [4.3 Adjusting existing object geometries of a layer](#toc43)
@@ -57,11 +56,7 @@
 
 </div>
 
-<a name="toc0"></a>
-
-# Introduction
-
-The manual refers to PostgreSQL Version 9.6.8 and PostGIS Version 2.4.4 under OpenSUSE Leap 15.0.<a name="toc1"></a>
+<a name="toc1"></a>
 
 # 1\. Administration
 
@@ -216,6 +211,7 @@ Furthermore there is the menu entry "Database" → "PG Version":
 
 <figcaption>Figure 7: PG Version integration in QGIS Menu.</figcaption>
 
+<a name="toc21"></a>   
 ### 2.1 Included database functions
 
 The schema `versions` created at initialization contains all the information needed to manage the versioned tables. Be careful not to make any changes in the `versions` schema. This is reserved for the pgvs functions alone.
