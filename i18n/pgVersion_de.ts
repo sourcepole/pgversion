@@ -425,9 +425,9 @@ den Layer mit dem &quot;Versionierten Layer Laden&quot; Knopf hinzu</translation
         <source>Layer {0} has modifications which will be lost after rollback! If you want to keep this modifications please commit them before you execute the rollback. 
 
 Are you sure to rollback to revision {1}?</source>
-        <translation>Der Layer {0} wurde modifiziert. Diese Modifikationen gehen mit dem Rollback verloren. Wenn Sie diese Modifikationen behalten wollen committen Sie die Änderunegn vor dem Rollback.
+        <translation>Der Layer {0} wurde modifiziert. Diese Modifikationen gehen mit dem Rollback verloren. Wenn Sie diese Modifikationen behalten wollen committen Sie die Änderungen vor dem Rollback.
 
-Sind Sie sicher, dass sie ein Rollback zur Version {1}durchführen möchten?</translation>
+Sind Sie sicher, dass sie ein Rollback zur Version {1} durchführen möchten?</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="718"/>
