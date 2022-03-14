@@ -95,7 +95,7 @@ class PgVersion(QObject):
             self.tr("Help"),
             self.iface.mainWindow())
         self.actionPower = QAction(
-            QIcon(":/plugins/pgversion/icons/pgversion-power.png"),
+            QIcon(":/plugins/pgversion/icons/pgversion-power_off.png"),
             self.tr("Activate and deactivate pgVersion"), self.iface.mainWindow())
         self.actionPower.setCheckable(True)
         self.actionPower.setChecked(False)
@@ -158,6 +158,7 @@ class PgVersion(QObject):
 
     def doPower(self):
         if self.actionPower.isChecked():
+            self.actionPower.setIcon(QIcon(":/plugins/pgversion/icons/pgversion-power_on.png"))
             self.iface.mapCanvas().selectionChanged.connect(self.SelectionChanged)
             self.iface.currentLayerChanged.connect(self.layer_changed)
             QgsProject().instance().layerWasAdded.connect(self.add_layer)
@@ -179,6 +180,7 @@ class PgVersion(QObject):
             except TypeError:
                 # no previous connections
                 pass
+            self.actionPower.setIcon(QIcon(":/plugins/pgversion/icons/pgversion-power_off.png"))
             self.actionInit.setEnabled(False)
             self.actionLoad.setEnabled(False)
             self.actionCommit.setEnabled(False)
