@@ -11,6 +11,7 @@
     <file>icons/pgversion-diff.png</file>
     <file>icons/pgversion-logview.png</file>
     <file>icons/pgversion-help.png</file>
+    <file>icons/pgversion-power.png</file>
   </qresource> 
 </RCC> 
 
