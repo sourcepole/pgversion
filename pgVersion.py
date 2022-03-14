@@ -94,6 +94,12 @@ class PgVersion(QObject):
             QIcon(":/plugins/pgversion/icons/pgversion-help.png"), 
             self.tr("Help"),
             self.iface.mainWindow())
+        self.actionPower = QAction(
+            QIcon(":/plugins/pgversion/icons/pgversion-power.png"),
+            self.tr("Activate and deactivate pgVersion"), self.iface.mainWindow())
+        self.actionPower.setCheckable(True)
+        self.actionPower.setChecked(False)
+
         self.actionAbout = QAction(QIcon(""), self.tr("About"),
                                    self.iface.mainWindow())
         self.actionDelete = QAction(
@@ -104,12 +110,14 @@ class PgVersion(QObject):
         self.actionDelete.setEnabled(False)
         self.set_actions(False)
         
-        self.actionList = [self.actionInit, self.actionLoad, self.actionCommit,
+        self.actionList = [self.actionPower,
+                           self.actionInit, self.actionLoad, self.actionCommit,
                            self.actionDiff, self.actionRevert,
                            self.actionLogView, self.actionDrop,
                            self.actionLogView, self.actionDelete,
                            self.actionHelp, self.actionAbout]
 
+        self.toolBar.addAction(self.actionPower)
         self.toolBar.addAction(self.actionInit)
         self.toolBar.addAction(self.actionLoad)
         self.toolBar.addAction(self.actionCommit)
@@ -130,6 +138,7 @@ class PgVersion(QObject):
             self.menuBar.addMenu(self.menu)
 
         # connect the action to the run method
+        self.actionPower.triggered.connect(self.doPower)
         self.actionInit.triggered.connect(self.doInit)
         self.actionLoad.triggered.connect(self.doLoad)
         self.actionDiff.triggered.connect(self.doDiff)
@@ -145,16 +154,39 @@ class PgVersion(QObject):
         self.LogViewDialog.rollbackLayer.connect(self.doRollback)
         self.LogViewDialog.checkoutLayer.connect(self.doCheckout)
         self.LogViewDialog.checkoutTag.connect(self.doCheckout)
+        self.doPower()
 
-        for a in self.iface.digitizeToolBar().actions():
-            if a.objectName() == 'mActionToggleEditing':
-                a.triggered.connect(self.SelectionChanged)
+    def doPower(self):
+        if self.actionPower.isChecked():
+            self.iface.mapCanvas().selectionChanged.connect(self.SelectionChanged)
+            self.iface.currentLayerChanged.connect(self.layer_changed)
+            QgsProject().instance().layerWasAdded.connect(self.add_layer)
+            QgsProject().instance().layerWillBeRemoved.connect(self.remove_layer)
+            for a in self.iface.digitizeToolBar().actions():
+                if a.objectName() == 'mActionToggleEditing':
+                    a.triggered.connect(self.SelectionChanged)
+            self.actionInit.setEnabled(True)
+            self.actionLoad.setEnabled(True)  
+        else:
+            try:
+                self.iface.mapCanvas().selectionChanged.disconnect(self.SelectionChanged)
+                self.iface.currentLayerChanged.disconnect(self.layer_changed)
+                QgsProject().instance().layerWasAdded.disconnect(self.add_layer)
+                QgsProject().instance().layerWillBeRemoved.disconnect(self.remove_layer)
+                for a in self.iface.digitizeToolBar().actions():
+                    if a.objectName() == 'mActionToggleEditing':
+                        a.triggered.disconnect(self.SelectionChanged)
+            except TypeError:
+                # no previous connections
+                pass
+            self.actionInit.setEnabled(False)
+            self.actionLoad.setEnabled(False)
+            self.actionCommit.setEnabled(False)
+            self.actionRevert.setEnabled(False)
+            self.actionDiff.setEnabled(False)
+            self.actionLogView.setEnabled(False)      
+            self.actionDrop.setEnabled(False)
 
-        self.iface.mapCanvas().selectionChanged.connect(self.SelectionChanged)
-        self.iface.currentLayerChanged.connect(self.layer_changed)
-        QgsProject().instance().layerWasAdded.connect(self.add_layer)
-        QgsProject().instance().layerWillBeRemoved.connect(
-            self.remove_layer)
 
     def layer_changed(self):
         if self.tools.hasVersion(self.iface.activeLayer()):
