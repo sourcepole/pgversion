@@ -6,31 +6,14 @@ CREATE ROLE versions WITH
 	ENCRYPTED PASSWORD '********';
 EXCEPTION WHEN duplicate_object THEN RAISE NOTICE '%, skipping', SQLERRM USING ERRCODE = SQLSTATE;
 END
+$$;
+
+DO $$
+BEGIN
+CREATE EXTENSION POSTGIS; 
+EXCEPTION WHEN duplicate_object THEN RAISE NOTICE '%, skipping', SQLERRM USING ERRCODE = SQLSTATE;
+END
 $$;-- ddl-end ---- Database generated with pgModeler (PostgreSQL Database Modeler).
--- pgModeler version: 0.9.4
--- PostgreSQL version: 12.0
--- Project Site: pgmodeler.io
--- Model Author: ---
--- object: versions | type: ROLE --
--- DROP ROLE IF EXISTS versions;
-CREATE ROLE versions WITH 
-	INHERIT
-	ENCRYPTED PASSWORD '********';
--- ddl-end --
-
-
--- Database creation must be performed outside a multi lined SQL file. 
--- These commands were put in this file only as a convenience.
--- 
--- object: pgvs_develop | type: DATABASE --
--- DROP DATABASE IF EXISTS pgvs_develop;
-CREATE DATABASE pgvs_develop
-	ENCODING = 'LATIN1'
-	LC_COLLATE = 'en_US'
-	LC_CTYPE = 'en_US'
-	TABLESPACE = pg_default
-	OWNER = versions;
--- ddl-end --
 
 
 SET check_function_bodies = false;
@@ -46,14 +29,14 @@ ALTER SCHEMA versions OWNER TO versions;
 SET search_path TO pg_catalog,public,versions;
 -- ddl-end --
 
--- object: postgis | type: EXTENSION --
--- DROP EXTENSION IF EXISTS postgis CASCADE;
-CREATE EXTENSION postgis
-WITH SCHEMA public;
--- ddl-end --
-COMMENT ON EXTENSION postgis IS 'PostGIS geometry, geography, and raster spatial types and functions';
--- ddl-end --
-
+-- -- object: postgis | type: EXTENSION --
+-- -- DROP EXTENSION IF EXISTS postgis CASCADE;
+-- CREATE EXTENSION postgis
+-- WITH SCHEMA public;
+-- -- ddl-end --
+-- COMMENT ON EXTENSION postgis IS 'PostGIS geometry, geography, and raster spatial types and functions';
+-- -- ddl-end --
+-- 
 -- object: versions.checkout | type: TYPE --
 -- DROP TYPE IF EXISTS versions.checkout CASCADE;
 CREATE TYPE versions.checkout AS
@@ -668,7 +651,7 @@ CREATE FUNCTION versions.pgvsinit (_param1 character varying)
     versionLogTableSeq := 'versions.'||quote_ident(mySchema||'_'||myTable||'_version_log_version_log_id_seq');
     versionLogTableTmp := 'versions.'||quote_ident(mySchema||'_'||myTable||'_version_log_tmp');
 
--- Feststellen ob die Tabelle oder der View existiert
+-- Check if the table or view exists
      select into testRec table_name
      from information_schema.tables
      where table_schema = mySchema::name
@@ -686,7 +669,7 @@ CREATE FUNCTION versions.pgvsinit (_param1 character varying)
      END IF;    
  
  
--- Die grundlegenden Geometrieparameter des Ausgangslayers ermitteln
+-- Obtain the basic geometry parameters of the initial layer
      select into testRec f_geometry_column, coord_dimension, srid, type
      from geometry_columns
      where f_table_schema = mySchema::name
@@ -703,7 +686,7 @@ CREATE FUNCTION versions.pgvsinit (_param1 character varying)
      geomType := testRec.type;
 		
        
--- Feststellen ob die Tabelle bereits besteht
+-- Check if the table already exists
      testTab := 'versions.'||quote_ident(mySchema||'_'||myTable||'_version_log');
      select into testRec table_name
      from information_schema.tables
@@ -716,7 +699,7 @@ CREATE FUNCTION versions.pgvsinit (_param1 character varying)
      END IF;    
   
      
-  -- Pruefen ob und welche Spalte der Primarykey der Tabelle ist 
+-- Check if and which column is the primary key of the table 
     select into myPkeyRec * from versions._primarykey(inTable);    
     myPkey := quote_ident(myPkeyRec.pkey_column);
 
@@ -816,7 +799,7 @@ CREATE FUNCTION versions.pgvsinit (_param1 character varying)
      execute 'ALTER VIEW '||versionView||' owner to versions';
 
      execute 'GRANT ALL PRIVILEGES ON TABLE '||versionView||' to versions';
-     execute 'GRANT all PRIVILEGES ON TABLE '||mySchema||'.'||myTable||' to versions';     
+     execute 'GRANT ALL PRIVILEGES ON TABLE '||mySchema||'.'||myTable||' to versions';
 
 
      execute 'CREATE TRIGGER pgvs_version_record_trigger
