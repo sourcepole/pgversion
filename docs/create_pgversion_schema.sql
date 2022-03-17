@@ -15,7 +15,7 @@ EXCEPTION WHEN duplicate_object THEN RAISE NOTICE '%, skipping', SQLERRM USING E
 END
 $$;-- ddl-end ---- Database generated with pgModeler (PostgreSQL Database Modeler).
 -- pgModeler version: 1.0.0-alpha
--- PostgreSQL version: 12.0
+-- PostgreSQL version: 14.0
 -- Project Site: pgmodeler.io
 -- Model Author: ---
 -- -- object: versions | type: ROLE --
@@ -62,7 +62,7 @@ SET search_path TO pg_catalog,public,versions;
 -- -- ddl-end --
 -- 
 -- object: versions.checkout | type: TYPE --
-DROP TYPE IF EXISTS versions.checkout CASCADE;
+-- DROP TYPE IF EXISTS versions.checkout CASCADE;
 CREATE TYPE versions.checkout AS
 (
  systime bigint,
@@ -1161,7 +1161,7 @@ CREATE FUNCTION versions.pgvsrevision ()
 DECLARE
   revision TEXT;
   BEGIN	
-    revision := '2.1.11';
+    revision := '2.1.12';
   RETURN revision ;                             
 
   END;
