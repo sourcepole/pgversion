@@ -75,13 +75,19 @@ class PgVersionLoadDialog(QDialog, FORM_CLASS):
             QgsCredentials.instance().put(connectionInfo, user, password)
             DBUSER = user
             DBPASSWD = password
+            
+        if DBUSER == '':
+            QMessageBox.warning(
+                None, self.tr('Error'),
+                self.tr('In order to work with pgversion properly, the database connection must contain at least one user name! Please fix the PostgreSQL database connection.'))
+            return None            
 
         try:
             myDb = DbObj(pluginname=selectedServer, typ=DBTYPE,
                          hostname=DBHOST, port=DBPORT,
                          dbname=DBNAME, username=DBUSER, password=DBPASSWD)
         except:
-            QMessageBox.information(
+            QMessageBox.warning(
                 None, self.tr('Error'),
                 self.tr('No Database Connection Established.'))
             self.cmbServer.setCurrentIndex(0)
