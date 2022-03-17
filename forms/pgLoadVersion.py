@@ -57,64 +57,72 @@ class PgVersionLoadDialog(QDialog, FORM_CLASS):
     def initDB(self, selectedServer):
         if self.cmbServer.currentIndex() == 0:
             return None
+            
         settings = QSettings()
         mySettings = '/PostgreSQL/connections/' + selectedServer
-        DBNAME = settings.value(mySettings + '/database')
-        DBUSER = settings.value(mySettings + '/username')
-        DBHOST = settings.value(mySettings + '/host')
-        DBPORT = settings.value(mySettings + '/port')
-        DBPASSWD = settings.value(mySettings + '/password')
-        DBTYPE = 'pg'
+        self.DBSERVICE = settings.value(mySettings + '/service')
+        self.DBNAME = settings.value(mySettings + '/database')
+        self.DBUSER = settings.value(mySettings + '/username')
+        self.DBHOST = settings.value(mySettings + '/host')
+        self.DBPORT = settings.value(mySettings + '/port')
+        self.DBPASSWD = settings.value(mySettings + '/password')
+        self.DBTYPE = 'pg'
+#        try:
+        if self.DBSERVICE != 'NULL' and self.DBSERVICE != '':
+            self.myDb = DbObj(pluginname=selectedServer, service=self.DBSERVICE)     
+            self.DBUSER = self.myDb.user()
+            self.DBNAME = self.myDb.dbname()
+            self.DBPORT = self.myDb.dbport()
+        else:
+            if self.DBUSER == '':
+                connectionInfo = "dbname='%s' host=%s port=%s" % (self.DBNAME,  self.DBHOST,  self.DBPORT)
+                (success, user, password) = QgsCredentials.instance().get(connectionInfo, None, None)
+                if not success:
+                    return None
+                QgsCredentials.instance().put(connectionInfo, user, password)
+                DBUSER = user
+                DBPASSWD = password
+            
+            self.myDb = DbObj(pluginname=selectedServer, 
+                                    typ=self.DBTYPE,
+                                    hostname=self.DBHOST, 
+                                    port=self.DBPORT,
+                                    dbname=self.DBNAME, 
+                                    username=self.DBUSER, 
+                                    password=self.DBPASSWD)
+#        except:
+#            QMessageBox.warning(
+#                None, self.tr('Error'),
+#                self.tr('No Database Connection Established.'))
+#            self.cmbServer.setCurrentIndex(0)
+#            return None
 
-        if DBUSER == '' or DBPASSWD == '':
-            connectionInfo = "dbname='" + DBNAME + "' host=" + DBHOST + ' port=' + DBPORT
-            (success, user, password) = QgsCredentials.instance().get(connectionInfo, None, None)
-            if not success:
-                return None
-            QgsCredentials.instance().put(connectionInfo, user, password)
-            DBUSER = user
-            DBPASSWD = password
-        
-        if DBUSER == '':
+        if self.DBUSER == '':
             QMessageBox.warning(
                 None, self.tr('Error'),
                 self.tr("""
 In order to work with pgversion properly, the database connection must contain at least one user name! 
 Please fix the PostgreSQL database connection."""))
             self.cmbTables.clear()
-            return None            
+            return None    
 
-        try:
-            myDb = DbObj(pluginname=selectedServer, 
-                                    typ=DBTYPE,
-                                    hostname=DBHOST, port=DBPORT,
-                                    dbname=DBNAME, 
-                                    username=DBUSER, 
-                                    password=DBPASSWD)
-        except:
-            QMessageBox.warning(
-                None, self.tr('Error'),
-                self.tr('No Database Connection Established.'))
-            self.cmbServer.setCurrentIndex(0)
-            return None
-
-        if not myDb.conn:
+        if not self.myDb.conn:
             self.cmbServer.setCurrentIndex(0)
             self.close()
             return None
 
-        if not self.tools.check_PGVS_revision(myDb):
+        if not self.tools.check_PGVS_revision(self.myDb):
             self.cmbServer.setCurrentIndex(0)
             return None
 
-        self.lblDBUser.setText(DBUSER)
+        self.lblDBUser.setText(self.DBUSER)
         query = 'select 4 as count,  1 as table'
-        sysResult,  error = myDb.read(query)
+        sysResult,  error = self.myDb.read(query)
 
         query = 'select version_table_schema as schema, version_table_name as table \
         from versions.version_tables \
         order by version_table_schema,version_table_name'
-        result,  error = myDb.read(query)
+        result,  error = self.myDb.read(query)
         self.cmbTables.clear()
 
         if sysResult['COUNT'][0] > 3 or len(result['TABLE']) > 0:
@@ -149,40 +157,17 @@ Please fix the PostgreSQL database connection."""))
         else:
             versionTableList = self.cmbTables.currentText().split('.')
             connectionName = self.cmbServer.currentText()
-            self.loadVersionLayer(connectionName, versionTableList[0],
+            self.loadVersionLayer(versionTableList[0],
                                   versionTableList[1])
 
-    def loadVersionLayer(self, connectionName, schema, table):
+    def loadVersionLayer(self, schema, table):
         QApplication.setOverrideCursor(Qt.WaitCursor)
-        settings = QSettings()
-        mySettings = '/PostgreSQL/connections/' + connectionName
-        DBNAME = settings.value(mySettings + '/database')
-        DBUSER = settings.value(mySettings + '/username')
-        DBHOST = settings.value(mySettings + '/host')
-        DBPORT = settings.value(mySettings + '/port')
-        DBPASSWD = settings.value(mySettings + '/password')
-        DBTYPE = 'pg'
 
-        if DBUSER == '' or DBPASSWD == '':
-            connectionInfo = "dbname='" + DBNAME + "' host=" + DBHOST + ' port=' + DBPORT
-            (success, user, password) = QgsCredentials.instance().get(
-                connectionInfo, None, None)
-            QgsCredentials.instance().put(connectionInfo, user, password)
-            DBUSER = user
-            DBPASSWD = password
-
-        myDb = DbObj(pluginname=connectionName, 
-                                typ=DBTYPE, 
-                                hostname=DBHOST,
-                                port=DBPORT, 
-                                dbname=DBNAME, 
-                                username=DBUSER,
-                                password=DBPASSWD)
         sql = "select * from versions.version_tables \
         where version_table_schema = '%s' \
           and version_table_name = '%s'" % (schema, table)
 
-        layer, error = myDb.read(sql)
+        layer, error = self.myDb.read(sql)
         if error is not None:
             QMessageBox.information(
                 None,
@@ -192,10 +177,13 @@ Please fix the PostgreSQL database connection."""))
             return
         uri = QgsDataSourceUri()
         
-        try:
-            uri.setConnection(DBHOST, DBPORT, DBNAME, DBUSER, DBPASSWD)
-        except:
-            uri.setConnection(DBHOST, DBPORT, DBNAME, DBUSER, '')
+#        try:
+        if self.DBSERVICE != '':
+            uri.setConnection(self.DBSERVICE,  self.DBNAME, self.DBUSER, self.DBPASSWD)
+        else:
+            uri.setConnection(self.DBHOST, self.DBPORT, self.DBNAME, self.DBUSER, self.DBPASSWD)
+#        except:
+#            uri.setConnection(self.DBHOST, self.DBPORT, self.DBNAME, self.DBUSER, '')
             
         uri.setDataSource(layer['VERSION_VIEW_SCHEMA'][0], layer[
             'VERSION_VIEW_NAME'][0], '' + layer[
@@ -213,6 +201,6 @@ Please fix the PostgreSQL database connection."""))
 
         QgsProject().instance().addMapLayer(vLayer)
 
-        myDb.close()
+        self.myDb.close()
         QApplication.restoreOverrideCursor()
         QApplication.setOverrideCursor(Qt.ArrowCursor)

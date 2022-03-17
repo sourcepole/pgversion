@@ -23,37 +23,56 @@ class DbObj:
   ## Konstruktor
   # @param pluginname string PlugIn-Name des PlugIns in welchem die DB-Verbindung hergestellt wird (default default)
   # @param typ string Datenbank Typ (default pg)
+  # @param service string Connection name defined in pg_service.conf
   # @param hostname string Hostname Name des db Hosts 
   # @param port string Port Name des db Ports (default 5432)
   # @param dbname string dbname Name der DB 
   # @param username string Username Name des users 
   # @param password string Passwort
-  def __init__(self,pluginname="default",typ="pg", hostname=None,port=5432,dbname=None,username=None, password=""):
+  def __init__(self,pluginname="default",
+                               typ="pg",
+                               service=None,  
+                               db_file=None,  
+                               hostname=None,
+                               port=5432,
+                               dbname=None,
+                               username=None, 
+                               password=""):
                 
-    self.errorDB = ""
-    self.errorDriver = ""
-    self.hostName = hostname
-    self.databaseName = dbname
-    self.userName = username
-    self.port = port
-    self.password = password
-    self.pluginName = pluginname
-    self.typ = typ
+        self.errorDB = ""
+        self.errorDriver = ""
+        self.service = service
+        self.hostName = hostname
+        self.databaseName = dbname
+        self.userName = username
+        self.port = port
+        self.password = password
+        self.db_file = db_file
+        self.pluginName = pluginname
+        self.typ = typ
+        self.conn = self.connect()
 
+  def connect(self):
 # Mit PostgreSQL verbinden
-    try:
-        if self.hostName == None:
-            self.conn = psycopg2.connect(database=self.databaseName(), user=self.userName())
-        else:
-            self.conn = psycopg2.connect(dbname=self.databaseName, \
-                                                    host=self.hostName,  \
-                                                    port=self.port,  \
-                                                    user=self.userName,  \
-                                                    password=self.password)    
-                                                    
-    except psycopg2.OperationalError as e:
-            self._error_message(e)
-            self.conn = None
+        if self.typ == 'pg':
+            try:
+                if self.service != None:
+                    conn = psycopg2.connect(service=self.service)
+                elif self.hostName == None:
+                    conn = psycopg2.connect(database=self.databaseName, 
+                                                                    port=self.port,  
+                                                                    user=self.userName,  
+                                                                    password=self.password)
+                else:
+                    conn = psycopg2.connect(dbname=self.databaseName, 
+                                                            host=self.hostName,  
+                                                            port=self.port,  
+                                                            user=self.userName,  
+                                                            password=self.password)   
+            except:
+                    self.__error_message(sys.exc_info())
+                    conn = None
+            return conn
 
         
   ## Rckgabe des QSqlDatabase Objektes
@@ -247,11 +266,14 @@ class DbObj:
   def dbHost(self):
       return self.hostName
 
-  def dbName(self):
-      return self.databaseName
+  def dbname(self):
+      return self.conn.info.dsn_parameters['dbname']
+
+  def user(self):
+      return self.conn.info.dsn_parameters['user']
 
   def dbUser(self):
-      return self.userName
+      return self.conn.info.dsn_parameters['user']
 
   def setDbUser(self,  userName):
       self.db.setUserName(userName)
@@ -259,14 +281,14 @@ class DbObj:
   def setPassword(self,  password):
       pass
 
-  def dbPort(self):
-      return self.port
+  def dbport(self):
+      return self.conn.info.dsn_parameters['port']
 
-  def dbPasswd(self):
+  def dbpasswd(self):
       return self.password
 
   def connection(self):
-      return "dbname="+self.databaseName+" host="+self.hostName+" user="+self.userName+" port="+self.port
+      return "dbname="+self.dbName+" host="+self.dbHost+" user="+self.dbUser+" port="+self.dbPort
 
   def primaryKey(self,  schema,  table):
         sql    = """

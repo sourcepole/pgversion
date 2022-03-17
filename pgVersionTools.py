@@ -54,8 +54,10 @@ class PgVersionTools(QObject):
                 myUri.setUsername(user)
             try:
                 myDb = DbObj(pluginname=connectionName,
-                             typ='pg', hostname=myUri.host(),
-                             port=myUri.port(), dbname=myUri.database(),
+                             typ='pg', 
+                             hostname=myUri.host(),
+                             port=myUri.port(), 
+                             dbname=myUri.database(),
                              username=myUri.username(),
                              password=myUri.password())
                 return myDb
@@ -128,7 +130,7 @@ class PgVersionTools(QObject):
           select count(project)
           from versions."%s_%s_log"
           where project = '%s' and not commit""" % (
-              schema, myLayerUri.table(), myDb.dbUser())
+              schema, myLayerUri.table(), myDb.user())
         result,  error = myDb.read(sql)
 
         try:
@@ -181,7 +183,15 @@ class PgVersionTools(QObject):
             if mySchema == '':
                 mySchema = 'public'
 
-            sql = ("select version_table_schema as schema, version_table_name as table from versions.version_tables where (version_view_schema = '{schema}' and version_view_name = '{table}') or (version_table_schema = '{schema}' and version_table_name = '{table}')").format(schema=mySchema, table=myTable)
+            sql = (
+            """select version_table_schema as schema, version_table_name as table 
+                from versions.version_tables 
+                where (
+                  version_view_schema = '{schema}' 
+                    and version_view_name = '{table}') or (version_table_schema = '{schema}' 
+                    and version_table_name = '{table}')
+            """).format(schema=mySchema, table=myTable)
+                    
             result,  error = myDb.read(sql)
 
             if result is not None and len(result) > 0:
@@ -194,12 +204,6 @@ class PgVersionTools(QObject):
             else:
                 return False
         except Exception as e:
-            # QMessageBox.information(
-            #     None, '',
-            #     self.tr('pgvs is not installed in your database. \n\n Please\
-            #             install the pgvs functions from file \n\n \
-            #             {createVersionPath}\n\n as mentioned in help').format(
-            #         createVersionPath=self.createVersionPath))
             return True
 
     def createGridView(self, tabView, tabData, headerText, colWidth,
@@ -256,8 +260,7 @@ class PgVersionTools(QObject):
                     self.mySchema,  self.myTable))
             return None
         else:
-            sql = "select count(myuser) from versions.pgvscheck('%s.%s')" % (
-                mySchema, myTable)
+            sql = "select count(myuser) from versions.pgvscheck('%s.%s')" % (mySchema, myTable)
             check,  error = myDb.read(sql)
 
         if check["COUNT"][0] is not 0:
@@ -361,8 +364,8 @@ class PgVersionTools(QObject):
 
         uri = QgsDataSourceUri()
 
-        uri.setConnection(myDb.dbHost(), str(myDb.dbPort()), myDb.dbName(),
-                          myDb.dbUser(), myDb.dbPasswd())
+        uri.setConnection(myDb.dbHost(), str(myDb.dbport()), myDb.dbname(),
+                          myDb.user(), myDb.dbpasswd())
 
         sql = """
                 select * from versions.pgvscheck('{0}.{1}')

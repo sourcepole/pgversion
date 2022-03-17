@@ -14,7 +14,31 @@ CREATE EXTENSION POSTGIS;
 EXCEPTION WHEN duplicate_object THEN RAISE NOTICE '%, skipping', SQLERRM USING ERRCODE = SQLSTATE;
 END
 $$;-- ddl-end ---- Database generated with pgModeler (PostgreSQL Database Modeler).
+-- pgModeler version: 1.0.0-alpha
+-- PostgreSQL version: 12.0
+-- Project Site: pgmodeler.io
+-- Model Author: ---
+-- -- object: versions | type: ROLE --
+-- -- DROP ROLE IF EXISTS versions;
+-- CREATE ROLE versions WITH 
+-- 	INHERIT
+-- 	ENCRYPTED PASSWORD '********';
+-- -- ddl-end --
+-- 
 
+-- Database creation must be performed outside a multi lined SQL file. 
+-- These commands were put in this file only as a convenience.
+-- 
+-- -- object: pgvs_develop | type: DATABASE --
+-- -- DROP DATABASE IF EXISTS pgvs_develop;
+-- CREATE DATABASE pgvs_develop
+-- 	ENCODING = 'LATIN1'
+-- 	LC_COLLATE = 'en_US'
+-- 	LC_CTYPE = 'en_US'
+-- 	TABLESPACE = pg_default
+-- 	OWNER = versions;
+-- -- ddl-end --
+-- 
 
 SET check_function_bodies = false;
 -- ddl-end --
@@ -38,7 +62,7 @@ SET search_path TO pg_catalog,public,versions;
 -- -- ddl-end --
 -- 
 -- object: versions.checkout | type: TYPE --
--- DROP TYPE IF EXISTS versions.checkout CASCADE;
+DROP TYPE IF EXISTS versions.checkout CASCADE;
 CREATE TYPE versions.checkout AS
 (
  systime bigint,
@@ -54,13 +78,13 @@ ALTER TYPE versions.checkout OWNER TO versions;
 -- DROP TYPE IF EXISTS versions.conflicts CASCADE;
 CREATE TYPE versions.conflicts AS
 (
- conflict_version_log_id bigint,
- conflict_systime bigint,
- myversion_log_id bigint,
- mysystime bigint,
  objectkey bigint,
+ mysystime bigint,
+ myuser text,
+ myversion_log_id bigint,
+ conflict_systime bigint,
  conflict_user text,
- myuser text
+ conflict_version_log_id bigint
 );
 -- ddl-end --
 ALTER TYPE versions.conflicts OWNER TO versions;
@@ -799,7 +823,7 @@ CREATE FUNCTION versions.pgvsinit (_param1 character varying)
      execute 'ALTER VIEW '||versionView||' owner to versions';
 
      execute 'GRANT ALL PRIVILEGES ON TABLE '||versionView||' to versions';
-     execute 'GRANT ALL PRIVILEGES ON TABLE '||mySchema||'.'||myTable||' to versions';
+     execute 'GRANT ALL PRIVILEGES ON TABLE '||quote_ident(mySchema)||'.'||quote_ident(myTable)||' to versions';
 
 
      execute 'CREATE TRIGGER pgvs_version_record_trigger
