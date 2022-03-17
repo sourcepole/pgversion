@@ -68,24 +68,29 @@ class PgVersionLoadDialog(QDialog, FORM_CLASS):
 
         if DBUSER == '' or DBPASSWD == '':
             connectionInfo = "dbname='" + DBNAME + "' host=" + DBHOST + ' port=' + DBPORT
-            (success, user, password) = QgsCredentials.instance().get(
-                connectionInfo, None, None)
+            (success, user, password) = QgsCredentials.instance().get(connectionInfo, None, None)
             if not success:
                 return None
             QgsCredentials.instance().put(connectionInfo, user, password)
             DBUSER = user
             DBPASSWD = password
-            
+        
         if DBUSER == '':
             QMessageBox.warning(
                 None, self.tr('Error'),
-                self.tr('In order to work with pgversion properly, the database connection must contain at least one user name! Please fix the PostgreSQL database connection.'))
+                self.tr("""
+In order to work with pgversion properly, the database connection must contain at least one user name! 
+Please fix the PostgreSQL database connection."""))
+            self.cmbTables.clear()
             return None            
 
         try:
-            myDb = DbObj(pluginname=selectedServer, typ=DBTYPE,
-                         hostname=DBHOST, port=DBPORT,
-                         dbname=DBNAME, username=DBUSER, password=DBPASSWD)
+            myDb = DbObj(pluginname=selectedServer, 
+                                    typ=DBTYPE,
+                                    hostname=DBHOST, port=DBPORT,
+                                    dbname=DBNAME, 
+                                    username=DBUSER, 
+                                    password=DBPASSWD)
         except:
             QMessageBox.warning(
                 None, self.tr('Error'),
@@ -166,9 +171,13 @@ class PgVersionLoadDialog(QDialog, FORM_CLASS):
             DBUSER = user
             DBPASSWD = password
 
-        myDb = DbObj(pluginname=connectionName, typ=DBTYPE, hostname=DBHOST,
-                     port=DBPORT, dbname=DBNAME, username=DBUSER,
-                     password=DBPASSWD)
+        myDb = DbObj(pluginname=connectionName, 
+                                typ=DBTYPE, 
+                                hostname=DBHOST,
+                                port=DBPORT, 
+                                dbname=DBNAME, 
+                                username=DBUSER,
+                                password=DBPASSWD)
         sql = "select * from versions.version_tables \
         where version_table_schema = '%s' \
           and version_table_name = '%s'" % (schema, table)
