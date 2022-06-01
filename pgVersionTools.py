@@ -263,7 +263,7 @@ class PgVersionTools(QObject):
             sql = "select count(myuser) from versions.pgvscheck('%s.%s')" % (mySchema, myTable)
             check,  error = myDb.read(sql)
 
-        if check["COUNT"][0] is not None:
+        if check["COUNT"][0] != 0 :
             sql = "select * from versions.pgvscheck('%s.%s') order by objectkey" % (mySchema, myTable)
             result,  error = myDb.read(sql)
             myDb.close()
