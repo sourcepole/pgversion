@@ -1,6 +1,6 @@
 <div class="header" id="header">
 
-# PostGIS Versioning - pgVersion 3.1.2
+# PostGIS Versioning - pgVersion 3.1.6
 
 ### Dr. Horst Duester, 2022, horst.duester@sourcepole.ch
 
