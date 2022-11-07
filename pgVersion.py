@@ -671,39 +671,16 @@ Are you sure to rollback to revision {1}?""").format(currentLayer.name(), revisi
         extent = self.iface.mapCanvas().extent().toString().replace(
             ':', ', ')
         authority, crs = currentLayer.crs().authid().split(':')
-        geo_idx = '%s && ST_MakeEnvelope(%s,%s)' % (
-            geomCol, extent, crs)
-        sql = """with
-head as (select max(revision) as head from
-versions."{schema}_{origin}_version_log"),
-delete as (
-select 'delete'::varchar as action, *
-  from (
-  select * from versions.pgvscheckout(NULL::"{schema}"."{origin}",
-  (select * from head), '{geo_idx}')
-  except
-  select * from "{schema}"."{origin}_version" where {geo_idx}
-  ) as foo
-),
-insert as (
-select 'insert'::varchar as action, *
-  from (
-    select * from "{schema}"."{origin}_version" where {geo_idx}
-except
-    select * from versions.pgvscheckout(NULL::"{schema}"."{origin}",
-    (select * from head), '{geo_idx}')
-   ) as foo)
-
-select row_number() OVER () AS rownum, *
-from
-(
-select * from delete
-union
-select * from insert) as foo""".format(
+#        geo_idx = '%s && ST_MakeEnvelope(%s,%s)' % (geomCol, extent, crs)
+        
+        with open('{0}/sql/diff.sql'.format(os.path.dirname(os.path.abspath(__file__))),  'r') as sql_file:
+            sql = sql_file.read().format(
             schema=mySchema,
             table=myTable,
             origin=myTable.replace(
-                '_version', ''), geo_idx=geo_idx)
+                '_version', ''))
+                
+#                , geo_idx=geo_idx)
 
         myUri = QgsDataSourceUri(self.tools.layerUri(currentLayer))
         myUri.setDataSource("", u"(%s\n)" % sql, geomCol, "", "rownum")
