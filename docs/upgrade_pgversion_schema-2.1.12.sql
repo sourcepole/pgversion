@@ -1,6 +1,6 @@
 -- Diff code generated with pgModeler (PostgreSQL Database Modeler)
 -- pgModeler version: 0.9.4
--- Diff date: 2022-11-10 14:48:23
+-- Diff date: 2022-11-10 14:53:32
 -- Source model: pgvs_develop
 -- Database: pgversion
 -- PostgreSQL version: 13.0
@@ -18,9 +18,9 @@ SET search_path=public,pg_catalog,versions;
 
 
 -- [ Created objects ] --
--- object: versions.pgvsupdate | type: FUNCTION --
--- DROP FUNCTION IF EXISTS versions.pgvsupdate(varchar,varchar) CASCADE;
-CREATE FUNCTION versions.pgvsupdate (IN in_new_layer varchar, IN in_out_layer varchar)
+-- object: versions.pgvsincrementalupdate | type: FUNCTION --
+-- DROP FUNCTION IF EXISTS versions.pgvsincrementalupdate(varchar,varchar) CASCADE;
+CREATE FUNCTION versions.pgvsincrementalupdate (IN in_new_layer varchar, IN in_out_layer varchar)
 	RETURNS boolean
 	LANGUAGE plpgsql
 	VOLATILE 

@@ -1781,9 +1781,9 @@ $$;
 ALTER FUNCTION versions.pgvscheckout(anyelement,bigint,text) OWNER TO versions;
 -- ddl-end --
 
--- object: versions.pgvsupdate | type: FUNCTION --
--- DROP FUNCTION IF EXISTS versions.pgvsupdate(varchar,varchar) CASCADE;
-CREATE FUNCTION versions.pgvsupdate (IN in_new_layer varchar, IN in_out_layer varchar)
+-- object: versions.pgvsincrementalupdate | type: FUNCTION --
+-- DROP FUNCTION IF EXISTS versions.pgvsincrementalupdate(varchar,varchar) CASCADE;
+CREATE FUNCTION versions.pgvsincrementalupdate (IN in_new_layer varchar, IN in_out_layer varchar)
 	RETURNS boolean
 	LANGUAGE plpgsql
 	VOLATILE 
