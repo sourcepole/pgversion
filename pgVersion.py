@@ -72,33 +72,47 @@ class PgVersion(QObject):
             QIcon(":/plugins/pgversion/icons/pgversion-init.png"),
             self.tr("Prepare Layer for Versioning"),
             self.iface.mainWindow())
+            
         self.actionLoad = QAction(
             QIcon(":/plugins/pgversion/icons/pgversion-commit.png"),
             self.tr("Load Versioned Layer"), self.iface.mainWindow())
+            
         self.actionCommit = QAction(
             QIcon(":/plugins/pgversion/icons/pgversion-load.png"),
             self.tr("Commit Changes"), self.iface.mainWindow())
+            
         self.actionRevert = QAction(
             QIcon(":/plugins/pgversion/icons/pgversion-revert.png"),
             self.tr("Revert to HEAD Revision"), self.iface.mainWindow())
+            
         self.actionLogView = QAction(
             QIcon(":/plugins/pgversion/icons/pgversion-logview.png"),
             self.tr("Show Logs"), self.iface.mainWindow())
+            
         self.actionDiff = QAction(
             QIcon(":/plugins/pgversion/icons/pgversion-diff.png"),
             self.tr("Show Diffs"), self.iface.mainWindow())
+            
         self.actionDrop = QAction(
             QIcon(":/plugins/pgversion/icons/pgversion-drop.png"),
             self.tr("Drop Versioning from Layer"), self.iface.mainWindow())
+            
         self.actionHelp = QAction(
             QIcon(":/plugins/pgversion/icons/pgversion-help.png"), 
             self.tr("Help"),
             self.iface.mainWindow())
+            
         self.actionAbout = QAction(QIcon(""), self.tr("About"),
                                    self.iface.mainWindow())
+                                   
         self.actionDelete = QAction(
             QIcon(":/plugins/pgversion/icons/pgversion-drop.png"),
             self.tr("Bulk delete directly in the database"),
+            self.iface.mainWindow())     
+            
+        self.actionUpdate = QAction(
+            QIcon(""), 
+            self.tr("Update Layer"),
             self.iface.mainWindow())
             
         self.actionDelete.setEnabled(False)
@@ -108,6 +122,7 @@ class PgVersion(QObject):
                            self.actionDiff, self.actionRevert,
                            self.actionLogView, self.actionDrop,
                            self.actionLogView, self.actionDelete,
+                           self.actionUpdate, 
                            self.actionHelp, self.actionAbout]
 
         self.toolBar.addAction(self.actionInit)
@@ -716,6 +731,9 @@ Are you sure to rollback to revision {1}?""").format(currentLayer.name(), revisi
         QApplication.restoreOverrideCursor()
         self.LogViewDialog.close()
         return
+        
+    def doUpdate(self):
+        pass
 
     def doDrop(self):
         theLayer = self.iface.activeLayer()
