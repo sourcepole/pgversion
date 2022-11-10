@@ -110,9 +110,9 @@ class PgVersion(QObject):
             self.tr("Bulk delete directly in the database"),
             self.iface.mainWindow())     
             
-        self.actionUpdate = QAction(
+        self.actionIncrementalUpdate = QAction(
             QIcon(""), 
-            self.tr("Update Layer"),
+            self.tr("Incremental Layer Update"),
             self.iface.mainWindow())
             
         self.actionDelete.setEnabled(False)
@@ -122,7 +122,7 @@ class PgVersion(QObject):
                            self.actionDiff, self.actionRevert,
                            self.actionLogView, self.actionDrop,
                            self.actionLogView, self.actionDelete,
-                           self.actionUpdate, 
+                           self.actionIncrementalUpdate, 
                            self.actionHelp, self.actionAbout]
 
         self.toolBar.addAction(self.actionInit)
