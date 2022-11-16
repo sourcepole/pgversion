@@ -6,14 +6,12 @@ Module implementing IncrementalLayerUpdate.
 from qgis.core import *
 from qgis.gui import *
 from qgis.PyQt.QtCore import pyqtSlot
-from qgis.PyQt.QtWidgets import QDialog,  QDialogButtonBox,  QMessageBox
+from qgis.PyQt.QtWidgets import QDialog,  QDialogButtonBox
 from qgis.PyQt import uic
 from qgis.core import QgsProject
 from ..dbtools.dbtools import DbObj
-from ..pgVersionTools import PgVersionTools
 
 import os
-import sys
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'incrementalLayerUpdate.ui'))
 
