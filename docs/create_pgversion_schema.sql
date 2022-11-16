@@ -613,7 +613,7 @@ CREATE FUNCTION versions.pgvsinit (_param1 character varying)
 	PARALLEL UNSAFE
 	COST 100
 	AS $$
-  DECLARE
+DECLARE
     inTable ALIAS FOR $1;
     pos INTEGER;
     mySchema TEXT;
@@ -632,6 +632,7 @@ CREATE FUNCTION versions.pgvsinit (_param1 character varying)
     testRec record;
     testPKey record;
     fields TEXT;
+    time_fields TEXT;
     type_fields TEXT;
     newFields TEXT;
     oldFields TEXT;
@@ -647,6 +648,7 @@ CREATE FUNCTION versions.pgvsinit (_param1 character varying)
   BEGIN	
     pos := strpos(inTable,'.');
     fields := '';
+    time_fields := '';
     type_fields := '';
     newFields := '';
     oldFields := '';
@@ -773,6 +775,7 @@ CREATE FUNCTION versions.pgvsinit (_param1 character varying)
           ELSE
             if myPkey <> attributes.column_name then
               fields := fields||','||quote_ident(attributes.column_name);
+              time_fields := time_fields||',v1.'||quote_ident(attributes.column_name);
               type_fields := type_fields||','||quote_ident(attributes.column_name)||' '||attributes.udt_name||'';              
               newFields := newFields||',new.'||quote_ident(attributes.column_name);
               oldFields := oldFields||',old.'||quote_ident(attributes.column_name);
@@ -791,9 +794,6 @@ CREATE FUNCTION versions.pgvsinit (_param1 character varying)
           RAISE EXCEPTION 'No Sequence defined for Table %.%', mySchema,myTable;
           RETURN False;
         END IF;
-     
-
-
             
      execute 'create or replace view '||versionView||' as 
                 SELECT v.'||myPkey||', '||fields||'
@@ -824,6 +824,18 @@ CREATE FUNCTION versions.pgvsinit (_param1 character varying)
 
      execute 'GRANT ALL PRIVILEGES ON TABLE '||versionView||' to versions';
      execute 'GRANT ALL PRIVILEGES ON TABLE '||quote_ident(mySchema)||'.'||quote_ident(myTable)||' to versions';
+
+     execute 'create or replace view '||versionView||'_time as 
+                SELECT row_number() OVER () AS rownum, 
+                       to_timestamp(v1.systime/1000)::timestamp without time zone as start_time, 
+                       to_timestamp(v2.systime/1000)::timestamp without time zone as end_time '||time_fields||'
+                FROM '||versionLogTable||' v1
+                LEFT JOIN '||versionLogTable||' v2 ON v2.id=v1.id AND v2.action=''delete''
+                WHERE v1.action=''insert''';
+
+     execute 'ALTER VIEW '||versionView||'_time owner to versions';
+
+     execute 'GRANT ALL PRIVILEGES ON TABLE '||versionView||'_time to versions';
 
 
      execute 'CREATE TRIGGER pgvs_version_record_trigger
@@ -1161,7 +1173,7 @@ CREATE FUNCTION versions.pgvsrevision ()
 DECLARE
   revision TEXT;
   BEGIN	
-    revision := '2.1.13';
+    revision := '2.1.14';
   RETURN revision ;                             
 
   END;
@@ -1783,8 +1795,13 @@ ALTER FUNCTION versions.pgvscheckout(anyelement,bigint,text) OWNER TO versions;
 
 -- object: versions.pgvsincrementalupdate | type: FUNCTION --
 -- DROP FUNCTION IF EXISTS versions.pgvsincrementalupdate(varchar,varchar) CASCADE;
-CREATE FUNCTION versions.pgvsincrementalupdate (IN in_new_layer varchar, IN in_out_layer varchar)
-	RETURNS boolean
+
+-- Prepended SQL commands --
+DROP FUNCTION versions.pgvsincrementalupdate(varchar,varchar);
+-- ddl-end --
+
+CREATE FUNCTION versions.pgvsincrementalupdate (IN in_new_layer varchar, IN in_old_layer varchar)
+	RETURNS text
 	LANGUAGE plpgsql
 	VOLATILE 
 	CALLED ON NULL INPUT
@@ -1799,6 +1816,8 @@ DECLARE
   new_schema TEXT;
   old_pkey_rec RECORD;
   new_pkey_rec RECORD;
+  old_geo_rec RECORD;
+  new_geo_rec RECORD;
   old_pkey TEXT;
   new_pkey TEXT;		
   att_check RECORD;
@@ -1810,11 +1829,10 @@ DECLARE
   n_arch_field TEXT;
   arch_fields TEXT;
   where_fields TEXT;
-  old_geo_rec RECORD;
-  new_geo_rec RECORD;
   pos INTEGER;
   integer_var INTEGER;		
   insub_query TEXT;
+  result text[];
   
   
   BEGIN
@@ -1855,7 +1873,8 @@ DECLARE
   
      IF NOT FOUND THEN
        RAISE EXCEPTION 'Die Tabelle % ist nicht als Geo-Layer in der Tabelle geometry_columns registriert', old_layer;
-       RETURN False;
+	   result := array_append(result, 'false');
+       RETURN result;
      END IF;
   	  
      select into new_geo_rec f_geometry_column, type as geom_type 
@@ -1865,7 +1884,8 @@ DECLARE
   
      IF NOT FOUND THEN
         RAISE EXCEPTION 'Die Tabelle % ist nicht als Geo-Layer in der Tabelle geometry_columns registriert', new_layer;
-        RETURN False;
+  	    result := array_append(result, 'false');
+        RETURN result;
      END IF;
   		
   
@@ -1884,7 +1904,8 @@ DECLARE
   			
     IF FOUND THEN
        RAISE EXCEPTION 'Die Tabelle % entspricht nicht der Tabelle %', new_layer, old_layer;
-       RETURN False;
+	   result := array_append(result, 'false');
+       RETURN result;
     END IF;
    
     n_arch_field := ' ';
@@ -1905,7 +1926,8 @@ DECLARE
   
     IF NOT FOUND THEN
         RAISE EXCEPTION 'Die Tabelle % hat keinen Primarykey', old_layer;
-        RETURN False;
+  	    result := array_append(result, 'false');
+        RETURN result;
     END IF;			
   
   
@@ -1922,7 +1944,8 @@ DECLARE
   
     IF NOT FOUND THEN
        RAISE EXCEPTION 'Die Tabelle % hat keinen Primarykey', new_layer;
-       RETURN False;
+  	    result := array_append(result, 'false');
+        RETURN result;
     END IF;			
   				
     
@@ -1930,37 +1953,37 @@ DECLARE
 	                   from %2$s.%3$s 
   	                   except 
   			   select o.%1$s 
-  			   from %4$s.%5$s as n,%s$s.%2$S as o 
+  			   from %4$s.%5$s as n,%2$s.%3$s as o 
   			   where md5(n.%6$s::TEXT)=md5(o.%7$s::TEXT) 
-  			     and o.%7$s && n.%6$s;',
+  			     and o.%7$s && n.%6$s ',
   			   old_pkey_rec.column_name,
   			   old_schema,
   			   old_layer,
-  			   new_schame,
+  			   new_schema,
   			   new_layer,
   			   new_geo_rec.f_geometry_column,
   			   old_geo_rec.f_geometry_column
-  	           )	
+  	           );
   		
   -- Alle Sequenzen ermitteln und unbercksichtigt lassen		
     FOR attributes in select column_name as att, data_type as typ
-                    		from information_schema.columns as col
-                    		where table_schema = old_schema::name
-                    			and table_name = old_layer::name
-                    			and column_name not in (old_geo_rec.f_geometry_column::name)
-                          and (position('nextval' in lower(column_default)) is NULL or position('nextval' in lower(column_default)) = 0)		
+                      from information_schema.columns as col
+                      where table_schema = old_schema::name
+                    	and table_name = old_layer::name
+                    	and column_name not in (old_geo_rec.f_geometry_column::name)
+                        and (position('nextval' in lower(column_default)) is NULL or position('nextval' in lower(column_default)) = 0)		
     LOOP
   
-    old_fields := old_fields ||','|| attributes.att;
+    	old_fields := old_fields ||','|| attributes.att;
   					 
   -- Eine Spalte vom Typ Bool darf nicht in die Coalesce-Funktion gesetzt werden					 
-    IF old_pkey_rec.column_name <> attributes.att THEN
-       IF attributes.typ = 'bool' THEN
-           where_fields := where_fields ||' and n.'||attributes.att||'=o.'||attributes.att;					 
-       ELSE
-  	   where_fields := where_fields ||' and coalesce(n.'||attributes.att||'::text,'''')=coalesce(o.'||attributes.att||'::text,'''')';
-       END IF;
-     END IF;
+    	IF old_pkey_rec.column_name <> attributes.att THEN
+       		IF attributes.typ = 'bool' THEN
+           		where_fields := where_fields ||' and n.'||attributes.att||'=o.'||attributes.att;					 
+       		ELSE
+  	   		where_fields := where_fields ||' and coalesce(n.'||attributes.att||'::text,'''')=coalesce(o.'||attributes.att||'::text,'''')';
+       		END IF;
+     	END IF;
   
     END LOOP;
   		
@@ -1980,7 +2003,7 @@ DECLARE
 -- RETURN false;											
   EXECUTE qry_delete;
   GET DIAGNOSTICS integer_var = ROW_COUNT;
-  RAISE NOTICE ' % Objekte wurden im Layer %.% archiviert',integer_var,old_schema,old_layer;
+  result := array_append(result, format(' %1$s Objekte archiviert',integer_var));
  --RETURN false;  
   -- Vorbereiten der Insert Funktion
   			
@@ -2016,9 +2039,10 @@ DECLARE
 --  RAISE NOTICE '%',insub_query;											
   EXECUTE qry_insert;
   GET DIAGNOSTICS integer_var = ROW_COUNT;
-  RAISE NOTICE ' % Objekte wurden in den Layer %.% neu eingefuegt',integer_var,old_schema,old_layer;
+  result := array_append(result, format(' %1$s Objekte neu eingefuegt',integer_var));
   
-  RETURN true;
+  result := array_append(result, 'true');
+  RETURN result;
 END;
 
 $$;
