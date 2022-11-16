@@ -25,7 +25,7 @@ from qgis.gui import *
 from .dbtools.dbtools import *
 from .forms.CommitMessage import CommitMessageDialog
 from .pgVersionConflictWindow import ConflictWindow
-
+from .forms.incrementalLayerUpdate import IncrementalLayerUpdateDialog
 from .forms.pgLoadVersion import PgVersionLoadDialog
 from .forms.help import HelpDialog
 from .forms.LogView import LogView
@@ -133,6 +133,7 @@ class PgVersion(QObject):
         self.toolBar.addAction(self.actionLogView)
         self.toolBar.addAction(self.actionDelete)
         self.toolBar.addAction(self.actionHelp)
+        self.toolBar.addAction(self.actionIncrementalUpdate)
 
         try:
             for a in self.actionList:
@@ -155,7 +156,7 @@ class PgVersion(QObject):
         self.actionHelp.triggered.connect(self.doHelp)
         self.actionAbout.triggered.connect(self.doAbout)
         self.actionDelete.triggered.connect(self.doDelete)
-
+        self.actionIncrementalUpdate.triggered.connect(self.doIncrementalUpdate)
         self.LogViewDialog.diffLayer.connect(self.doDiff)
         self.LogViewDialog.rollbackLayer.connect(self.doRollback)
         self.LogViewDialog.checkoutLayer.connect(self.doCheckout)
@@ -780,7 +781,18 @@ Are you sure to rollback to revision {1}?""").format(currentLayer.name(), revisi
                         duration=3)
                     self.iface.mapCanvas().refreshAllLayers()
                     
-
+    def doIncrementalUpdate(self):
+        if len(self.iface.layerTreeView().selectedLayers()) > 0:
+            theLayer = self.iface.layerTreeView().selectedLayers()[0]
+            if self.tools.hasVersion(theLayer):
+                self.upgradeDlg = IncrementalLayerUpdateDialog(self)
+                self.upgradeDlg.show()
+            else:
+                QMessageBox.information(None,  self.tr('Error'),  self.tr('Please select a versioned layer to upgrade'))
+        else:
+            QMessageBox.information(None,  self.tr('Error'),  self.tr('Please select a versioned layer to upgrade'))
+#      
+        
     def doHelp(self):
         helpUrl = QUrl()
         if self.locale != 'de':

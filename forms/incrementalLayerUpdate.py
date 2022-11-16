@@ -29,27 +29,24 @@ class IncrementalLayerUpdateDialog(QDialog, FORM_CLASS):
         @param parent reference to the parent widget (defaults to None)
         @type QWidget (optional)
         """
-        try:        
-            QDialog.__init__(self)
-            super().__init__(self)
-            self.setupUi(self)
-            self.iface = parent.iface
-            self.buttonBox.clicked.connect(self.handleButtonClick)
-            self.tools = parent.tools
-            excepted_layer_list = []
-            self.layer_list = parent.layer_list
-        
+        QDialog.__init__(self)
+        super().__init__(self)
+        self.setupUi(self)
+        self.iface = parent.iface
+        self.buttonBox.clicked.connect(self.handleButtonClick)
+        self.tools = parent.tools
+        excepted_layer_list = []
+        self.layer_list = parent.layer_list
+    
 
-            self.update_layer = self.iface.layerTreeView().selectedLayers()[0]
-            excepted_layer_list.append(self.update_layer)
-            map_layers = QgsProject.instance().mapLayers().values()
-            
-            for layer in map_layers:
-                if layer.dataProvider().name() != 'postgres':
-                    excepted_layer_list.append(layer)
-            self.mMapLayerComboBox.setExceptedLayerList(excepted_layer_list)    
-        except:
-            QMessageBox.information(None,  self.tr('Error'),  self.tr('Please select a versioned layer to upgrade'))
+        self.update_layer = self.iface.layerTreeView().selectedLayers()[0]
+        excepted_layer_list.append(self.update_layer)
+        map_layers = QgsProject.instance().mapLayers().values()
+        
+        for layer in map_layers:
+            if layer.dataProvider().name() != 'postgres':
+                excepted_layer_list.append(layer)
+        self.mMapLayerComboBox.setExceptedLayerList(excepted_layer_list)    
             
 
     def handleButtonClick(self, button):
@@ -81,17 +78,19 @@ class IncrementalLayerUpdateDialog(QDialog, FORM_CLASS):
             
             result_array = result['UPDATE'][0].split(',')
             message = ''
-            for text in result_array:
-                message += '%s \n\n' % text
+            
+            message = '%s, %s' % (result_array[0],  result_array[1])
+            
+            message = message.replace('{',  '').replace('"',  '')
             
             self.iface.messageBar().pushMessage(
                 "Info",
                 message,
-                level=Qgis.MessageLevel(0), duration=3)
+                level=Qgis.MessageLevel(0), duration=5)
 
-            self.layer_list.append(self.update_layer)
-            self.tools.setModified([self.update_layer])
-            
+            self.layer_list.append(self.update_layer.id())
+            self.tools.setModified(self.layer_list)
+            self.update_layer.triggerRepaint()
             self.close()
         
                 
