@@ -5,8 +5,8 @@ Module implementing IncrementalLayerUpdate.
 """
 from qgis.core import *
 from qgis.gui import *
-from qgis.PyQt.QtCore import pyqtSlot
-from qgis.PyQt.QtWidgets import QDialog,  QDialogButtonBox
+from qgis.PyQt.QtCore import pyqtSlot,  Qt
+from qgis.PyQt.QtWidgets import QDialog,  QDialogButtonBox,  QMessageBox,  QApplication
 from qgis.PyQt import uic
 from qgis.core import QgsProject
 from ..dbtools.dbtools import DbObj
@@ -35,18 +35,10 @@ class IncrementalLayerUpdateDialog(QDialog, FORM_CLASS):
         self.tools = parent.tools
         excepted_layer_list = []
         self.layer_list = parent.layer_list
-    
-
         self.update_layer = self.iface.layerTreeView().selectedLayers()[0]
         excepted_layer_list.append(self.update_layer)
-        map_layers = QgsProject.instance().mapLayers().values()
-        
-        for layer in map_layers:
-            if layer.dataProvider().name() != 'postgres':
-                excepted_layer_list.append(layer)
         self.mMapLayerComboBox.setExceptedLayerList(excepted_layer_list)    
             
-
     def handleButtonClick(self, button):
         role = self.buttonBox.buttonRole(button)
         if role == QDialogButtonBox.ApplyRole:
@@ -56,29 +48,79 @@ class IncrementalLayerUpdateDialog(QDialog, FORM_CLASS):
 
     @pyqtSlot()
     def doApply(self):
-        """
-        Slot documentation goes here.
-        """
-        selected_layer = self.mMapLayerComboBox.currentLayer()
+        db = self.layer_db_connection(self.update_layer)        
+        self.selected_layer = self.mMapLayerComboBox.currentLayer()
         
-        db = self.layer_db_connection(self.update_layer)
-        selected_schema = selected_layer.dataProvider().uri().schema()
-        selected_table = selected_layer.dataProvider().uri().table()
+# check if the selected layer is a postgres layer
+# Import a non postgres layer to update_layer database                
+        if self.selected_layer.dataProvider().name() != 'postgres':                       
+            self.import_to_postgis(db)
+            
+        self.incremental_upgrade(db)
+
+    def import_to_postgis(self,  db):
+        answer = QMessageBox.StandardButton.Yes
+        if db.exists('table',  '{}.{}'.format(self.update_layer.dataProvider().uri().schema(), self.selected_layer.name())):
+            answer = QMessageBox.information(
+                None,
+                self.tr("Table {schema}.{table} exists".format(
+                                                schema = self.update_layer.dataProvider().uri().schema(), 
+                                                table = self.selected_layer.name()
+                                                )
+                                    ),
+                self.tr("""Do you like to overwrite the table? """),
+                (
+                    QMessageBox.StandardButton.No
+                    | QMessageBox.StandardButton.Yes),
+            )
+            
+            if answer == QMessageBox.StandardButton.Yes:
+                sql = "drop table {schema}.{table}".format(
+                                                    schema = self.update_layer.dataProvider().uri().schema(), 
+                                                    table = self.selected_layer.name()
+                                                )
+                db.run(sql)                    
+                
+            
+        if answer == QMessageBox.StandardButton.Yes:
+            QApplication.setOverrideCursor(Qt.WaitCursor)
+            con_string = "dbname='{dbname}' host='{dbhost}' port='{dbport}' user='{dbuser}' password='{dbpasswd}' key={key} type={geometrytype} schema={schema} table={table} (geom)".format(
+                    dbname = db.dbname(), 
+                    dbhost = db.dbHost(), 
+                    dbport = db.dbport(), 
+                    dbuser = db.dbUser(), 
+                    dbpasswd = db.dbpasswd(), 
+                    key = self.update_layer.dataProvider().uri().keyColumn(), 
+                    geometrytype = QgsWkbTypes.displayString(int(self.update_layer.wkbType())), 
+                    schema = self.update_layer.dataProvider().uri().schema(), 
+                    table = self.selected_layer.name()
+            )
+            
+            CRS = self.update_layer.crs().authid()
+            err = QgsVectorLayerExporter.exportLayer(self.selected_layer, con_string, 'postgres', QgsCoordinateReferenceSystem(CRS), False)
+            
+            if err[0] != 0:
+                QMessageBox.information(None, self.tr('Import Error'),  err[1])
+            
+            self.close()
+    
+        
+    def incremental_upgrade(self,  db):
+        selected_schema = self.update_layer.dataProvider().uri().schema()
+        selected_table = self.selected_layer.name()        
         update_schema = self.update_layer.dataProvider().uri().schema()
         update_table = self.update_layer.dataProvider().uri().table().replace('_version',  '')
-        if db.exists('table',  '%s.%s' % (selected_schema,  selected_table)):
-            sql = """
-            select pgvsincrementalupdate as update 
-            from versions.pgvsincrementalupdate('%s.%s', '%s.%s')
-            """ % (selected_schema,  selected_table,  update_schema,  update_table)
-            
-            result,  error = db.read(sql)
-            
+        
+        sql = """
+        select pgvsincrementalupdate as update 
+        from versions.pgvsincrementalupdate('%s.%s', '%s.%s')
+        """ % (selected_schema,  selected_table,  update_schema,  update_table)
+        result,  error = db.read(sql)
+        
+        if error == None:
             result_array = result['UPDATE'][0].split(',')
             message = ''
-            
             message = '%s, %s' % (result_array[0],  result_array[1])
-            
             message = message.replace('{',  '').replace('"',  '')
             
             self.iface.messageBar().pushMessage(
@@ -89,9 +131,10 @@ class IncrementalLayerUpdateDialog(QDialog, FORM_CLASS):
             self.layer_list.append(self.update_layer.id())
             self.tools.setModified(self.layer_list)
             self.update_layer.triggerRepaint()
-            self.close()
-        
-                
+        else: 
+            QMessageBox.information(None, self.tr('Update Error'),  str(error))
+            
+        QApplication.restoreOverrideCursor()
         
     def layer_db_connection(self,  layer):
         uri = layer.dataProvider().uri()
