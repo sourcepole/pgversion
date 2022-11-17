@@ -1974,14 +1974,14 @@ DECLARE
                         and (position('nextval' in lower(column_default)) is NULL or position('nextval' in lower(column_default)) = 0)		
     LOOP
   
-    	old_fields := old_fields ||','|| attributes.att;
+    	old_fields := old_fields ||','|| quote_ident(attributes.att);
   					 
   -- Eine Spalte vom Typ Bool darf nicht in die Coalesce-Funktion gesetzt werden					 
     	IF old_pkey_rec.column_name <> attributes.att THEN
        		IF attributes.typ = 'bool' THEN
-           		where_fields := where_fields ||' and n.'||attributes.att||'=o.'||attributes.att;					 
+           		where_fields := where_fields ||' and n.'||quote_ident(attributes.att)||'=o.'||quote_ident(attributes.att);					 
        		ELSE
-  	   		where_fields := where_fields ||' and coalesce(n.'||attributes.att||'::text,'''')=coalesce(o.'||attributes.att||'::text,'''')';
+  	   		where_fields := where_fields ||' and coalesce(n.'||quote_ident(attributes.att)||'::text,'''')=coalesce(o.'||quote_ident(attributes.att)||'::text,'''')';
        		END IF;
      	END IF;
   
