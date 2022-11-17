@@ -112,7 +112,7 @@ class PgVersion(QObject):
             
         self.actionIncrementalUpdate = QAction(
             QIcon(""), 
-            self.tr("Incremental Layer Update"),
+            self.tr("PGVS Update"),
             self.iface.mainWindow())
             
         self.actionDelete.setEnabled(False)
