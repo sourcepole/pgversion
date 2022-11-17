@@ -10,7 +10,7 @@ from qgis.PyQt.QtWidgets import QDialog,  QDialogButtonBox,  QMessageBox,  QAppl
 from qgis.PyQt import uic
 from qgis.core import QgsProject
 from ..dbtools.dbtools import DbObj
-
+import re
 import os
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), 'incrementalLayerUpdate.ui'))
@@ -45,6 +45,27 @@ class IncrementalLayerUpdateDialog(QDialog, FORM_CLASS):
             self.doApply()
         elif role == QDialogButtonBox.RejectRole:
             self.doReject()
+            
+#    @staticmethod
+    def launder_pg_name(self,  name):
+        # OGRPGDataSource::LaunderName
+        # return re.sub(r"[#'-]", '_', unicode(name).lower())
+        input_string = str(name).lower().encode('ascii', 'replace')
+        input_string = input_string.replace(b" ", b"_")
+        input_string = input_string.replace(b".", b"_")
+        input_string = input_string.replace(b"-", b"_")
+        input_string = input_string.replace(b"+", b"_")
+        input_string = input_string.replace(b"'", b"_")
+
+        # check if table_name starts with number
+
+        if re.search(r"^\d", input_string.decode('utf-8')):
+            input_string = '_'+input_string.decode('utf-8')
+
+        try:
+            return input_string.decode('utf-8')
+        except:
+            return input_string            
 
     @pyqtSlot()
     def doApply(self):
@@ -59,6 +80,8 @@ class IncrementalLayerUpdateDialog(QDialog, FORM_CLASS):
         self.incremental_upgrade(db)
 
     def import_to_postgis(self,  db):
+        self.selected_layer.setName(self.launder_pg_name(self.selected_layer.name()))
+        QMessageBox.information(None, '',  '{}.{}'.format(self.update_layer.dataProvider().uri().schema(), self.selected_layer.name()))
         answer = QMessageBox.StandardButton.Yes
         if db.exists('table',  '{}.{}'.format(self.update_layer.dataProvider().uri().schema(), self.selected_layer.name())):
             answer = QMessageBox.information(
