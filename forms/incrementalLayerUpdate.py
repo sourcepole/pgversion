@@ -35,8 +35,14 @@ class IncrementalLayerUpdateDialog(QDialog, FORM_CLASS):
         self.tools = parent.tools
         excepted_layer_list = []
         self.layer_list = parent.layer_list
-        self.update_layer = self.iface.layerTreeView().selectedLayers()[0]
+        self.loaded_layers = self.iface.layerTreeView().selectedLayers()
+        self.update_layer = self.loaded_layers[0]
         excepted_layer_list.append(self.update_layer)
+        
+        for layer in QgsProject.instance().mapLayers().values():
+            if layer.type() != QgsMapLayerType.VectorLayer:
+                excepted_layer_list.append(layer)
+            
         self.mMapLayerComboBox.setExceptedLayerList(excepted_layer_list)    
             
     def handleButtonClick(self, button):
