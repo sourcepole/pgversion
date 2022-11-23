@@ -69,36 +69,36 @@ class PgVersion(QObject):
         self.toolBar.setObjectName("PG Version")
 
         self.actionInit = QAction(
-            QIcon(":/plugins/pgversion/icons/pgversion-init.png"),
+            QIcon(":/plugins/pgversion/icons/pgversion-init.svg"),
             self.tr("Prepare Layer for Versioning"),
             self.iface.mainWindow())
             
         self.actionLoad = QAction(
-            QIcon(":/plugins/pgversion/icons/pgversion-commit.png"),
+            QIcon(":/plugins/pgversion/icons/pgversion-commit.svg"),
             self.tr("Load Versioned Layer"), self.iface.mainWindow())
             
         self.actionCommit = QAction(
-            QIcon(":/plugins/pgversion/icons/pgversion-load.png"),
+            QIcon(":/plugins/pgversion/icons/pgversion-load.svg"),
             self.tr("Commit Changes"), self.iface.mainWindow())
             
         self.actionRevert = QAction(
-            QIcon(":/plugins/pgversion/icons/pgversion-revert.png"),
+            QIcon(":/plugins/pgversion/icons/pgversion-revert.svg"),
             self.tr("Revert to HEAD Revision"), self.iface.mainWindow())
             
         self.actionLogView = QAction(
-            QIcon(":/plugins/pgversion/icons/pgversion-logview.png"),
+            QIcon(":/plugins/pgversion/icons/pgversion-log.svg"),
             self.tr("Show Logs"), self.iface.mainWindow())
             
         self.actionDiff = QAction(
-            QIcon(":/plugins/pgversion/icons/pgversion-diff.png"),
+            QIcon(":/plugins/pgversion/icons/pgversion-diff.svg"),
             self.tr("Show Diffs"), self.iface.mainWindow())
             
         self.actionDrop = QAction(
-            QIcon(":/plugins/pgversion/icons/pgversion-drop.png"),
+            QIcon(":/plugins/pgversion/icons/pgversion-drop.svg"),
             self.tr("Drop Versioning from Layer"), self.iface.mainWindow())
             
         self.actionHelp = QAction(
-            QIcon(":/plugins/pgversion/icons/pgversion-help.png"), 
+            QIcon(":/plugins/pgversion/icons/pgversion-help.svg"), 
             self.tr("Help"),
             self.iface.mainWindow())
             
@@ -106,12 +106,12 @@ class PgVersion(QObject):
                                    self.iface.mainWindow())
                                    
         self.actionDelete = QAction(
-            QIcon(":/plugins/pgversion/icons/pgversion-drop.png"),
+            QIcon(":/plugins/pgversion/icons/pgversion-drop.svg"),
             self.tr("Bulk delete directly in the database"),
             self.iface.mainWindow())     
             
         self.actionIncrementalUpdate = QAction(
-            QIcon(":/plugins/pgversion/icons/pgversion-incremental_update.png"), 
+            QIcon(":/plugins/pgversion/icons/pgversion-incremental_update.svg"), 
             self.tr("Incremental Layer Update"),
             self.iface.mainWindow())
             

@@ -2,23 +2,23 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="24"
    height="24"
    id="svg5692"
    version="1.1"
-   inkscape:version="0.48.1 r9760"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
    sodipodi:docname="pgversion-log.svg"
    inkscape:export-filename="/home/hdus/.qgis/python/plugins/pgversion/icons/pgversion-log.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90"
-   style="display:inline">
+   style="display:inline"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
   <title
      id="title2968">PgVersion icon - log</title>
   <defs
@@ -165,20 +165,21 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="29.833333"
-     inkscape:cx="12"
-     inkscape:cy="12"
+     inkscape:cx="11.98324"
+     inkscape:cy="11.98324"
      inkscape:current-layer="layer8"
      showgrid="true"
      inkscape:grid-bbox="true"
      inkscape:document-units="px"
      borderlayer="false"
-     inkscape:window-width="1680"
-     inkscape:window-height="973"
-     inkscape:window-x="0"
-     inkscape:window-y="25"
+     inkscape:window-width="1846"
+     inkscape:window-height="1016"
+     inkscape:window-x="74"
+     inkscape:window-y="27"
      inkscape:window-maximized="1"
      showguides="true"
-     inkscape:guide-bbox="true">
+     inkscape:guide-bbox="true"
+     inkscape:pagecheckerboard="0">
     <inkscape:grid
        type="xygrid"
        id="grid5700"
@@ -187,10 +188,10 @@
        enabled="true"
        snapvisiblegridlinesonly="true"
        dotted="true"
-       originx="2.5px"
-       originy="2.5px"
-       spacingx="1px"
-       spacingy="1px" />
+       originx="2.5"
+       originy="2.5"
+       spacingx="1"
+       spacingy="1" />
     <sodipodi:guide
        orientation="1,0"
        position="18.536313,5.396648"

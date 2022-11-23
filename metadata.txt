@@ -23,6 +23,8 @@ about=Sourcepole AG - Linux & Open Source Solutions, Weberstrasse 5, 8004 Zurich
 changelog=
     3.2.0
     - Incremenal Update introduced
+    - Laundering of tablenames introduced. 
+    - Uppercase column names fixed
     3.1.6
     - Fixed Diff query
     - Diff query swapped to SQL file    
