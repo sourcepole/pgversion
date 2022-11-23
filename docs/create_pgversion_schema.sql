@@ -14,7 +14,7 @@ CREATE EXTENSION POSTGIS;
 EXCEPTION WHEN duplicate_object THEN RAISE NOTICE '%, skipping', SQLERRM USING ERRCODE = SQLSTATE;
 END
 $$;-- ddl-end ---- Database generated with pgModeler (PostgreSQL Database Modeler).
--- pgModeler version: 0.9.4
+-- pgModeler version: 0.9.4-beta
 -- PostgreSQL version: 13.0
 -- Project Site: pgmodeler.io
 -- Model Author: ---
@@ -37,6 +37,15 @@ $$;-- ddl-end ---- Database generated with pgModeler (PostgreSQL Database Modele
 -- 	LC_CTYPE = 'en_US'
 -- 	TABLESPACE = pg_default
 -- 	OWNER = versions;
+-- -- ddl-end --
+-- 
+-- -- Appended SQL commands --
+-- ALTER DEFAULT PRIVILEGES IN SCHEMA public, versions GRANT ALL ON TABLES TO versions;
+-- ALTER DEFAULT PRIVILEGES IN SCHEMA versions, public GRANT EXECUTE ON FUNCTIONS TO versions;
+-- ALTER DEFAULT PRIVILEGES IN SCHEMA versions, public GRANT USAGE, SELECT ON SEQUENCES TO versions;
+-- GRANT ALL ON ALL TABLES IN SCHEMA public, versions TO versions;
+-- GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA versions, public TO versions;
+-- GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA versions, public TO versions;
 -- -- ddl-end --
 -- 
 
@@ -1409,6 +1418,7 @@ CREATE TABLE versions.version_tables_logmsg (
 	systime bigint DEFAULT (date_part('epoch'::text, now()) * (1000)::double precision),
 	project character varying DEFAULT "current_user"(),
 	CONSTRAINT version_tables_logmsg_pkey PRIMARY KEY (id)
+
 );
 -- ddl-end --
 ALTER TABLE versions.version_tables_logmsg OWNER TO versions;
@@ -1425,6 +1435,7 @@ CREATE TABLE versions.version_tables (
 	version_view_pkey character varying,
 	version_view_geometry_column character varying,
 	CONSTRAINT version_table_pkey PRIMARY KEY (version_table_id)
+
 );
 -- ddl-end --
 ALTER TABLE versions.version_tables OWNER TO versions;
@@ -1453,6 +1464,7 @@ CREATE TABLE versions.version_tags (
 	revision bigint NOT NULL,
 	tag_text character varying NOT NULL,
 	CONSTRAINT version_tags_pkey PRIMARY KEY (version_table_id,revision,tag_text)
+
 );
 -- ddl-end --
 ALTER TABLE versions.version_tags OWNER TO versions;
@@ -1797,7 +1809,7 @@ ALTER FUNCTION versions.pgvscheckout(anyelement,bigint,text) OWNER TO versions;
 -- DROP FUNCTION IF EXISTS versions.pgvsincrementalupdate(varchar,varchar) CASCADE;
 
 -- Prepended SQL commands --
-DROP FUNCTION versions.pgvsincrementalupdate(varchar,varchar);
+DROP FUNCTION IF EXISTS versions.pgvsincrementalupdate(varchar,varchar);
 -- ddl-end --
 
 CREATE FUNCTION versions.pgvsincrementalupdate (IN in_new_layer varchar, IN in_old_layer varchar)
@@ -1832,6 +1844,7 @@ DECLARE
   pos INTEGER;
   integer_var INTEGER;		
   insub_query TEXT;
+  missing_column TEXT;
   result text[];
   
   
@@ -1890,6 +1903,7 @@ DECLARE
   		
   
   -- Pruefen, ob der new_layer mindestens der Struktur des old_layer entspricht	
+     missing_column := chr(10);
      select into att_check col.column_name
      from information_schema.columns as col
      where table_schema = old_schema::name
@@ -1900,10 +1914,24 @@ DECLARE
      from information_schema.columns as col
      where table_schema = new_schema::name
        and table_name = new_layer::name;
-  			 
-  			
+  	
     IF FOUND THEN
-       RAISE EXCEPTION 'Die Tabelle % entspricht nicht der Tabelle %', new_layer, old_layer;
+	   for att_check in 
+	      select col.column_name
+          from information_schema.columns as col
+          where table_schema = old_schema::name
+            and table_name = old_layer::name
+             and (position('nextval' in lower(column_default)) is NULL or position('nextval' in lower(column_default)) = 0)		
+          except
+            select col.column_name
+            from information_schema.columns as col
+            where table_schema = new_schema::name
+              and table_name = new_layer::name
+  	   LOOP
+	     missing_column := missing_column||chr(10)||att_check.column_name;
+	   END LOOP;
+	   missing_column := missing_column||chr(10);
+       RAISE EXCEPTION 'Die Tabelle % entspricht nicht der Tabelle % % %diese Spalten fehlen: %', new_layer, old_layer, chr(10), chr(10), missing_column;
 	   result := array_append(result, 'false');
        RETURN result;
     END IF;
@@ -2045,6 +2073,7 @@ DECLARE
   RETURN result;
 END;
 
+
 $$;
 -- ddl-end --
 
@@ -2092,199 +2121,199 @@ GRANT CREATE,USAGE
    TO PUBLIC;
 -- ddl-end --
 
--- object: "grant_U_42d5f2009f" | type: PERMISSION --
+-- object: "grant_U_36abba67dd" | type: PERMISSION --
 GRANT USAGE
    ON TYPE versions.checkout
    TO PUBLIC;
 -- ddl-end --
 
--- object: "grant_U_a91a4e0eef" | type: PERMISSION --
+-- object: "grant_U_6869c7bfde" | type: PERMISSION --
 GRANT USAGE
    ON TYPE versions.checkout
    TO versions;
 -- ddl-end --
 
--- object: "grant_U_d8901c038e" | type: PERMISSION --
+-- object: "grant_U_25d5505568" | type: PERMISSION --
 GRANT USAGE
    ON TYPE versions.conflicts
    TO PUBLIC;
 -- ddl-end --
 
--- object: "grant_U_d214edb885" | type: PERMISSION --
+-- object: "grant_U_6ed296fb20" | type: PERMISSION --
 GRANT USAGE
    ON TYPE versions.conflicts
    TO versions;
 -- ddl-end --
 
--- object: "grant_U_8b2b79301a" | type: PERMISSION --
+-- object: "grant_U_d35d7e80f3" | type: PERMISSION --
 GRANT USAGE
    ON TYPE versions.logview
    TO PUBLIC;
 -- ddl-end --
 
--- object: "grant_U_a16ac1be33" | type: PERMISSION --
+-- object: "grant_U_32d5dd0409" | type: PERMISSION --
 GRANT USAGE
    ON TYPE versions.logview
    TO versions;
 -- ddl-end --
 
--- object: "grant_X_03f5193db0" | type: PERMISSION --
+-- object: "grant_X_69a3597eb5" | type: PERMISSION --
 GRANT EXECUTE
    ON FUNCTION versions.pgvscheck(character varying)
    TO PUBLIC;
 -- ddl-end --
 
--- object: "grant_X_19ed3de1a9" | type: PERMISSION --
+-- object: "grant_X_15fde580b8" | type: PERMISSION --
 GRANT EXECUTE
    ON FUNCTION versions.pgvscheck(character varying)
    TO versions;
 -- ddl-end --
 
--- object: "grant_X_2be9896bbf" | type: PERMISSION --
+-- object: "grant_X_81bddac82f" | type: PERMISSION --
 GRANT EXECUTE
    ON FUNCTION versions.pgvscommit(character varying,text)
    TO PUBLIC;
 -- ddl-end --
 
--- object: "grant_X_139e258a8c" | type: PERMISSION --
+-- object: "grant_X_8a3a0c37cb" | type: PERMISSION --
 GRANT EXECUTE
    ON FUNCTION versions.pgvscommit(character varying,text)
    TO versions;
 -- ddl-end --
 
--- object: "grant_X_5ede700689" | type: PERMISSION --
+-- object: "grant_X_825f69f4cc" | type: PERMISSION --
 GRANT EXECUTE
    ON FUNCTION versions.pgvsdrop(character varying)
    TO PUBLIC;
 -- ddl-end --
 
--- object: "grant_X_711aee7598" | type: PERMISSION --
+-- object: "grant_X_3d71ab0b83" | type: PERMISSION --
 GRANT EXECUTE
    ON FUNCTION versions.pgvsdrop(character varying)
    TO versions;
 -- ddl-end --
 
--- object: "grant_X_b54b3d7786" | type: PERMISSION --
+-- object: "grant_X_76287e64dd" | type: PERMISSION --
 GRANT EXECUTE
    ON FUNCTION versions.pgvsinit(character varying)
    TO PUBLIC;
 -- ddl-end --
 
--- object: "grant_X_0a7b9f8a18" | type: PERMISSION --
+-- object: "grant_X_7c0c76e67f" | type: PERMISSION --
 GRANT EXECUTE
    ON FUNCTION versions.pgvsinit(character varying)
    TO versions;
 -- ddl-end --
 
--- object: "grant_X_7e739cdcac" | type: PERMISSION --
+-- object: "grant_X_f609b9e390" | type: PERMISSION --
 GRANT EXECUTE
    ON FUNCTION versions.pgvslogview(character varying)
    TO PUBLIC;
 -- ddl-end --
 
--- object: "grant_X_7d95b8ac51" | type: PERMISSION --
+-- object: "grant_X_29ba5cd4bf" | type: PERMISSION --
 GRANT EXECUTE
    ON FUNCTION versions.pgvslogview(character varying)
    TO versions;
 -- ddl-end --
 
--- object: "grant_X_ab89332287" | type: PERMISSION --
+-- object: "grant_X_1e420b9a0d" | type: PERMISSION --
 GRANT EXECUTE
    ON FUNCTION versions.pgvsmerge(character varying,integer,character varying)
    TO PUBLIC;
 -- ddl-end --
 
--- object: "grant_X_561ac74d08" | type: PERMISSION --
+-- object: "grant_X_0b0de7448b" | type: PERMISSION --
 GRANT EXECUTE
    ON FUNCTION versions.pgvsmerge(character varying,integer,character varying)
    TO versions;
 -- ddl-end --
 
--- object: "grant_X_4302f0a595" | type: PERMISSION --
+-- object: "grant_X_2c2eba4edf" | type: PERMISSION --
 GRANT EXECUTE
    ON FUNCTION versions.pgvsrevert(character varying)
    TO PUBLIC;
 -- ddl-end --
 
--- object: "grant_X_ec7406e984" | type: PERMISSION --
+-- object: "grant_X_fc34365d68" | type: PERMISSION --
 GRANT EXECUTE
    ON FUNCTION versions.pgvsrevert(character varying)
    TO versions;
 -- ddl-end --
 
--- object: "grant_X_22a7706db8" | type: PERMISSION --
+-- object: "grant_X_b45f4873d5" | type: PERMISSION --
 GRANT EXECUTE
    ON FUNCTION versions.pgvsrevision()
    TO PUBLIC;
 -- ddl-end --
 
--- object: "grant_X_ccd283bf9c" | type: PERMISSION --
+-- object: "grant_X_40631763b6" | type: PERMISSION --
 GRANT EXECUTE
    ON FUNCTION versions.pgvsrevision()
    TO versions;
 -- ddl-end --
 
--- object: "grant_X_303a02c11e" | type: PERMISSION --
+-- object: "grant_X_3c3b5449b4" | type: PERMISSION --
 GRANT EXECUTE
    ON FUNCTION versions.pgvsrollback(character varying,integer)
    TO PUBLIC;
 -- ddl-end --
 
--- object: "grant_X_01409a41b2" | type: PERMISSION --
+-- object: "grant_X_2c43f1cc66" | type: PERMISSION --
 GRANT EXECUTE
    ON FUNCTION versions.pgvsrollback(character varying,integer)
    TO versions;
 -- ddl-end --
 
--- object: "grant_X_6db39958a4" | type: PERMISSION --
+-- object: "grant_X_275124c736" | type: PERMISSION --
 GRANT EXECUTE
    ON FUNCTION versions.pgvsupdatecheck(character varying)
    TO PUBLIC;
 -- ddl-end --
 
--- object: "grant_X_c2263d5a55" | type: PERMISSION --
+-- object: "grant_X_37ba0f4e7e" | type: PERMISSION --
 GRANT EXECUTE
    ON FUNCTION versions.pgvsupdatecheck(character varying)
    TO versions;
 -- ddl-end --
 
--- object: "grant_rawdDxt_5ebaf06277" | type: PERMISSION --
+-- object: "grant_rawdDxt_64147dc69c" | type: PERMISSION --
 GRANT SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER
    ON TABLE versions.version_tables_logmsg
    TO versions;
 -- ddl-end --
 
--- object: "grant_rawdDxt_8b8380e224" | type: PERMISSION --
+-- object: "grant_rawdDxt_b3efd8927b" | type: PERMISSION --
 GRANT SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER
    ON TABLE versions.version_tables
    TO versions;
 -- ddl-end --
 
--- object: "grant_rawdDxt_cce5756517" | type: PERMISSION --
+-- object: "grant_rawdDxt_75f1f1e6e4" | type: PERMISSION --
 GRANT SELECT,INSERT,UPDATE,DELETE,TRUNCATE,REFERENCES,TRIGGER
    ON TABLE versions.version_tags
    TO versions;
 -- ddl-end --
 
--- object: "grant_X_902e477de6" | type: PERMISSION --
+-- object: "grant_X_3cb9e164cd" | type: PERMISSION --
 GRANT EXECUTE
    ON FUNCTION versions._primarykey(character varying)
    TO PUBLIC;
 -- ddl-end --
 
--- object: "grant_X_077743f0e7" | type: PERMISSION --
+-- object: "grant_X_a603eb042a" | type: PERMISSION --
 GRANT EXECUTE
    ON FUNCTION versions._primarykey(character varying)
    TO versions;
 -- ddl-end --
 
--- object: "grant_X_65ef0cf81b" | type: PERMISSION --
+-- object: "grant_X_17846be44c" | type: PERMISSION --
 GRANT EXECUTE
    ON FUNCTION versions.pgvs_version_record()
    TO PUBLIC;
 -- ddl-end --
 
--- object: "grant_X_ed22db6db7" | type: PERMISSION --
+-- object: "grant_X_24326a3c5f" | type: PERMISSION --
 GRANT EXECUTE
    ON FUNCTION versions.pgvs_version_record()
    TO versions;
