@@ -111,29 +111,35 @@ class PgVersion(QObject):
             self.iface.mainWindow())     
             
         self.actionIncrementalUpdate = QAction(
-            QIcon(""), 
-            self.tr("PGVS Update"),
+            QIcon(":/plugins/pgversion/icons/pgversion-incremental_update.png"), 
+            self.tr("Incremental Layer Update"),
             self.iface.mainWindow())
             
         self.actionDelete.setEnabled(False)
         self.set_actions(False)
         
-        self.actionList = [self.actionInit, self.actionLoad, self.actionCommit,
-                           self.actionDiff, self.actionRevert,
-                           self.actionLogView, self.actionDrop,
-                           self.actionLogView, self.actionDelete,
-                           self.actionIncrementalUpdate, 
-                           self.actionHelp, self.actionAbout]
+        self.actionList = [self.actionInit, 
+                                    self.actionLoad, 
+                                    self.actionCommit,
+                                    self.actionDiff, 
+                                    self.actionRevert,
+                                    self.actionLogView, 
+                                    self.actionDrop,
+                                    self.actionLogView, 
+                                    self.actionDelete,
+                                    self.actionIncrementalUpdate, 
+                                    self.actionHelp, 
+                                    self.actionAbout]
 
         self.toolBar.addAction(self.actionInit)
         self.toolBar.addAction(self.actionLoad)
         self.toolBar.addAction(self.actionCommit)
         self.toolBar.addAction(self.actionRevert)
         self.toolBar.addAction(self.actionDiff)
+        self.toolBar.addAction(self.actionIncrementalUpdate)        
         self.toolBar.addAction(self.actionLogView)
         self.toolBar.addAction(self.actionDelete)
         self.toolBar.addAction(self.actionHelp)
-        self.toolBar.addAction(self.actionIncrementalUpdate)
 
         try:
             for a in self.actionList:
@@ -198,7 +204,8 @@ class PgVersion(QObject):
         self.actionCommit.setEnabled(isActive)
         self.actionRevert.setEnabled(isActive)
         self.actionDiff.setEnabled(isActive)
-        self.actionLogView.setEnabled(isActive)               
+        self.actionLogView.setEnabled(isActive)       
+        self.actionIncrementalUpdate.setEnabled(isActive)        
 
     def add_layer(self, l):
         if self.tools.hasVersion(l):
