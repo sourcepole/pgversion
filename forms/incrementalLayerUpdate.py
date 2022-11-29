@@ -89,6 +89,8 @@ class IncrementalLayerUpdateDialog(QDialog, FORM_CLASS):
             self.incremental_upgrade(db)
 
         QApplication.restoreOverrideCursor()
+        
+        self.close()
 
     def import_to_postgis(self,  db):
         self.selected_layer.setName(self.launder_pg_name(self.selected_layer.name()))
@@ -160,13 +162,13 @@ class IncrementalLayerUpdateDialog(QDialog, FORM_CLASS):
         result,  error = db.read(sql)
 
         if error == None:
-            self.do_update_layer(result)
+            self.do_update_layer(db,  result)
         else: 
             message = str(error)
             QMessageBox.information(None, self.tr('Update Error'),  message)
         
         
-    def do_update_layer(self,  result):
+    def do_update_layer(self,  db,  result):
         result_array = result['UPDATE'][0].split(',')
         message = ''
         message = '%s, %s' % (result_array[0],  result_array[1])
@@ -180,6 +182,13 @@ class IncrementalLayerUpdateDialog(QDialog, FORM_CLASS):
         self.layer_list.append(self.update_layer.id())
         self.tools.setModified(self.layer_list)
         self.update_layer.triggerRepaint()        
+        
+        sql = """
+                 DROP TABLE {schema}.{table} 
+        """.format(schema = self.update_layer.dataProvider().uri().schema(), 
+                         table = self.selected_layer.name()) 
+        
+        db.run(sql)
         
     def layer_db_connection(self,  layer):
         uri = layer.dataProvider().uri()
