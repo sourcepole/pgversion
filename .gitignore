@@ -1,5 +1,7 @@
 *.pyc
 *.e4p
+*.epj
 .eric*
 tools
 *~
+.jedi
