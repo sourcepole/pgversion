@@ -458,6 +458,22 @@ Die pgvsrollback Funktion bringt eine Revision wieder zurück auf die HEAD Revis
 <P>
 Diese Funktion arbeitet zuverlässig ab der pgvs db-Version 1.8.4 und der QGIS-Plugin Version 2.0.2. Falls es vorherige Revisionen eines Layers gibt,  sind diese nicht für einen Rollback bereit.
 
+<A NAME="toc219"></A>
+<H3>2.1.9 pgvsincrementalupdate</H3>
+
+Die Funktion <CODE>pgvsincrementalupdate</CODE> bietet die Möglichkeit, 
+einen neuen Layer, mit exakt gleicher Struktur, mit dem HEAD der Versioinierung 
+zu vergleichen und dann die Änderungen in die Versionierung zu spielen.
+
+Es werden letztendlich dann nur noch die Unterschiede mit dem Repository abgeglichen.
+
+<P>
+<CODE>
+select * from versions.pgpslogview ('&#60;import_table_name&#62;', '&#60;versioned_table_name&#62;');
+</CODE>
+
+<A NAME="toc216"></A>
+
 <A NAME="toc3"></A>
 <H1>3. Umsetzung als PgVersion Plugin in QGIS</H1>
 
