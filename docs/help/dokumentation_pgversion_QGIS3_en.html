@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Help PgVersion 3.1.2</title>
+<title>Help PgVersion 3.2.0</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<TITLE>PostGIS Versioning - pgVersion 3.1.6</TITLE>
+<TITLE>PostGIS Versioning - pgVersion 3.2.0</TITLE>
 </head>
 <body>
 
@@ -41,8 +41,8 @@
   </style>
 
   <DIV CLASS="header" ID="header">
-  <H1>PostGIS Versioning - pgVersion 3.1.6</H1>
-  <H3>Dr. Horst Duester, 2022, horst.duester@sourcepole.ch</H3>
+  <H1>PostGIS Versioning - pgVersion 3.2.0</H1>
+  <H3>Dr. Horst Duester, 2023, horst.duester@sourcepole.ch</H3>
   </DIV>
 
   <DIV CLASS="toc">
@@ -77,6 +77,7 @@
           <LI><A HREF="#toc216">2.1.6 pgvsrevision</A>
           <LI><A HREF="#toc217">2.1.7 pgvslogview</A>
           <LI><A HREF="#toc218">2.1.8 pgvsrollback</A>
+          <LI><A HREF="#toc218">2.1.9 pgvsincrementalupdate</A>
         </UL>
       </UL>
     <LI><A HREF="#toc3">Implementation as a PgVersion plugin in QGIS</A>
@@ -438,7 +439,7 @@ The pgvslogview function returns all the logs of a specific, versioned table:
 
 <P>
 <CODE>
-select * from versions.pgpslogview ('&#60;table_name&#62;');
+select * from versions.pgpslogview ('&#60;import_table_name&#62;', '&#60;versioned_table_name&#62;');
 </CODE>
 
 <A NAME="toc218"></A>
@@ -454,6 +455,17 @@ The pgvsrollback function returns a revision to the HEAD revision:
 
 <P>
 This feature works reliably from the pgvs db version 1.8.4 and the QGIS plugin version 2.0.2. If there are previous revisions of a layer, they are not ready for rollback.
+
+<A NAME="toc219"></A>
+<H3>2.1.9 pgvsincrementalupdate</H3>
+The <CODE>pgvsincrementalupdate</CODE> function offers the possibility to compare a new layer with exactly the same structure with the HEAD of the versioning and then to import the changes into the versioning.
+
+In the end, only the differences are compared with the repository.
+<P>
+<CODE>
+select * from versions.pgvsincrementalupdate ('&#60;import_table_name&#62;', '&#60;versioned_table_name&#62;');
+</CODE>
+
 
 <A NAME="toc3"></A>
 <H1>3. Implementation as PgVersion plugin in QGIS</H1>
