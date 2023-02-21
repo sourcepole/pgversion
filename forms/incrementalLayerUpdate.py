@@ -77,20 +77,31 @@ class IncrementalLayerUpdateDialog(QDialog, FORM_CLASS):
     def doApply(self):
         db = self.layer_db_connection(self.update_layer)        
         self.selected_layer = self.mMapLayerComboBox.currentLayer()
-        success = True
-# check if the selected layer is a postgres layer
-# Import a non postgres layer to update_layer database      
-
-        QApplication.setOverrideCursor(Qt.WaitCursor)
-        if self.selected_layer.dataProvider().name() != 'postgres':                       
-            success = self.import_to_postgis(db)
-            
-        if success:
-            self.incremental_upgrade(db)
-
-        QApplication.restoreOverrideCursor()
         
-        self.close()
+        if self.selected_layer != None:
+            success = True
+    # check if the selected layer is a postgres layer
+    # Import a non postgres layer to update_layer database      
+    
+            QApplication.setOverrideCursor(Qt.WaitCursor)
+            if self.selected_layer.dataProvider().name() != 'postgres':                       
+                success = self.import_to_postgis(db)
+                
+            if success:
+                self.incremental_upgrade(db)
+    
+            QApplication.restoreOverrideCursor()
+            
+            self.close()
+        else:
+            res = QMessageBox.warning(
+                self,
+                self.tr("Warning"),
+                self.tr("""Please select an import layer."""),
+                (
+                    QMessageBox.StandardButton.Ok),
+            )
+            
 
     def import_to_postgis(self,  db):
         self.selected_layer.setName(self.launder_pg_name(self.selected_layer.name()))
