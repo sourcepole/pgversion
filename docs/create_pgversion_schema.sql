@@ -54,7 +54,7 @@ SET check_function_bodies = false;
 
 -- object: versions | type: SCHEMA --
 -- DROP SCHEMA IF EXISTS versions CASCADE;
-CREATE SCHEMA versions;
+CREATE SCHEMA IF NOT EXISTS versions;
 -- ddl-end --
 ALTER SCHEMA versions OWNER TO versions;
 -- ddl-end --
@@ -71,7 +71,7 @@ SET search_path TO pg_catalog,public,versions;
 -- -- ddl-end --
 -- 
 -- object: versions.checkout | type: TYPE --
--- DROP TYPE IF EXISTS versions.checkout CASCADE;
+DROP TYPE IF EXISTS versions.checkout CASCADE;
 CREATE TYPE versions.checkout AS
 (
  systime bigint,
@@ -84,7 +84,7 @@ ALTER TYPE versions.checkout OWNER TO versions;
 -- ddl-end --
 
 -- object: versions.conflicts | type: TYPE --
--- DROP TYPE IF EXISTS versions.conflicts CASCADE;
+DROP TYPE IF EXISTS versions.conflicts CASCADE;
 CREATE TYPE versions.conflicts AS
 (
  objectkey bigint,
@@ -100,7 +100,7 @@ ALTER TYPE versions.conflicts OWNER TO versions;
 -- ddl-end --
 
 -- object: versions.logview | type: TYPE --
--- DROP TYPE IF EXISTS versions.logview CASCADE;
+DROP TYPE IF EXISTS versions.logview CASCADE;
 CREATE TYPE versions.logview AS
 (
  revision integer,
@@ -114,7 +114,7 @@ ALTER TYPE versions.logview OWNER TO versions;
 
 -- object: versions._hasserial | type: FUNCTION --
 -- DROP FUNCTION IF EXISTS versions._hasserial(character varying) CASCADE;
-CREATE FUNCTION versions._hasserial (in_table character varying)
+CREATE OR REPLACE FUNCTION versions._hasserial (in_table character varying)
 	RETURNS boolean
 	LANGUAGE plpgsql
 	VOLATILE 
@@ -165,18 +165,15 @@ ALTER FUNCTION versions._hasserial(character varying) OWNER TO versions;
 
 -- object: versions.pgvscheck | type: FUNCTION --
 -- DROP FUNCTION IF EXISTS versions.pgvscheck(character varying) CASCADE;
-CREATE FUNCTION versions.pgvscheck (_param1 character varying)
-	RETURNS SETOF versions.conflicts
-	LANGUAGE plpgsql
-	VOLATILE 
-	CALLED ON NULL INPUT
-	SECURITY INVOKER
-	PARALLEL UNSAFE
-	COST 100
-	ROWS 1000
-	AS $$
+CREATE OR REPLACE FUNCTION versions.pgvscheck(
+	_param1 character varying)
+    RETURNS SETOF versions.conflicts 
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
 
-
+AS $BODY$
 
   DECLARE
     inTable ALIAS FOR $1;
@@ -210,7 +207,6 @@ CREATE FUNCTION versions.pgvscheck (_param1 character varying)
   -- Pruefen ob und welche Spalte der Primarykey der Tabelle ist 
     select into myPkeyRec * from versions._primarykey(inTable);    
     myPkey := quote_ident(myPkeyRec.pkey_column);
-    RAISE NOTICE '%', myPkey;
     
 /*
 Check for conflicts before committing. When conflicts are existing stop the commit process 
@@ -248,25 +244,23 @@ with a listing of the conflicting objects.
                                     and a.'||myPkey||' = b.'||myPkey;
 
 --RAISE EXCEPTION '%',myDebug;           
+    EXECUTE myDebug into confExists;   
+      
+    IF COUNT(confExists) > 1 THEN
+	for conflictCheck IN EXECUTE myDebug
+	LOOP
+	  return next conflictCheck;
+	  conflict := True;
+	  message := message||E'\n'||'WARNING! The object with '||myPkey||'='||conflictCheck.objectkey||' is also changed by user '||conflictCheck.conflict_user||'.';
+	END LOOP;    
 
-      EXECUTE myDebug into confExists;                         
-                                    
-      for conflictCheck IN EXECUTE myDebug
-      LOOP
-        return next conflictCheck;
-        conflict := True;
-        message := message||E'\n'||'WARNING! The object with '||myPkey||'='||conflictCheck.objectkey||' is also changed by user '||conflictCheck.conflict_user||'.';
-      END LOOP;    
-              
-      message := message||E'\n\n';
-      message := message||'Changes are not committed!'||E'\n\n';
-      RAISE NOTICE '%', message;
+	message := message||E'\n\n';
+	message := message||'Changes are not committed!'||E'\n\n';
+	RAISE NOTICE '%', message;
+    END IF;
   END;
 
-
-
-
-$$;
+$BODY$;
 -- ddl-end --
 ALTER FUNCTION versions.pgvscheck(character varying) OWNER TO versions;
 -- ddl-end --
@@ -456,7 +450,7 @@ ALTER FUNCTION versions.pgvscommit(character varying,text) OWNER TO versions;
 
 -- object: versions.pgvsdrop | type: FUNCTION --
 -- DROP FUNCTION IF EXISTS versions.pgvsdrop(character varying) CASCADE;
-CREATE FUNCTION versions.pgvsdrop (_param1 character varying)
+CREATE OR REPLACE FUNCTION versions.pgvsdrop (_param1 character varying)
 	RETURNS boolean
 	LANGUAGE plpgsql
 	VOLATILE 
@@ -613,7 +607,7 @@ ALTER FUNCTION versions.pgvsdrop(character varying) OWNER TO versions;
 
 -- object: versions.pgvsinit | type: FUNCTION --
 -- DROP FUNCTION IF EXISTS versions.pgvsinit(character varying) CASCADE;
-CREATE FUNCTION versions.pgvsinit (_param1 character varying)
+CREATE OR REPLACE FUNCTION versions.pgvsinit (_param1 character varying)
 	RETURNS boolean
 	LANGUAGE plpgsql
 	VOLATILE 
@@ -756,7 +750,7 @@ DECLARE
              alter table '||versionLogTable||' add column version_log_id bigserial;
              alter table '||versionLogTable||' add column action character varying;
              alter table '||versionLogTable||' add column project character varying default current_user;     
-             alter table '||versionLogTable||' add column systime bigint default extract(epoch from now()::timestamp)*1000;    
+             alter table '||versionLogTable||' add column systime bigint default extract(epoch from now()::timestamp with timezone)*1000;    
              alter table '||versionLogTable||' add column revision bigint;
              alter table '||versionLogTable||' add column logmsg text;        
              alter table '||versionLogTable||' add column commit boolean DEFAULT False;
@@ -877,7 +871,7 @@ ALTER FUNCTION versions.pgvsinit(character varying) OWNER TO versions;
 
 -- object: versions.pgvslogview | type: FUNCTION --
 -- DROP FUNCTION IF EXISTS versions.pgvslogview(character varying) CASCADE;
-CREATE FUNCTION versions.pgvslogview (_param1 character varying)
+CREATE OR REPLACE FUNCTION versions.pgvslogview (_param1 character varying)
 	RETURNS SETOF versions.logview
 	LANGUAGE plpgsql
 	VOLATILE 
@@ -938,7 +932,7 @@ ALTER FUNCTION versions.pgvslogview(character varying) OWNER TO versions;
 
 -- object: versions.pgvsmerge | type: FUNCTION --
 -- DROP FUNCTION IF EXISTS versions.pgvsmerge(character varying,integer,character varying) CASCADE;
-CREATE FUNCTION versions.pgvsmerge ("inTable" character varying, "targetGid" integer, "targetProject" character varying)
+CREATE OR REPLACE FUNCTION versions.pgvsmerge ("inTable" character varying, "targetGid" integer, "targetProject" character varying)
 	RETURNS boolean
 	LANGUAGE plpgsql
 	VOLATILE 
@@ -1079,7 +1073,7 @@ ALTER FUNCTION versions.pgvsmerge(character varying,integer,character varying) O
 
 -- object: versions.pgvsrevert | type: FUNCTION --
 -- DROP FUNCTION IF EXISTS versions.pgvsrevert(character varying) CASCADE;
-CREATE FUNCTION versions.pgvsrevert (_param1 character varying)
+CREATE OR REPLACE FUNCTION versions.pgvsrevert (_param1 character varying)
 	RETURNS integer
 	LANGUAGE plpgsql
 	VOLATILE 
@@ -1168,7 +1162,7 @@ ALTER FUNCTION versions.pgvsrevert(character varying) OWNER TO versions;
 
 -- object: versions.pgvsrevision | type: FUNCTION --
 -- DROP FUNCTION IF EXISTS versions.pgvsrevision() CASCADE;
-CREATE FUNCTION versions.pgvsrevision ()
+CREATE OR REPLACE FUNCTION versions.pgvsrevision ()
 	RETURNS text
 	LANGUAGE plpgsql
 	VOLATILE 
@@ -1195,7 +1189,7 @@ ALTER FUNCTION versions.pgvsrevision() OWNER TO versions;
 
 -- object: versions.pgvsrollback | type: FUNCTION --
 -- DROP FUNCTION IF EXISTS versions.pgvsrollback(character varying,integer) CASCADE;
-CREATE FUNCTION versions.pgvsrollback (_param1 character varying, _param2 integer)
+CREATE OR REPLACE FUNCTION versions.pgvsrollback (_param1 character varying, _param2 integer)
 	RETURNS boolean
 	LANGUAGE plpgsql
 	VOLATILE 
@@ -1338,7 +1332,7 @@ ALTER FUNCTION versions.pgvsrollback(character varying,integer) OWNER TO version
 
 -- object: versions.pgvsupdatecheck | type: FUNCTION --
 -- DROP FUNCTION IF EXISTS versions.pgvsupdatecheck(character varying) CASCADE;
-CREATE FUNCTION versions.pgvsupdatecheck (_param1 character varying)
+CREATE OR REPLACE FUNCTION versions.pgvsupdatecheck (_param1 character varying)
 	RETURNS boolean
 	LANGUAGE plpgsql
 	VOLATILE 
@@ -1379,8 +1373,8 @@ ALTER FUNCTION versions.pgvsupdatecheck(character varying) OWNER TO versions;
 -- ddl-end --
 
 -- object: versions.version_tables_version_table_id_seq | type: SEQUENCE --
--- DROP SEQUENCE IF EXISTS versions.version_tables_version_table_id_seq CASCADE;
-CREATE SEQUENCE versions.version_tables_version_table_id_seq
+--DROP SEQUENCE IF EXISTS versions.version_tables_version_table_id_seq CASCADE;
+CREATE SEQUENCE IF NOT EXISTS versions.version_tables_version_table_id_seq
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 9223372036854775807
@@ -1395,7 +1389,7 @@ ALTER SEQUENCE versions.version_tables_version_table_id_seq OWNER TO versions;
 
 -- object: versions.version_tables_logmsg_id_seq | type: SEQUENCE --
 -- DROP SEQUENCE IF EXISTS versions.version_tables_logmsg_id_seq CASCADE;
-CREATE SEQUENCE versions.version_tables_logmsg_id_seq
+CREATE SEQUENCE IF NOT EXISTS versions.version_tables_logmsg_id_seq
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 9223372036854775807
@@ -1410,7 +1404,7 @@ ALTER SEQUENCE versions.version_tables_logmsg_id_seq OWNER TO versions;
 
 -- object: versions.version_tables_logmsg | type: TABLE --
 -- DROP TABLE IF EXISTS versions.version_tables_logmsg CASCADE;
-CREATE TABLE versions.version_tables_logmsg (
+CREATE TABLE IF NOT EXISTS versions.version_tables_logmsg (
 	id bigint NOT NULL DEFAULT nextval('versions.version_tables_logmsg_id_seq'::regclass),
 	version_table_id bigint,
 	revision character varying,
@@ -1426,7 +1420,7 @@ ALTER TABLE versions.version_tables_logmsg OWNER TO versions;
 
 -- object: versions.version_tables | type: TABLE --
 -- DROP TABLE IF EXISTS versions.version_tables CASCADE;
-CREATE TABLE versions.version_tables (
+CREATE TABLE IF NOT EXISTS versions.version_tables (
 	version_table_id bigint NOT NULL DEFAULT nextval('versions.version_tables_version_table_id_seq'::regclass),
 	version_table_schema character varying,
 	version_table_name character varying,
@@ -1443,7 +1437,7 @@ ALTER TABLE versions.version_tables OWNER TO versions;
 
 -- object: versions.version_tags_tags_id_seq | type: SEQUENCE --
 -- DROP SEQUENCE IF EXISTS versions.version_tags_tags_id_seq CASCADE;
-CREATE SEQUENCE versions.version_tags_tags_id_seq
+CREATE SEQUENCE IF NOT EXISTS versions.version_tags_tags_id_seq
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 9223372036854775807
@@ -1458,7 +1452,7 @@ ALTER SEQUENCE versions.version_tags_tags_id_seq OWNER TO versions;
 
 -- object: versions.version_tags | type: TABLE --
 -- DROP TABLE IF EXISTS versions.version_tags CASCADE;
-CREATE TABLE versions.version_tags (
+CREATE TABLE IF NOT EXISTS versions.version_tags (
 	tags_id bigint NOT NULL DEFAULT nextval('versions.version_tags_tags_id_seq'::regclass),
 	version_table_id bigint NOT NULL,
 	revision bigint NOT NULL,
@@ -1472,7 +1466,7 @@ ALTER TABLE versions.version_tags OWNER TO versions;
 
 -- object: fki_version_tables_fkey | type: INDEX --
 -- DROP INDEX IF EXISTS versions.fki_version_tables_fkey CASCADE;
-CREATE INDEX fki_version_tables_fkey ON versions.version_tables_logmsg
+CREATE INDEX IF NOT EXISTS fki_version_tables_fkey ON versions.version_tables_logmsg
 USING btree
 (
 	version_table_id
@@ -1482,7 +1476,7 @@ WITH (FILLFACTOR = 90);
 
 -- object: versions._primarykey | type: FUNCTION --
 -- DROP FUNCTION IF EXISTS versions._primarykey(character varying) CASCADE;
-CREATE FUNCTION versions._primarykey (IN intable character varying, OUT pkey_column character varying, OUT success boolean)
+CREATE OR REPLACE FUNCTION versions._primarykey (IN intable character varying, OUT pkey_column character varying, OUT success boolean)
 	RETURNS record
 	LANGUAGE plpgsql
 	VOLATILE 
@@ -1537,7 +1531,7 @@ ALTER FUNCTION versions._primarykey(character varying) OWNER TO versions;
 
 -- object: versions.pgvs_version_record | type: FUNCTION --
 -- DROP FUNCTION IF EXISTS versions.pgvs_version_record() CASCADE;
-CREATE FUNCTION versions.pgvs_version_record ()
+CREATE OR REPLACE FUNCTION versions.pgvs_version_record ()
 	RETURNS trigger
 	LANGUAGE plpgsql
 	VOLATILE 
@@ -1627,7 +1621,7 @@ ALTER FUNCTION versions.pgvs_version_record() OWNER TO versions;
 
 -- object: versions.pgvscheckout | type: FUNCTION --
 -- DROP FUNCTION IF EXISTS versions.pgvscheckout(anyelement,bigint) CASCADE;
-CREATE FUNCTION versions.pgvscheckout (_in_table anyelement, revision bigint)
+CREATE OR REPLACE FUNCTION versions.pgvscheckout (_in_table anyelement, revision bigint)
 	RETURNS SETOF anyelement
 	LANGUAGE plpgsql
 	VOLATILE 
@@ -1718,7 +1712,7 @@ ALTER FUNCTION versions.pgvscheckout(anyelement,bigint) OWNER TO versions;
 
 -- object: versions.pgvscheckout | type: FUNCTION --
 -- DROP FUNCTION IF EXISTS versions.pgvscheckout(anyelement,bigint,text) CASCADE;
-CREATE FUNCTION versions.pgvscheckout (_in_table anyelement, revision bigint, extent text)
+CREATE OR REPLACE FUNCTION versions.pgvscheckout (_in_table anyelement, revision bigint, extent text)
 	RETURNS SETOF anyelement
 	LANGUAGE plpgsql
 	VOLATILE 
@@ -1808,11 +1802,7 @@ ALTER FUNCTION versions.pgvscheckout(anyelement,bigint,text) OWNER TO versions;
 -- object: versions.pgvsincrementalupdate | type: FUNCTION --
 -- DROP FUNCTION IF EXISTS versions.pgvsincrementalupdate(varchar,varchar) CASCADE;
 
--- Prepended SQL commands --
-DROP FUNCTION IF EXISTS versions.pgvsincrementalupdate(varchar,varchar);
--- ddl-end --
-
-CREATE FUNCTION versions.pgvsincrementalupdate (IN in_new_layer varchar, IN in_old_layer varchar)
+CREATE OR REPLACE FUNCTION versions.pgvsincrementalupdate (IN in_new_layer varchar, IN in_old_layer varchar)
 	RETURNS text
 	LANGUAGE plpgsql
 	VOLATILE 
@@ -2078,14 +2068,14 @@ $$;
 -- ddl-end --
 
 -- object: version_tables_fkey | type: CONSTRAINT --
--- ALTER TABLE versions.version_tables_logmsg DROP CONSTRAINT IF EXISTS version_tables_fkey CASCADE;
+ALTER TABLE versions.version_tables_logmsg DROP CONSTRAINT IF EXISTS version_tables_fkey CASCADE;
 ALTER TABLE versions.version_tables_logmsg ADD CONSTRAINT version_tables_fkey FOREIGN KEY (version_table_id)
 REFERENCES versions.version_tables (version_table_id) MATCH SIMPLE
 ON DELETE CASCADE ON UPDATE CASCADE;
 -- ddl-end --
 
 -- object: version_tables_fk | type: CONSTRAINT --
--- ALTER TABLE versions.version_tags DROP CONSTRAINT IF EXISTS version_tables_fk CASCADE;
+ALTER TABLE versions.version_tags DROP CONSTRAINT IF EXISTS version_tables_fk CASCADE;
 ALTER TABLE versions.version_tags ADD CONSTRAINT version_tables_fk FOREIGN KEY (version_table_id)
 REFERENCES versions.version_tables (version_table_id) MATCH FULL
 ON DELETE CASCADE ON UPDATE CASCADE;
