@@ -129,7 +129,7 @@ class IncrementalLayerUpdateDialog(QDialog, FORM_CLASS):
             else:
                 self.close()
                 
-        con_string = "dbname='{dbname}' host='{dbhost}' port='{dbport}' user='{dbuser}' password='{dbpasswd}' key={key} type={geometrytype} schema={schema} table={table} {geometryColumn}".format(
+        con_string = "dbname='{dbname}' host='{dbhost}' port='{dbport}' user='{dbuser}' password='{dbpasswd}' key={key} type={geometrytype} schema={schema} table={table} ({geometryColumn})".format(
                 dbname = db.dbname(), 
                 dbhost = db.dbHost(), 
                 dbport = db.dbport(), 
@@ -139,7 +139,7 @@ class IncrementalLayerUpdateDialog(QDialog, FORM_CLASS):
                 geometrytype = QgsWkbTypes.displayString(int(self.update_layer.wkbType())), 
                 schema = self.update_layer.dataProvider().uri().schema(), 
                 table = self.selected_layer.name(), 
-                geometryColumn = self.selected_layer.dataProvider().uri().geometryColumn()
+                geometryColumn = self.update_layer.dataProvider().uri().geometryColumn()
         )
         
         CRS = self.update_layer.crs().authid()
