@@ -419,7 +419,7 @@ with a listing of the conflicting objects.
                          commit = True, 
                          revision = '||revision||', 
                          logmsg = '''||logMessage ||''',    
-                         systime = ' || EXTRACT(EPOCH FROM now()::TIMESTAMP)*1000 || '
+                         systime = ' || EXTRACT(EPOCH FROM now()::TIMESTAMP WITH TIME ZONE)*1000 || '
                     where not commit
                       and project = current_user;';
 
@@ -750,7 +750,7 @@ DECLARE
              alter table '||versionLogTable||' add column version_log_id bigserial;
              alter table '||versionLogTable||' add column action character varying;
              alter table '||versionLogTable||' add column project character varying default current_user;     
-             alter table '||versionLogTable||' add column systime bigint default extract(epoch from now()::timestamp with time zone)*1000;    
+             alter table '||versionLogTable||' add column systime bigint default extract(epoch from now()::TIMESTAMP WITH TIME ZONE)*1000;    
              alter table '||versionLogTable||' add column revision bigint;
              alter table '||versionLogTable||' add column logmsg text;        
              alter table '||versionLogTable||' add column commit boolean DEFAULT False;
@@ -830,8 +830,8 @@ DECLARE
 
      execute 'create or replace view '||versionView||'_time as 
                 SELECT row_number() OVER () AS rownum, 
-                       to_timestamp(v1.systime/1000)::timestamp without time zone as start_time, 
-                       to_timestamp(v2.systime/1000)::timestamp without time zone as end_time '||time_fields||'
+                       to_timestamp(v1.systime/1000)::TIMESTAMP WITH TIME ZONE as start_time, 
+                       to_timestamp(v2.systime/1000)::TIMESTAMP WITH TIME ZONE as end_time '||time_fields||'
                 FROM '||versionLogTable||' v1
                 LEFT JOIN '||versionLogTable||' v2 ON v2.id=v1.id AND v2.action=''delete''
                 WHERE v1.action=''insert''';
@@ -1015,7 +1015,7 @@ myDebug := 'select a.'||myPkey||' as objectkey,
              FROM information_schema.columns 
              WHERE (table_schema, table_name) = ($1, $2)' into cols using mySchema, myTable;  
 
-     myTimestamp := round(extract(epoch from now()::timestamp)*1000);
+     myTimestamp := round(extract(epoch from now()::TIMESTAMP WITH TIME ZONE)*1000);
     
     for conflictCheck IN EXECUTE myDebug
     LOOP
@@ -1597,7 +1597,7 @@ CREATE OR REPLACE FUNCTION versions.pgvs_version_record ()
       
       qry := 'insert into versions.'|| pgvslog ||' 
                 ('||fields||', action, project, systime, revision, logmsg, commit)
-                select '||field_values||', '''||lower(TG_OP)||''', current_user, date_part(''epoch''::text, (now())::timestamp without time zone) * (1000)::double precision, NULL, NULL, false';    
+                select '||field_values||', '''||lower(TG_OP)||''', current_user, date_part(''epoch''::text, (now())::TIMESTAMP WITH TIME ZONE) * (1000)::double precision, NULL, NULL, false';    
 
       
      if TG_OP = 'INSERT' THEN     
