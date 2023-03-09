@@ -750,7 +750,7 @@ DECLARE
              alter table '||versionLogTable||' add column version_log_id bigserial;
              alter table '||versionLogTable||' add column action character varying;
              alter table '||versionLogTable||' add column project character varying default current_user;     
-             alter table '||versionLogTable||' add column systime bigint default extract(epoch from now()::timestamp with timezone)*1000;    
+             alter table '||versionLogTable||' add column systime bigint default extract(epoch from now()::timestamp with time zone)*1000;    
              alter table '||versionLogTable||' add column revision bigint;
              alter table '||versionLogTable||' add column logmsg text;        
              alter table '||versionLogTable||' add column commit boolean DEFAULT False;
