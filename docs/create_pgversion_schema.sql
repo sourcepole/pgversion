@@ -13,31 +13,9 @@ BEGIN
 CREATE EXTENSION POSTGIS; 
 EXCEPTION WHEN duplicate_object THEN RAISE NOTICE '%, skipping', SQLERRM USING ERRCODE = SQLSTATE;
 END
-$$;-- ddl-end ---- Database generated with pgModeler (PostgreSQL Database Modeler).
--- pgModeler version: 0.9.4-beta
--- PostgreSQL version: 13.0
--- Project Site: pgmodeler.io
--- Model Author: ---
--- -- object: versions | type: ROLE --
--- -- DROP ROLE IF EXISTS versions;
--- CREATE ROLE versions WITH 
--- 	INHERIT
--- 	ENCRYPTED PASSWORD '********';
--- -- ddl-end --
--- 
+$$;
 
--- Database creation must be performed outside a multi lined SQL file. 
--- These commands were put in this file only as a convenience.
--- 
--- -- object: pgvs_develop | type: DATABASE --
--- -- DROP DATABASE IF EXISTS pgvs_develop;
--- CREATE DATABASE pgvs_develop
--- 	ENCODING = 'LATIN1'
--- 	LC_COLLATE = 'en_US'
--- 	LC_CTYPE = 'en_US'
--- 	TABLESPACE = pg_default
--- 	OWNER = versions;
--- -- ddl-end --
+
 -- 
 -- -- Appended SQL commands --
 -- ALTER DEFAULT PRIVILEGES IN SCHEMA public, versions GRANT ALL ON TABLES TO versions;
@@ -48,6 +26,8 @@ $$;-- ddl-end ---- Database generated with pgModeler (PostgreSQL Database Modele
 -- GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA versions, public TO versions;
 -- -- ddl-end --
 -- 
+
+
 
 SET check_function_bodies = false;
 -- ddl-end --
@@ -71,6 +51,28 @@ SET search_path TO pg_catalog,public,versions;
 -- -- ddl-end --
 -- 
 -- object: versions.checkout | type: TYPE --
+
+-- object: versions.pgvsrevision | type: FUNCTION --
+-- DROP FUNCTION IF EXISTS versions.pgvsrevision() CASCADE;
+CREATE OR REPLACE FUNCTION versions.pgvsrevision ()
+	RETURNS text
+	LANGUAGE plpgsql
+	VOLATILE 
+	CALLED ON NULL INPUT
+	SECURITY INVOKER
+	PARALLEL UNSAFE
+	COST 100
+	AS $$    
+DECLARE
+  revision TEXT;
+  BEGIN	
+    revision := '2.1.15';
+  RETURN revision ;                             
+
+  END;
+$$;
+
+
 DROP TYPE IF EXISTS versions.checkout CASCADE;
 CREATE TYPE versions.checkout AS
 (
@@ -831,10 +833,11 @@ DECLARE
      execute 'create or replace view '||versionView||'_time as 
                 SELECT row_number() OVER () AS rownum, 
                        to_timestamp(v1.systime/1000)::TIMESTAMP WITH TIME ZONE as start_time, 
-                       to_timestamp(v2.systime/1000)::TIMESTAMP WITH TIME ZONE as end_time '||time_fields||'
+                       to_timestamp(v2.systime/1000)::TIMESTAMP WITH TIME ZONE as end_time,
+                       v1.*
                 FROM '||versionLogTable||' v1
-                LEFT JOIN '||versionLogTable||' v2 ON v2.id=v1.id AND v2.action=''delete''
-                WHERE v1.action=''insert''';
+                LEFT JOIN '||versionLogTable||' v2 ON v2.id=v1.id AND v2.action=''delete'' and v1.revision <> v2.revision
+                WHERE (v1.action=''insert'' or v1.action = ''update'') and v1.commit = True';
 
      execute 'ALTER VIEW '||versionView||'_time owner to versions';
 
@@ -1160,29 +1163,6 @@ $$;
 ALTER FUNCTION versions.pgvsrevert(character varying) OWNER TO versions;
 -- ddl-end --
 
--- object: versions.pgvsrevision | type: FUNCTION --
--- DROP FUNCTION IF EXISTS versions.pgvsrevision() CASCADE;
-CREATE OR REPLACE FUNCTION versions.pgvsrevision ()
-	RETURNS text
-	LANGUAGE plpgsql
-	VOLATILE 
-	CALLED ON NULL INPUT
-	SECURITY INVOKER
-	PARALLEL UNSAFE
-	COST 100
-	AS $$
-
-    
-DECLARE
-  revision TEXT;
-  BEGIN	
-    revision := '2.1.14';
-  RETURN revision ;                             
-
-  END;
-
-
-$$;
 -- ddl-end --
 ALTER FUNCTION versions.pgvsrevision() OWNER TO versions;
 -- ddl-end --
@@ -1799,18 +1779,18 @@ $$;
 ALTER FUNCTION versions.pgvscheckout(anyelement,bigint,text) OWNER TO versions;
 -- ddl-end --
 
--- object: versions.pgvsincrementalupdate | type: FUNCTION --
--- DROP FUNCTION IF EXISTS versions.pgvsincrementalupdate(varchar,varchar) CASCADE;
+-- FUNCTION: versions.pgvsincrementalupdate(character varying, character varying)
 
-CREATE OR REPLACE FUNCTION versions.pgvsincrementalupdate (IN in_new_layer varchar, IN in_old_layer varchar)
-	RETURNS text
-	LANGUAGE plpgsql
-	VOLATILE 
-	CALLED ON NULL INPUT
-	SECURITY INVOKER
-	PARALLEL UNSAFE
-	COST 100
-	AS $$
+-- DROP FUNCTION IF EXISTS versions.pgvsincrementalupdate(character varying, character varying);
+
+CREATE OR REPLACE FUNCTION versions.pgvsincrementalupdate(
+	in_new_layer character varying,
+	in_old_layer character varying)
+    RETURNS text
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
 DECLARE
   new_layer TEXT;
   old_layer TEXT;
@@ -1848,18 +1828,17 @@ DECLARE
   	pos := pos + 1; 
         old_layer = substr(in_old_layer,pos);
     END IF;
-  
+
     pos := strpos(in_new_layer,'.');
     if pos=0 then 
         new_schema := 'public';
-  	new_layer := in_new_layer; 
+  	    new_layer := in_new_layer; 
     else 
         new_schema = substr(in_new_layer,0,pos);
-  	pos := pos+1; 
-  	new_layer = substr(in_new_layer,pos);
+  	    pos := pos+1; 
+  	    new_layer = substr(in_new_layer,pos);
     END IF;
-  
-  
+    
   -- Vorbelegen der Variablen
     fields := '';
     old_fields := '';		
@@ -2063,8 +2042,7 @@ DECLARE
   RETURN result;
 END;
 
-
-$$;
+$BODY$;
 -- ddl-end --
 
 -- object: version_tables_fkey | type: CONSTRAINT --
