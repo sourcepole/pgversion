@@ -53,8 +53,8 @@ class DbVersionCheckDialog(QDialog, FORM_CLASS):
     def btnUpdate_clicked(self):
         fp = open(self.install_path)
         s = fp.read()
-        success, error = self.myDb.run(s)
-
+        success, error = self.myDb.run(s,  isolated=True)
+        
         if error is not None:
             QMessageBox.information(
                 None,
