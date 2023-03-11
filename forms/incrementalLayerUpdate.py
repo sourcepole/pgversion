@@ -86,7 +86,7 @@ class IncrementalLayerUpdateDialog(QDialog, FORM_CLASS):
             QApplication.setOverrideCursor(Qt.WaitCursor)
             if self.selected_layer.dataProvider().name() != 'postgres':                       
                 success = self.import_to_postgis(db)
-                
+                            
             if success:
                 self.incremental_upgrade(db)
     
@@ -129,7 +129,7 @@ class IncrementalLayerUpdateDialog(QDialog, FORM_CLASS):
             else:
                 self.close()
                 
-        con_string = "dbname='{dbname}' host='{dbhost}' port='{dbport}' user='{dbuser}' password='{dbpasswd}' key={key} type={geometrytype} schema={schema} table={table} ({geometryColumn})".format(
+        con_string = "dbname='{dbname}' host='{dbhost}' port='{dbport}' user='{dbuser}' password='{dbpasswd}' key={key} type={geometrytype} schema={schema} table={table} ({geometryColumnn})".format(
                 dbname = db.dbname(), 
                 dbhost = db.dbHost(), 
                 dbport = db.dbport(), 
@@ -139,7 +139,7 @@ class IncrementalLayerUpdateDialog(QDialog, FORM_CLASS):
                 geometrytype = QgsWkbTypes.displayString(int(self.update_layer.wkbType())), 
                 schema = self.update_layer.dataProvider().uri().schema(), 
                 table = self.selected_layer.name(), 
-                geometryColumn = self.update_layer.dataProvider().uri().geometryColumn()
+                geometryColumnn = self.update_layer.dataProvider().uri().geometryColumn()
         )
         
         CRS = self.update_layer.crs().authid()
@@ -162,11 +162,14 @@ class IncrementalLayerUpdateDialog(QDialog, FORM_CLASS):
 
         
     def incremental_upgrade(self,  db):
-        selected_schema = self.update_layer.dataProvider().uri().schema()
+        selected_schema = self.selected_layer.dataProvider().uri().schema()
         selected_table = self.selected_layer.name()        
         update_schema = self.update_layer.dataProvider().uri().schema()
         update_table = self.update_layer.dataProvider().uri().table().replace('_version',  '')
         
+        if selected_schema == '':
+            selected_schema = 'public'
+            
         sql = """
         select pgvsincrementalupdate as update 
         from versions.pgvsincrementalupdate('%s.%s', '%s.%s')
