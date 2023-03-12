@@ -1,3 +1,22 @@
+-- object: versions.pgvsrevision | type: FUNCTION --
+-- DROP FUNCTION IF EXISTS versions.pgvsrevision() CASCADE;
+CREATE OR REPLACE FUNCTION versions.pgvsrevision ()
+	RETURNS text
+	LANGUAGE plpgsql
+	VOLATILE 
+	CALLED ON NULL INPUT
+	SECURITY INVOKER
+	PARALLEL UNSAFE
+	COST 100
+	AS $$    
+DECLARE
+  revision TEXT;
+  BEGIN	
+    revision := '2.1.15';
+    RETURN revision ;                             
+  END;
+$$;
+
 -- Prepended SQL commands --
 DO $$
 BEGIN
@@ -51,26 +70,6 @@ SET search_path TO pg_catalog,public,versions;
 -- -- ddl-end --
 -- 
 -- object: versions.checkout | type: TYPE --
-
--- object: versions.pgvsrevision | type: FUNCTION --
--- DROP FUNCTION IF EXISTS versions.pgvsrevision() CASCADE;
-CREATE OR REPLACE FUNCTION versions.pgvsrevision ()
-	RETURNS text
-	LANGUAGE plpgsql
-	VOLATILE 
-	CALLED ON NULL INPUT
-	SECURITY INVOKER
-	PARALLEL UNSAFE
-	COST 100
-	AS $$    
-DECLARE
-  revision TEXT;
-  BEGIN	
-    revision := '2.1.15';
-  RETURN revision ;                             
-
-  END;
-$$;
 
 
 DROP TYPE IF EXISTS versions.checkout CASCADE;
