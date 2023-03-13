@@ -1,22 +1,3 @@
--- object: versions.pgvsrevision | type: FUNCTION --
--- DROP FUNCTION IF EXISTS versions.pgvsrevision() CASCADE;
-CREATE OR REPLACE FUNCTION versions.pgvsrevision ()
-	RETURNS text
-	LANGUAGE plpgsql
-	VOLATILE 
-	CALLED ON NULL INPUT
-	SECURITY INVOKER
-	PARALLEL UNSAFE
-	COST 100
-	AS $$    
-DECLARE
-  revision TEXT;
-  BEGIN	
-    revision := '2.1.15';
-    RETURN revision ;                             
-  END;
-$$;
-
 -- Prepended SQL commands --
 DO $$
 BEGIN
@@ -46,30 +27,39 @@ $$;
 -- -- ddl-end --
 -- 
 
-
-
 SET check_function_bodies = false;
+-- ddl-end --
+
+SET search_path TO pg_catalog,public,versions;
 -- ddl-end --
 
 -- object: versions | type: SCHEMA --
 -- DROP SCHEMA IF EXISTS versions CASCADE;
 CREATE SCHEMA IF NOT EXISTS versions;
 -- ddl-end --
+
 ALTER SCHEMA versions OWNER TO versions;
 -- ddl-end --
 
-SET search_path TO pg_catalog,public,versions;
--- ddl-end --
 
--- -- object: postgis | type: EXTENSION --
--- -- DROP EXTENSION IF EXISTS postgis CASCADE;
--- CREATE EXTENSION postgis
--- WITH SCHEMA public;
--- -- ddl-end --
--- COMMENT ON EXTENSION postgis IS E'PostGIS geometry, geography, and raster spatial types and functions';
--- -- ddl-end --
--- 
--- object: versions.checkout | type: TYPE --
+-- object: versions.pgvsrevision | type: FUNCTION --
+-- DROP FUNCTION IF EXISTS versions.pgvsrevision() CASCADE;
+CREATE OR REPLACE FUNCTION versions.pgvsrevision ()
+	RETURNS text
+	LANGUAGE plpgsql
+	VOLATILE 
+	CALLED ON NULL INPUT
+	SECURITY INVOKER
+	PARALLEL UNSAFE
+	COST 100
+	AS $$    
+DECLARE
+  revision TEXT;
+  BEGIN	
+    revision := '2.1.15';
+    RETURN revision;                             
+  END;
+$$;
 
 
 DROP TYPE IF EXISTS versions.checkout CASCADE;
