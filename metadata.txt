@@ -9,7 +9,7 @@
 name=PgVersion
 description=Client for the Postgres Versioning System pgvs
 category=Database
-version=3.3.0
+version=3.3.1
 qgisMinimumVersion=3.0
 qgisMaximumVersion=3.99
 class_name=PgVersion
@@ -21,6 +21,9 @@ about=Sourcepole AG - Linux & Open Source Solutions, Weberstrasse 5, 8004 Zurich
 ; Optional items:
 
 changelog=
+    3.3.1
+    - Database revision 2.1.16 implemented
+    - Layer vie for Time Viewer has been modified so that current objects allways have the current time to avoid NULL 
     3.3.0
     - Database revision 2.1.15 implemented
     - View to query  the time history of the layer commits for use in QGIS andd QWC2 Time manager 
