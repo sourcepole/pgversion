@@ -822,7 +822,11 @@ DECLARE
      execute 'create or replace view '||versionView||'_time as 
                 SELECT row_number() OVER () AS rownum, 
                        to_timestamp(v1.systime/1000)::TIMESTAMP WITH TIME ZONE as start_time, 
-                       to_timestamp(v2.systime/1000)::TIMESTAMP WITH TIME ZONE as end_time,
+                       CASE WHEN v2.systime IS NULL THEN 
+                         CURRENT_TIMESTAMP
+                       else
+                         to_timestamp(v2.systime/1000)::TIMESTAMP WITH TIME ZONE 
+                       END as end_time,
                        v1.*
                 FROM '||versionLogTable||' v1
                 LEFT JOIN '||versionLogTable||' v2 ON v2.id=v1.id AND v2.action=''delete'' and v1.revision <> v2.revision
