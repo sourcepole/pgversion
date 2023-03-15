@@ -33,7 +33,7 @@ class PgVersionTools(QObject):
 
     def __init__(self, parent):
         QObject.__init__(self, parent)
-        self.pgvsRevision = '2.1.16'
+        self.pgvsRevision = '2.1.17'
         self.parent = parent
         self.iface = parent.iface
         self.layer_list = parent.layer_list
@@ -462,8 +462,10 @@ functions directly with click on Install pgvs.""" % (create_version_path))
             self.vsCheck.show()
             return False
         else:
-            result, error = myDb.read(
-                'select pgvsrevision from versions.pgvsrevision()')
+            result, error = myDb.read('select pgvsrevision from versions.pgvsrevision()')
+            
+            if error != None:
+                QMessageBox.information(None, '',  str(error))
 
             my_major_revision = self.pgvsRevision.split('.')[1]
             my_minor_revision = self.pgvsRevision.split('.')[2]

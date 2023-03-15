@@ -56,7 +56,7 @@ CREATE OR REPLACE FUNCTION versions.pgvsrevision ()
 DECLARE
   revision TEXT;
   BEGIN	
-    revision := '2.1.16';
+    revision := '2.1.17';
     RETURN revision;                             
   END;
 $$;
@@ -829,7 +829,7 @@ DECLARE
                        END as end_time,
                        v1.*
                 FROM '||versionLogTable||' v1
-                LEFT JOIN '||versionLogTable||' v2 ON v2.id=v1.id AND v2.action=''delete'' and v1.revision <> v2.revision
+                LEFT JOIN '||versionLogTable||' v2 ON v2.'||myPkey||'=v1.'||myPkey||' AND v2.action=''delete'' and v1.revision <> v2.revision
                 WHERE (v1.action=''insert'' or v1.action = ''update'') and v1.commit = True';
 
      execute 'ALTER VIEW '||versionView||'_time owner to versions';
