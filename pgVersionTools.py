@@ -489,8 +489,8 @@ If you have appropriate DB permissions you can update the DB directly with click
 
                     self.vsCheck.messageTextEdit.setText(revisionMessage)
                     self.vsCheck.btnUpdate.setText(self.tr(
-                        'Upgrade pgvs to Revision %s.%s.%s') % (
-                            2, my_major_revision, i + 1))
+                        'Upgrade pgvs to Revision %s') % (
+                            self.pgvsRevision))
                     self.vsCheck.show()
                     return False
         return True
