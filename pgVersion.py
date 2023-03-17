@@ -175,8 +175,7 @@ class PgVersion(QObject):
         self.iface.mapCanvas().selectionChanged.connect(self.SelectionChanged)
         self.iface.currentLayerChanged.connect(self.layer_changed)
         QgsProject().instance().layerWasAdded.connect(self.add_layer)
-        QgsProject().instance().layerWillBeRemoved.connect(
-            self.remove_layer)
+        QgsProject().instance().layerWillBeRemoved.connect(self.remove_layer)
 
     def layer_changed(self):
         if self.tools.hasVersion(self.iface.activeLayer()):
