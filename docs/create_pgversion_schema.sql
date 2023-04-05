@@ -56,7 +56,7 @@ CREATE OR REPLACE FUNCTION versions.pgvsrevision ()
 DECLARE
   revision TEXT;
   BEGIN	
-    revision := '2.1.17';
+    revision := '2.1.18';
     RETURN revision;                             
   END;
 $$;
@@ -821,11 +821,11 @@ DECLARE
 
      execute 'create or replace view '||versionView||'_time as 
                 SELECT row_number() OVER () AS rownum, 
-                       to_timestamp(v1.systime/1000)::TIMESTAMP WITH TIME ZONE as start_time, 
+                       to_timestamp(v1.systime/1000)::TIMESTAMP as start_time, 
                        CASE WHEN v2.systime IS NULL THEN 
-                         CURRENT_TIMESTAMP
+                         CURRENT_TIMESTAMP::TIMESTAMP
                        else
-                         to_timestamp(v2.systime/1000)::TIMESTAMP WITH TIME ZONE 
+                         to_timestamp(v2.systime/1000)::TIMESTAMP 
                        END as end_time,
                        v1.*
                 FROM '||versionLogTable||' v1
