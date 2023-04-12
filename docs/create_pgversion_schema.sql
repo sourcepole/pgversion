@@ -821,11 +821,11 @@ DECLARE
 
      execute 'create or replace view '||versionView||'_time as
                 SELECT row_number() OVER () AS rownum,
-                       to_timestamp(v1.systime/1000)::TIMESTAMP as start_time,
+                       to_timestamp(v1.systime/1000)::TIMESTAMP WITHOUT TIME ZONE  as start_time,
                        CASE WHEN v2.systime IS NULL THEN
-                         CURRENT_TIMESTAMP::TIMESTAMP
+                         \'9999-01-01 00:00:00\'::timestamp WITHOUT TIME ZONE
                        else
-                         to_timestamp(v2.systime/1000)::TIMESTAMP
+                         to_timestamp(v2.systime/1000)::TIMESTAMP WITHOUT TIME ZONE
                        END as end_time,
                        v1.*
                 FROM '||versionLogTable||' v1
