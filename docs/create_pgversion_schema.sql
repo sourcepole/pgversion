@@ -56,7 +56,7 @@ CREATE OR REPLACE FUNCTION versions.pgvsrevision ()
 DECLARE
   revision TEXT;
   BEGIN
-    revision := '2.1.18';
+    revision := '2.1.19';
     RETURN revision;
   END;
 $$;

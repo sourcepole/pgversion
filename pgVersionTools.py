@@ -33,7 +33,7 @@ class PgVersionTools(QObject):
 
     def __init__(self, parent):
         QObject.__init__(self, parent)
-        self.pgvsRevision = '2.1.18'
+        self.pgvsRevision = '2.1.19'
         self.parent = parent
         self.iface = parent.iface
         self.layer_list = parent.layer_list
