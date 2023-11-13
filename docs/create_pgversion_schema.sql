@@ -605,7 +605,7 @@ CREATE OR REPLACE FUNCTION versions.pgvsinit(
     LANGUAGE 'plpgsql'
     COST 100
     VOLATILE PARALLEL UNSAFE
-AS $BODY$
+AS $$
 DECLARE
     inTable ALIAS FOR $1;
     pos INTEGER;
