@@ -596,17 +596,16 @@ $$;
 ALTER FUNCTION versions.pgvsdrop(character varying) OWNER TO versions;
 -- ddl-end --
 
--- object: versions.pgvsinit | type: FUNCTION --
--- DROP FUNCTION IF EXISTS versions.pgvsinit(character varying) CASCADE;
-CREATE OR REPLACE FUNCTION versions.pgvsinit (_param1 character varying)
-	RETURNS boolean
-	LANGUAGE plpgsql
-	VOLATILE
-	CALLED ON NULL INPUT
-	SECURITY INVOKER
-	PARALLEL UNSAFE
-	COST 100
-	AS $$
+-- FUNCTION: versions.pgvsinit(character varying)
+-- DROP FUNCTION IF EXISTS versions.pgvsinit(character varying);
+
+CREATE OR REPLACE FUNCTION versions.pgvsinit(
+	_param1 character varying)
+    RETURNS boolean
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
 DECLARE
     inTable ALIAS FOR $1;
     pos INTEGER;
@@ -637,7 +636,6 @@ DECLARE
     testTab TEXT;
     archiveWhere TEXT;
     sql TEXT;
-
 
   BEGIN
     pos := strpos(inTable,'.');
@@ -688,7 +686,6 @@ DECLARE
        END IF;
      END IF;
 
-
 -- Obtain the basic geometry parameters of the initial layer
      select into testRec f_geometry_column, coord_dimension, srid, type
      from geometry_columns
@@ -705,7 +702,6 @@ DECLARE
      geomSRID := testRec.srid;
      geomType := testRec.type;
 
-
 -- Check if the table already exists
      testTab := 'versions.'||quote_ident(mySchema||'_'||myTable||'_version_log');
      select into testRec table_name
@@ -718,7 +714,6 @@ DECLARE
        execute 'drop table '||quote_ident(mySchema)||'.'||quote_ident(testTab)||' cascade';
      END IF;
 
-
 -- Check if and which column is the primary key of the table
     select into myPkeyRec * from versions._primarykey(inTable);
     myPkey := quote_ident(myPkeyRec.pkey_column);
@@ -729,7 +724,6 @@ DECLARE
     IF testRec.max is Null THEN
       RAISE EXCEPTION 'The table %.% is empty, but must contain at least one record for correct initialization.', mySchema, myTable;
     END IF;
-
 
     sql := 'create table '||versionLogTable||' (LIKE '||quote_ident(mySchema)||'.'||quote_ident(myTable)||');
 	    ALTER TABLE '||versionLogTable||' OWNER TO versions;
@@ -823,7 +817,7 @@ DECLARE
                 SELECT row_number() OVER () AS rownum,
                        to_timestamp(v1.systime/1000)::TIMESTAMP WITHOUT TIME ZONE  as start_time,
                        CASE WHEN v2.systime IS NULL THEN
-                         \'9999-01-01 00:00:00\'::timestamp WITHOUT TIME ZONE
+                         to_timestamp(''9999-01-01 00:00:00'', ''YYYY-MM-DD HH:MI:SS'')
                        else
                          to_timestamp(v2.systime/1000)::TIMESTAMP WITHOUT TIME ZONE
                        END as end_time,
@@ -835,7 +829,6 @@ DECLARE
      execute 'ALTER VIEW '||versionView||'_time owner to versions';
 
      execute 'GRANT ALL PRIVILEGES ON TABLE '||versionView||'_time to versions';
-
 
      execute 'CREATE TRIGGER pgvs_version_record_trigger
               INSTEAD OF INSERT OR UPDATE OR DELETE
@@ -849,18 +842,19 @@ DECLARE
 
      execute 'INSERT INTO versions.version_tables_logmsg(
                 version_table_id, revision, logmsg)
-              SELECT version_table_id, 0 as revision, ''initial commit revision 0'' as logmsg FROM versions.version_tables where version_table_schema = '''||mySchema||''' and version_table_name = '''|| myTable||'''';
+              SELECT version_table_id, 0 as revision, ''initial commit revision 0'' as logmsg 
+			  FROM versions.version_tables 
+			  where version_table_schema = '''||mySchema||''' and version_table_name = '''|| myTable||'''';
 
      execute 'INSERT INTO versions.version_tags(
                 version_table_id, revision, tag_text)
               SELECT version_table_id, 0 as revision, ''initial commit revision 0'' as tag_text FROM versions.version_tables where version_table_schema = '''||mySchema||''' and version_table_name = '''|| myTable||'''';
 
-
   RETURN true ;
 
   END;
-
 $$;
+
 -- ddl-end --
 ALTER FUNCTION versions.pgvsinit(character varying) OWNER TO versions;
 -- ddl-end --
