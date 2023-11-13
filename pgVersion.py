@@ -57,9 +57,6 @@ class PgVersion(QObject):
             self.translator = QTranslator()
             self.translator.load(locale_path)
 
-            if qVersion() > '4.3.3':
-                QCoreApplication.installTranslator(self.translator)
-
     def initGui(self):
 
         self.helpDialog = HelpDialog()
@@ -177,6 +174,17 @@ class PgVersion(QObject):
         QgsProject().instance().layerWasAdded.connect(self.add_layer)
         QgsProject().instance().layerWillBeRemoved.connect(self.remove_layer)
 
+    def datasource_changed(self,  l):
+
+        if self.tools.hasVersion(l):
+            self.add_layer(l)
+            self.set_actions(True)
+            if self.tools.isModified(l):
+                if '(modified)' not in l.name():
+                    l.setName(l.name() + ' (modified)')
+            else:
+                l.setName(l.name().replace(' (modified)', ''))        
+        
     def layer_changed(self):
         if self.tools.hasVersion(self.iface.activeLayer()):
             self.set_actions(True)
@@ -207,13 +215,16 @@ class PgVersion(QObject):
         self.actionIncrementalUpdate.setEnabled(isActive)        
 
     def add_layer(self, l):
+        l.dataSourceChanged.connect(lambda my_layer=l: self.datasource_changed(my_layer))
         if self.tools.hasVersion(l):
+            l.dataSourceChanged.connect(lambda my_layer=l: self.datasource_changed(my_layer))
             if l.id not in self.layer_list:
                 l.editingStopped.connect(
                     lambda my_list=self.layer_list: self.tools.setModified(
                         my_list))
                 self.layer_list.append(l.id())
                 self.tools.setModified(self.layer_list)
+                
 
     def remove_layer(self, id):
         self.layer_list = list(set(self.layer_list))
