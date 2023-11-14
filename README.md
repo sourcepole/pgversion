@@ -66,7 +66,7 @@ This section is about installing and administer the database in preparation for 
 
 For example, assume that the database is named `historization` and is installed by the default administrator `postgres` on the server with the IP address `192.168.2.10` shall be.
 
-<figure>![CreateDatabase_en](image_en/CreateDatabase_en.png)
+<figure>![CreateDatabase_en](docs/help/image_en/CreateDatabase_en.png)
 
 <figcaption>Figure 1: Create a new database with PgAdmin3.</figcaption>
 
