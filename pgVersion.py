@@ -175,7 +175,6 @@ class PgVersion(QObject):
         QgsProject().instance().layerWillBeRemoved.connect(self.remove_layer)
 
     def datasource_changed(self,  l):
-
         if self.tools.hasVersion(l):
             self.add_layer(l)
             self.set_actions(True)
@@ -217,7 +216,6 @@ class PgVersion(QObject):
     def add_layer(self, l):
         l.dataSourceChanged.connect(lambda my_layer=l: self.datasource_changed(my_layer))
         if self.tools.hasVersion(l):
-            l.dataSourceChanged.connect(lambda my_layer=l: self.datasource_changed(my_layer))
             if l.id not in self.layer_list:
                 l.editingStopped.connect(
                     lambda my_list=self.layer_list: self.tools.setModified(
