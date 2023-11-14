@@ -1,15 +1,8 @@
-# This file contains metadata for your plugin. Beginning
-# with version 1.8 this is the preferred way to supply information about a
-# plugin. The current method of embedding metadata in __init__.py will
-# be supported until version 2.0
-
-# This file should be included when you package your plugin.
-
 [general]
 name=PgVersion
 description=Client for the Postgres Versioning System pgvs
 category=Database
-version=3.3.8
+version=3.4.0
 qgisMinimumVersion=3.0
 qgisMaximumVersion=3.99
 class_name=PgVersion
@@ -21,6 +14,8 @@ about=Sourcepole AG - Linux & Open Source Solutions, Weberstrasse 5, 8004 Zurich
 ; Optional items:
 
 changelog=
+    3.4.0
+    - Loading of multiple versioned layers at once implemented
     3.3.8
     - Implementing interaction with the offline plugin
     3.3.7

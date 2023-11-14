@@ -7,8 +7,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>533</width>
-    <height>155</height>
+    <width>783</width>
+    <height>319</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -25,22 +25,15 @@
        <property name="text">
         <string>select versioned layer for loading into canvas:</string>
        </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+       </property>
       </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QComboBox" name="cmbTables"/>
      </item>
      <item row="0" column="0">
       <widget class="QLabel" name="label_2">
        <property name="text">
         <string>Current Database Connection Name:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_3">
-       <property name="text">
-        <string>Current Database User:</string>
        </property>
       </widget>
      </item>
@@ -51,8 +44,22 @@
        </property>
       </widget>
      </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>Current Database User:</string>
+       </property>
+      </widget>
+     </item>
      <item row="0" column="1">
       <widget class="QComboBox" name="cmbServer"/>
+     </item>
+     <item row="2" column="1">
+      <widget class="QListWidget" name="lst_tables">
+       <property name="selectionMode">
+        <enum>QAbstractItemView::MultiSelection</enum>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

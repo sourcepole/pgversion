@@ -103,7 +103,7 @@ class PgVersionLoadDialog(QDialog, FORM_CLASS):
                 self.tr("""
 In order to work with pgversion properly, the database connection must contain at least one user name! 
 Please fix the PostgreSQL database connection."""))
-            self.cmbTables.clear()
+            self.lst_tables.clear()
             return None    
 
         if not self.myDb.conn:
@@ -123,14 +123,14 @@ Please fix the PostgreSQL database connection."""))
         from versions.version_tables \
         order by version_table_schema,version_table_name'
         result,  error = self.myDb.read(query)
-        self.cmbTables.clear()
+        self.lst_tables.clear()
 
         if sysResult['COUNT'][0] > 3 or len(result['TABLE']) > 0:
-            self.cmbTables.addItem('-------------')
+            self.lst_tables.addItem('-------------')
             if result is None:
                 return
             for i in range(len(result['TABLE'])):
-                self.cmbTables.addItem(result['SCHEMA'][i] + '.' + result[
+                self.lst_tables.addItem(result['SCHEMA'][i] + '.' + result[
                     'TABLE'][i])
 
     def setDBServer(self, dbServerName):
@@ -144,28 +144,29 @@ Please fix the PostgreSQL database connection."""))
         '''
         if self.cmbServer.currentIndex() == 0:
             self.lblDBUser.setText("")
-            self.cmbTables.clear()
+            self.lst_tables.clear()
 
         self.setDBServer(self.cmbServer.currentText())
         self.initDB(self.cmbServer.currentText())
 
     def buttonBox_accepted(self):
-        if self.cmbTables.currentIndex() == 0 or self.cmbServer.currentIndex() == 0:
+        
+        if len(self.lst_tables.selectedItems()) == 0:
             QMessageBox.warning(None, self.tr('Error'),
                                 self.tr('No Layer was selected.'))
             return 0
         else:
-            versionTableList = self.cmbTables.currentText().split('.')
-            connectionName = self.cmbServer.currentText()
-            self.loadVersionLayer(versionTableList[0],
-                                  versionTableList[1])
+            for item in self.lst_tables.selectedItems():
+                versionTable = item.text().split('.')
+#                connectionName = self.cmbServer.currentText()
+                self.loadVersionLayer(versionTable[0], versionTable[1])
 
     def loadVersionLayer(self, schema, table):
         QApplication.setOverrideCursor(Qt.WaitCursor)
 
-        sql = "select * from versions.version_tables \
-        where version_table_schema = '%s' \
-          and version_table_name = '%s'" % (schema, table)
+        sql = """select * from versions.version_tables 
+        where version_table_schema = '%s' 
+          and version_table_name = '%s'""" % (schema, table)
 
         layer, error = self.myDb.read(sql)
         if error is not None:
@@ -201,6 +202,6 @@ Please fix the PostgreSQL database connection."""))
 
         QgsProject().instance().addMapLayer(vLayer)
 
-        self.myDb.close()
+#        self.myDb.close()
         QApplication.restoreOverrideCursor()
-        QApplication.setOverrideCursor(Qt.ArrowCursor)
+#        QApplication.setOverrideCursor(Qt.ArrowCursor)
