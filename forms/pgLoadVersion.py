@@ -60,19 +60,26 @@ class PgVersionLoadDialog(QDialog, FORM_CLASS):
             
         settings = QSettings()
         mySettings = '/PostgreSQL/connections/' + selectedServer
-        self.DBSERVICE = settings.value(mySettings + '/service')
-        self.DBNAME = settings.value(mySettings + '/database')
-        self.DBUSER = settings.value(mySettings + '/username')
-        self.DBHOST = settings.value(mySettings + '/host')
-        self.DBPORT = settings.value(mySettings + '/port')
-        self.DBPASSWD = settings.value(mySettings + '/password')
+
+        #if "##"+settings.value(mySettings + '/service')+"##"=='####':
+        if settings.value(mySettings + '/service')=='':
+          self.DBSERVICE = ''
+          self.DBNAME = settings.value(mySettings + '/database')
+          self.DBUSER = settings.value(mySettings + '/username')
+          self.DBHOST = settings.value(mySettings + '/host')
+          self.DBPORT = settings.value(mySettings + '/port')
+          self.DBPASSWD = settings.value(mySettings + '/password')        
+        else:  
+            self.DBSERVICE = settings.value(mySettings + '/service')
+          
         self.DBTYPE = 'pg'
 #        try:
-        if self.DBSERVICE != 'NULL' and self.DBSERVICE != '':
-            self.myDb = DbObj(pluginname=selectedServer, service=self.DBSERVICE)     
-            self.DBUSER = self.myDb.user()
-            self.DBNAME = self.myDb.dbname()
-            self.DBPORT = self.myDb.dbport()
+        if self.DBSERVICE != '':
+            self.myDb = DbObj(pluginname=selectedServer, typ=self.DBTYPE,  service=self.DBSERVICE)     
+            self.DBUSER = self.myDb.dbUser()
+            self.DBNAME = self.myDb.dbName()
+            self.DBPORT = self.myDb.dbPort()
+            self.DBHOST = self.myDb.dbHost()
         else:
             if self.DBUSER == '':
                 connectionInfo = "dbname='%s' host=%s port=%s" % (self.DBNAME,  self.DBHOST,  self.DBPORT)
@@ -80,8 +87,8 @@ class PgVersionLoadDialog(QDialog, FORM_CLASS):
                 if not success:
                     return None
                 QgsCredentials.instance().put(connectionInfo, user, password)
-                DBUSER = user
-                DBPASSWD = password
+                self.DBUSER = user
+                self.DBPASSWD = password
             
             self.myDb = DbObj(pluginname=selectedServer, 
                                     typ=self.DBTYPE,
@@ -119,14 +126,14 @@ Please fix the PostgreSQL database connection."""))
         query = 'select 4 as count,  1 as table'
         sysResult,  error = self.myDb.read(query)
 
-        query = 'select version_table_schema as schema, version_table_name as table \
-        from versions.version_tables \
-        order by version_table_schema,version_table_name'
+        query = """select version_table_schema as schema, version_table_name as table 
+        from versions.version_tables 
+        order by version_table_schema,version_table_name"""
+        
         result,  error = self.myDb.read(query)
         self.lst_tables.clear()
 
         if sysResult['COUNT'][0] > 3 or len(result['TABLE']) > 0:
-            self.lst_tables.addItem('-------------')
             if result is None:
                 return
             for i in range(len(result['TABLE'])):
@@ -179,6 +186,7 @@ Please fix the PostgreSQL database connection."""))
         uri = QgsDataSourceUri()
         
 #        try:
+
         if self.DBSERVICE != '':
             uri.setConnection(self.DBSERVICE,  self.DBNAME, self.DBUSER, self.DBPASSWD)
         else:
