@@ -20,7 +20,7 @@ email                 :  horst.duester@sourcepole.ch
 from qgis.PyQt.QtCore import *
 from qgis.PyQt.QtGui import *
 from qgis.PyQt.QtWidgets import *
-from qgis.PyQt.QtSql import *
+#from qgis.PyQt.QtSql import *
 from qgis.gui import *
 from qgis.core import *
 from .forms.dbVersionCheck import DbVersionCheckDialog
@@ -45,14 +45,19 @@ class PgVersionTools(QObject):
     def layerDB(self, connectionName, layer):
         myUri = QgsDataSourceUri(layer.source())
         if layer.dataProvider().name() == 'postgres':
-            if myUri.username() == '':
+            if myUri.service() != '':
+                myDb = DbObj(pluginname=connectionName,
+                             typ='pg', 
+                             service=myUri.service())            
+            elif myUri.username() == '':
                 connectionInfo = myUri.connectionInfo()
                 (success, user, password) = QgsCredentials.instance().get(
                     connectionInfo, None, None)
+                
                 QgsCredentials.instance().put(connectionInfo, user, password)
                 myUri.setPassword(password)
                 myUri.setUsername(user)
-            try:
+#            try:
                 myDb = DbObj(pluginname=connectionName,
                              typ='pg', 
                              hostname=myUri.host(),
@@ -60,12 +65,20 @@ class PgVersionTools(QObject):
                              dbname=myUri.database(),
                              username=myUri.username(),
                              password=myUri.password())
-                return myDb
-            except:
-                QMessageBox.information(
-                    None, self.tr('Error'),
-                    self.tr('No Database Connection Established.'))
-                return None
+            else:
+                myDb = DbObj(pluginname=connectionName,
+                             typ='pg', 
+                             hostname=myUri.host(),
+                             port=myUri.port(), 
+                             dbname=myUri.database(),
+                             username=myUri.username(),
+                             password=myUri.password())
+            return myDb
+#        except:
+#                QMessageBox.information(
+#                    None, self.tr('Error'),
+#                    self.tr('No Database Connection Established.'))
+#                return None
 
     def setConfTable(self, theLayer):
         provider = theLayer.dataProvider()
@@ -88,7 +101,6 @@ class PgVersionTools(QObject):
 #                error = self.tr("Please select a versioned layer to display its log information.")
 #                QMessageBox.warning(None,  self.tr('No versioned layer selected'),  str(error))
                 return False
-                
             myDb = self.layerDB('hasVersion', theLayer)
 
             if myDb is None:
@@ -151,7 +163,6 @@ class PgVersionTools(QObject):
     def setModified(self, layer_list):
 
         layer_list = list(set(layer_list))
-
         for i in range(len(layer_list)):
             map_layer = QgsProject().instance().mapLayer(layer_list[i])
             if self.isModified(map_layer):

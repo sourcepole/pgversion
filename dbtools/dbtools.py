@@ -55,6 +55,7 @@ class DbObj:
   def connect(self):
 # Mit PostgreSQL verbinden
         if self.typ == 'pg':
+            print (self.service)
             try:
                 if self.service != None:
                     conn = psycopg2.connect(service=self.service)
@@ -266,7 +267,7 @@ class DbObj:
   def dbHost(self):
       return self.hostName
 
-  def dbname(self):
+  def dbName(self):
       return self.conn.info.dsn_parameters['dbname']
 
   def user(self):
@@ -281,10 +282,10 @@ class DbObj:
   def setPassword(self,  password):
       pass
 
-  def dbport(self):
+  def dbPort(self):
       return self.conn.info.dsn_parameters['port']
 
-  def dbpasswd(self):
+  def dbPasswd(self):
       return self.password
 
   def connection(self):
