@@ -8,6 +8,7 @@ copyright            : (C) 2013 by Dr. Horst Duester / Sourcepole AG
 email                : horst.duester@sourcepole.ch
  ***************************************************************************/
 """
+from PyQt5.QtWidgets import QMessageBox
 import subprocess
 try:
     import psycopg2
@@ -15,7 +16,7 @@ except:
     subprocess.call(['pip3', 'install', 'psycopg2'])
     import psycopg2
 
-#import time,  os,  sys
+import sys
 
 
 class DbObj:
@@ -55,7 +56,6 @@ class DbObj:
   def connect(self):
 # Mit PostgreSQL verbinden
         if self.typ == 'pg':
-            print (self.service)
             try:
                 if self.service != None:
                     conn = psycopg2.connect(service=self.service)
@@ -70,20 +70,15 @@ class DbObj:
                                                             port=self.port,  
                                                             user=self.userName,  
                                                             password=self.password)   
+                
+                    
+#            except psycopg2.OperationalError as e:
+#                self._error_message (e)
+#                conn = None
             except:
-                    self.__error_message(sys.exc_info())
-                    conn = None
+                self._error_message(sys.exc_info())
+                conn = None
             return conn
-
-        
-  ## Rckgabe des QSqlDatabase Objektes
-  # @return self.db QSqlDatabase
-  def dbObj(self):
-    return self.db
-
-
-  def __pystring(self,  qvar):
-    return unicode(qvar.toString()) if hasattr(qvar, 'toString') else unicode(qvar)
 
 
   ## Lesen des Ergebnisses in ein Dictionary ["FELDNAME"][RecNo]. Jedem Key des Dictionary wird eine list zugeordnet.
@@ -270,9 +265,6 @@ class DbObj:
   def dbName(self):
       return self.conn.info.dsn_parameters['dbname']
 
-  def user(self):
-      return self.conn.info.dsn_parameters['user']
-
   def dbUser(self):
       return self.conn.info.dsn_parameters['user']
 
@@ -307,5 +299,10 @@ class DbObj:
 
         return pkey['PKEY'][0]
         
+#  def _error_message(self, e):
+#      print (e)
+#      return e
+      
   def _error_message(self, e):
-      print (e)
+        QMessageBox.information(None,'PG: Error',  str(e[1]))
+        return None      
