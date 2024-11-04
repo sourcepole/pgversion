@@ -188,7 +188,8 @@ Please fix the PostgreSQL database connection."""))
 #        try:
 
         if self.DBSERVICE != '':
-            uri.setConnection(self.DBSERVICE,  self.DBNAME, self.DBUSER, self.DBPASSWD)
+#            uri.setConnection(service=self.DBSERVICE) #,  self.DBNAME, self.DBUSER, self.DBPASSWD)
+            uri.setEncodedUri("service="+self.DBSERVICE)
         else:
             uri.setConnection(self.DBHOST, self.DBPORT, self.DBNAME, self.DBUSER, self.DBPASSWD)
 #        except:
