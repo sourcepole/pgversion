@@ -149,7 +149,7 @@ class PgVersionTools(QObject):
           select count(project)
           from versions."%s_%s_log"
           where project = '%s' and not commit""" % (
-              schema, myLayerUri.table(), myDb.user())
+              schema, myLayerUri.table(), myDb.dbUser())
         result,  error = myDb.read(sql)
 
         try:
