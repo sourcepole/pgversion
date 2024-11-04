@@ -219,7 +219,6 @@ class ConflictWindow(QMainWindow):
                         where myuser = '%s' or conflict_user = '%s' 
                         order by objectkey""" % (
                 mySchema, myTable, projectName, projectName)
-            print (sql)
             result,  error = myDb.read(sql)
             for i in range(len(result['OBJECTKEY'])):
                 sql = "select versions.pgvsmerge('%s.%s',%s,'%s')" % (
