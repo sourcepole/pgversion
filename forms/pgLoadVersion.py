@@ -58,7 +58,7 @@ class PgVersionLoadDialog(QDialog, FORM_CLASS):
         if self.cmbServer.currentIndex() == 0:
             return None
             
-        settings = QSettings()
+        settings = QgsSettings()
         mySettings = '/PostgreSQL/connections/' + selectedServer
 
         #if "##"+settings.value(mySettings + '/service')+"##"=='####':
