@@ -12,6 +12,7 @@
     <file>icons/pgversion-log.svg</file>
     <file>icons/pgversion-help.svg</file>
     <file>icons/pgversion-incremental_update.svg</file>
+    <file>icons/pgversion-clone_table.svg</file>
   </qresource> 
 </RCC> 
 

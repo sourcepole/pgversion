@@ -80,9 +80,9 @@ class IncrementalLayerUpdateDialog(QDialog, FORM_CLASS):
         
         if self.selected_layer != None:
             success = True
+            
     # check if the selected layer is a postgres layer
     # Import a non postgres layer to update_layer database      
-    
             QApplication.setOverrideCursor(Qt.WaitCursor)
             if self.selected_layer.dataProvider().name() != 'postgres':                       
                 success = self.import_to_postgis(db)
@@ -91,7 +91,6 @@ class IncrementalLayerUpdateDialog(QDialog, FORM_CLASS):
                 self.incremental_upgrade(db)
     
             QApplication.restoreOverrideCursor()
-            
             self.close()
         else:
             res = QMessageBox.warning(
@@ -105,13 +104,16 @@ class IncrementalLayerUpdateDialog(QDialog, FORM_CLASS):
 
     def import_to_postgis(self,  db):
         self.selected_layer.setName(self.launder_pg_name(self.selected_layer.name()))
+        update_schema = self.update_layer.dataProvider().uri().schema()
+        update_table = self.update_layer.dataProvider().uri().table()
+        update_geometry_column = self.update_layer.dataProvider().uri().geometryColumn()
 
-        if db.exists('table',  '{}.{}'.format(self.update_layer.dataProvider().uri().schema(), self.selected_layer.name())):
+        if db.exists('table',  '{}.{}'.format(update_schema, self.selected_layer.dataProvider().uri().table())):
             answer = QMessageBox.information(
                 None,
                 self.tr("Table {schema}.{table} exists".format(
-                                                schema = self.update_layer.dataProvider().uri().schema(), 
-                                                table = self.selected_layer.name()
+                                                schema = update_schema, 
+                                                table = update_table
                                                 )
                                     ),
                 self.tr("""Do you like to overwrite the table? """),
@@ -122,8 +124,8 @@ class IncrementalLayerUpdateDialog(QDialog, FORM_CLASS):
             
             if answer == QMessageBox.StandardButton.Yes:
                 sql = "drop table {schema}.{table}".format(
-                                                    schema = self.update_layer.dataProvider().uri().schema(), 
-                                                    table = self.selected_layer.name()
+                                                    schema = update_schema, 
+                                                    table = update_table
                                                 )
                 db.run(sql)       
             else:
@@ -137,18 +139,18 @@ class IncrementalLayerUpdateDialog(QDialog, FORM_CLASS):
                 dbpasswd = db.dbpasswd(), 
                 key = self.update_layer.dataProvider().uri().keyColumn(), 
                 geometrytype = QgsWkbTypes.displayString(int(self.update_layer.wkbType())), 
-                schema = self.update_layer.dataProvider().uri().schema(), 
-                table = self.selected_layer.name(), 
-                geometryColumnn = self.update_layer.dataProvider().uri().geometryColumn()
+                schema = update_schema, 
+                table = update_table, 
+                geometryColumnn = update_geometry_column
         )
         
         CRS = self.update_layer.crs().authid()
         err = QgsVectorLayerExporter.exportLayer(self.selected_layer, con_string, 'postgres', QgsCoordinateReferenceSystem(CRS), False)
         
         sql = "CREATE INDEX sidx_{table}_geom ON {schema}.{table}({geometry_column});".format(
-                                                                                                schema=self.update_layer.dataProvider().uri().schema(), 
-                                                                                                table=self.selected_layer.name(), 
-                                                                                                geometry_column = self.update_layer.dataProvider().uri().geometryColumn()
+                                                                                                schema=update_schema, 
+                                                                                                table=update_table, 
+                                                                                                geometry_column = update_geometry_column
                                                                                         )
         db.run(sql)
         
@@ -163,7 +165,7 @@ class IncrementalLayerUpdateDialog(QDialog, FORM_CLASS):
         
     def incremental_upgrade(self,  db):
         selected_schema = self.selected_layer.dataProvider().uri().schema()
-        selected_table = self.selected_layer.name()        
+        selected_table = self.selected_layer.dataProvider().uri().table()        
         update_schema = self.update_layer.dataProvider().uri().schema()
         update_table = self.update_layer.dataProvider().uri().table().replace('_version',  '')
         
@@ -201,7 +203,7 @@ class IncrementalLayerUpdateDialog(QDialog, FORM_CLASS):
         sql = """
                  DROP TABLE {schema}.{table} 
         """.format(schema = self.update_layer.dataProvider().uri().schema(), 
-                         table = self.selected_layer.name()) 
+                         table = self.update_layer.dataProvider().uri().table()) 
         
         db.run(sql)
         

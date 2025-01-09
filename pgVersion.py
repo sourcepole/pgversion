@@ -32,6 +32,7 @@ from .forms.LogView import LogView
 from .pgVersionTools import PgVersionTools
 from .about.doAbout import DlgAbout
 import os
+import uuid
 
 
 class PgVersion(QObject):
@@ -112,6 +113,11 @@ class PgVersion(QObject):
             self.tr("Incremental Layer Update"),
             self.iface.mainWindow())
             
+        self.actionCloneTable = QAction(
+            QIcon(":/plugins/pgversion/icons/pgversion-clone_table.svg"), 
+            self.tr("Clone Table"),
+            self.iface.mainWindow())            
+            
         self.actionDelete.setEnabled(False)
         self.set_actions(False)
         
@@ -125,6 +131,7 @@ class PgVersion(QObject):
                                     self.actionLogView, 
                                     self.actionDelete,
                                     self.actionIncrementalUpdate, 
+                                    self.actionCloneTable, 
                                     self.actionHelp, 
                                     self.actionAbout]
 
@@ -134,6 +141,7 @@ class PgVersion(QObject):
         self.toolBar.addAction(self.actionRevert)
         self.toolBar.addAction(self.actionDiff)
         self.toolBar.addAction(self.actionIncrementalUpdate)        
+        self.toolBar.addAction(self.actionCloneTable)        
         self.toolBar.addAction(self.actionLogView)
         self.toolBar.addAction(self.actionDelete)
         self.toolBar.addAction(self.actionHelp)
@@ -160,6 +168,7 @@ class PgVersion(QObject):
         self.actionAbout.triggered.connect(self.doAbout)
         self.actionDelete.triggered.connect(self.doDelete)
         self.actionIncrementalUpdate.triggered.connect(self.doIncrementalUpdate)
+        self.actionCloneTable.triggered.connect(self.doCloneTable)
         self.LogViewDialog.diffLayer.connect(self.doDiff)
         self.LogViewDialog.rollbackLayer.connect(self.doRollback)
         self.LogViewDialog.checkoutLayer.connect(self.doCheckout)
@@ -807,6 +816,55 @@ Are you sure to rollback to revision {1}?""").format(currentLayer.name(), revisi
         else:
             QMessageBox.information(None,  self.tr('Error'),  self.tr('Please select a versioned layer to upgrade'))
 #      
+    def doCloneTable(self):
+        if len(self.iface.layerTreeView().selectedLayers()) > 0:
+            theLayer = self.iface.layerTreeView().selectedLayers()[0]
+            if self.tools.hasVersion(theLayer):
+                provider = theLayer.dataProvider()
+                uri = provider.dataSourceUri()
+                mySchema = QgsDataSourceUri(uri).schema()
+                if len(mySchema) == 0:
+                    mySchema = 'public'
+                myTable = QgsDataSourceUri(uri).table()
+                myDb = self.tools.layerDB('doCloneTable', theLayer)
+                myUuid = str(uuid.uuid4()).replace('-', '')
+                sql ="""
+                CREATE TABLE versions.{table}_{uuid} (LIKE {schema}.{table} INCLUDING DEFAULTS INCLUDING CONSTRAINTS INCLUDING INDEXES );
+                 INSERT INTO versions.{table}_{uuid} SELECT * FROM {schema}.{table};
+                """.format(schema = mySchema,  
+                                  table = myTable,  
+                                  uuid = myUuid)
+                myDb.run(sql)
+                clone_uri = QgsDataSourceUri()
+
+                # set host name, port, database name, username and password
+                clone_uri.setConnection(self.tools.layerHost(theLayer), 
+                                             self.tools.layerPort(theLayer), 
+                                             self.tools.layerDatabase(theLayer), 
+                                             self.tools.layerUsername(theLayer), 
+                                             self.tools.layerPassword(theLayer))
+
+                # set database schema, table name, geometry column and optionally
+                table = myTable+"_"+myUuid 
+                geom_col = self.tools.layerGeomCol(theLayer)
+                key_col = self.tools.layerKeyCol(theLayer)
+                clone_uri.setDataSource("versions", 
+                                                        table, 
+                                                        geom_col, 
+                                                        "", 
+                                                        key_col)
+                                                        
+                clone_layer = QgsVectorLayer(
+                                                        clone_uri.uri(False), 
+                                                        table, 
+                                                        "postgres")
+                                                        
+                QgsProject.instance().addMapLayer(clone_layer)
+            else:
+                QMessageBox.information(None,  self.tr('Error'),  self.tr('Please select a versioned layer to upgrade'))
+        else:
+            QMessageBox.information(None,  self.tr('Error'),  self.tr('Please select a versioned layer to upgrade'))
+
         
     def doHelp(self):
         helpUrl = QUrl()

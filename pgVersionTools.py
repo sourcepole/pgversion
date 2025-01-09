@@ -530,6 +530,9 @@ If you have appropriate DB permissions you can update the DB directly with click
     def layerGeomCol(self, layer):
         return QgsDataSourceUri(self.layerUri(layer)).geometryColumn()
 
+    def layerDatabase(self, layer):
+        return QgsDataSourceUri(self.layerUri(layer)).database()
+
     def layerSchema(self, layer):
         mySchema = QgsDataSourceUri(self.layerUri(layer)).schema()
         if len(mySchema) == 0:
