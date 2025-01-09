@@ -1,8 +1,8 @@
 <div class="header" id="header">
 
-# PostGIS Versioning - pgVersion 3.4.0
+# PostGIS Versioning - pgVersion 3.5.2
 
-### Dr. Horst Duester, 2023, horst.duester@sourcepole.ch
+### Dr. Horst Duester, 2025, horst.duester@sourcepole.ch
 
 </div>
 
