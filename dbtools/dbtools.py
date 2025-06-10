@@ -116,7 +116,9 @@ class DbObj:
                 return None,  e
             except psycopg2.DatabaseError as  e:
                 self._error_message(e)
-                return None,  e                
+                return None,  e          
+            finally:      
+                self.conn.commit()
 
    # do stuff                
 
