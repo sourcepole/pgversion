@@ -109,16 +109,16 @@ class DbObj:
                 return datensatz,  None
 
             except  psycopg2.ProgrammingError as e:
+                self.conn.commit()
                 self._error_message(e)
                 return None,  e
             except psycopg2.InternalError as e:
+                self.conn.commit()
                 self._error_message(e)
                 return None,  e
             except psycopg2.DatabaseError as  e:
-                self._error_message(e)
-                return None,  e          
-            finally:      
                 self.conn.commit()
+                self._error_message(e)
 
    # do stuff                
 
