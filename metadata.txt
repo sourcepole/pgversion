@@ -91,3 +91,4 @@ changelog=
 homepage=https://github.com/sourcepole/pgversion
 tracker=https://github.com/sourcepole/pgversion/issues
 repository=https://github.com/sourcepole/pgversion.git
+icon=icons/pgversion-log.svg
