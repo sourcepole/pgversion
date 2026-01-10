@@ -256,7 +256,31 @@ class DbObj:
             return
         
         return result['EXISTS'][0]
+        
+  ## Prueft, ob ein Objekt vom Typ eine Tabelle eine ID mit Serial hat
+  # @param name String  Name der Tabelle
+  # @return Boolean
+  def hasSerial(self, name):
 
+        tmp_arr = name.split(".");
+        if (len(tmp_arr) == 1):
+            schema = "public"
+        else:
+            schema = tmp_arr[0]
+            name = tmp_arr[1]
+
+        sql = f"""select exists (
+            select column_name as att,
+                   data_type as typ, column_default
+            from information_schema.columns as col
+            where table_schema = '{schema}'::name
+              and table_name = '{name}'::name
+              and (position('nextval' in lower(column_default)) is NOT NULL
+              or position('nextval' in lower(column_default)) <> 0))
+            """
+                
+        result,  error =  self.read(sql)
+        return result['EXISTS'][0]
 
   def dbConn(self):
       return self.db

@@ -92,6 +92,26 @@ class PgVersionTools(QObject):
         myTable = myTable.remove("_version")
         sql = "select versions.pgvscommit('" + mySchema + "." + myTable + "')"
         result,  error = myDb.read(sql)
+        
+        
+    def hasSerial(self,  theLayer):
+            try:
+                myLayerUri = QgsDataSourceUri(theLayer.source())
+            except:
+                return False
+                
+            myDb = self.layerDB('hasSerial', theLayer)
+
+            if myDb is None:
+                return None
+
+            if len(myLayerUri.schema()) == 1:
+                schema = 'public'
+            else:
+                schema = myLayerUri.schema()        
+                
+            layer_table = schema+'.'+myLayerUri.table()
+            return myDb.hasSerial(layer_table)
 
     def hasVersion(self, theLayer):
 

@@ -173,6 +173,16 @@ class PgVersion(QObject):
         self.iface.currentLayerChanged.connect(self.layer_changed)
         QgsProject().instance().layerWasAdded.connect(self.add_layer)
         QgsProject().instance().layerWillBeRemoved.connect(self.remove_layer)
+        
+    from contextlib import contextmanager
+    
+    @contextmanager
+    def wait_cursor(self):
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        try:
+            yield
+        finally:
+            QApplication.restoreOverrideCursor()              
 
     def datasource_changed(self,  l):
         if self.tools.hasVersion(l):
@@ -249,7 +259,6 @@ class PgVersion(QObject):
             QMessageBox.No | QMessageBox.Yes)
 
         if res == QMessageBox.Yes:
-            QApplication.restoreOverrideCursor()
             canvas = self.iface.mapCanvas()
             currentLayer = canvas.currentLayer()
             mySchema = self.tools.layerSchema(currentLayer)
@@ -268,9 +277,10 @@ class PgVersion(QObject):
                 delete_list += ")"
                 sql = "delete from \"%s\".\"%s\" where \"%s\" in %s" % (
                     mySchema, myTable, myPkey, delete_list)
-                QApplication.setOverrideCursor(Qt.WaitCursor)
-                success,  error = myDb.run(sql)
-                QApplication.restoreOverrideCursor()
+                
+                with self.wait_cursor():
+                    success,  error = myDb.run(sql)
+                
                 currentLayer.removeSelection()
                 currentLayer.triggerRepaint()
                 self.tools.setModified(self.layer_list)
@@ -283,9 +293,14 @@ class PgVersion(QObject):
             return
         elif currentLayer.dataProvider().name() != 'postgres':
                 QMessageBox.warning(
-                    None, '', self.tr('Please select a postgres layer '
-                                      'for versioning'))
+                    None, '', self.tr('Please select a postgres layer for versioning'))
                 return
+        elif not self.tools.hasSerial(currentLayer):
+            QMessageBox.warning(
+                None, self.tr('Warning'),
+                self.tr('The selected layer is no serial defined!'))
+            return
+            
         elif self.tools.hasVersion(currentLayer):
             QMessageBox.warning(
                 None, self.tr('Warning'),
@@ -301,18 +316,16 @@ class PgVersion(QObject):
             if not self.tools.versionExists(currentLayer):
                 answer = QMessageBox.question(
                     None, '', self.tr(
-                        'Do you want to create the version environment\
-                         for the table {0}?').format(
-                            mySchema + '.' + myTable),
+                        """Do you want to create the version environment for the table {0}?""").format(mySchema + '.' + myTable),
                     QMessageBox.Yes | QMessageBox.No)
                 if answer == QMessageBox.No:
                     return
-                QApplication.setOverrideCursor(Qt.WaitCursor)
-                sql = "select * from versions.pgvsinit('%s.%s')" % (
-                    mySchema, myTable)
-                result, error = myDb.run(sql)
-
-                QApplication.restoreOverrideCursor()
+                
+                with self.wait_cursor():
+                    
+                    sql = "select * from versions.pgvsinit('%s.%s')" % (
+                        mySchema, myTable)
+                    result, error = myDb.run(sql)
                 
                 if result is True:
                     QMessageBox. information(None, 'Init', self.tr(
@@ -392,26 +405,25 @@ Are you sure to rollback to revision {1}?""").format(currentLayer.name(), revisi
                 if answer == QMessageBox.Cancel:
                     return
 
-            QApplication.setOverrideCursor(Qt.WaitCursor)
-            provider = currentLayer.dataProvider()
-            uri = provider.dataSourceUri()
-            myDb = self.tools.layerDB('doRollback', currentLayer)
-            if not self.tools.check_PGVS_revision(myDb):
-                return
-            mySchema = QgsDataSourceUri(uri).schema()
+            with self.wait_cursor():
+                provider = currentLayer.dataProvider()
+                uri = provider.dataSourceUri()
+                myDb = self.tools.layerDB('doRollback', currentLayer)
+                if not self.tools.check_PGVS_revision(myDb):
+                    return
+                mySchema = QgsDataSourceUri(uri).schema()
 
-            if len(mySchema) == 0:
-                mySchema = 'public'
-            myTable = QgsDataSourceUri(uri).table()
+                if len(mySchema) == 0:
+                    mySchema = 'public'
+                myTable = QgsDataSourceUri(uri).table()
 
-            sql = "select * from versions.pgvsrollback('" + mySchema + "." + myTable.replace('_version', '') + "'," + revision + ")"
+                sql = "select * from versions.pgvsrollback('" + mySchema + "." + myTable.replace('_version', '') + "'," + revision + ")"
 
-            success,  error = myDb.run(sql)
-            self.LogViewDialog.close()
-            currentLayer.triggerRepaint()
-            QApplication.restoreOverrideCursor()
-            self.tools.setModified(self.layer_list)
-            self.LogViewDialog.close()
+                success,  error = myDb.run(sql)
+                self.LogViewDialog.close()
+                currentLayer.triggerRepaint()
+                self.tools.setModified(self.layer_list)
+                self.LogViewDialog.close()
             self.iface.messageBar().pushMessage(
                 'Info',
                 self.tr('Rollback to revision {0} was successful!').format(
@@ -444,20 +456,19 @@ Are you sure to rollback to revision {1}?""").format(currentLayer.name(), revisi
                     result = self.dlgCommitMessage.exec_()
 
                     if result == QDialog.Accepted:
-                        QApplication.setOverrideCursor(Qt.WaitCursor)
-                        sql = "select * from versions.pgvscommit('%s.%s','%s')\
-                        " % (
-                            mySchema, myTable,
-                            self.dlgCommitMessage.textEdit.toPlainText())
-                        myDB = self.tools.layerDB('commit', theLayer)
-                        success,  error = myDB.run(sql)
-                        self.tools.layerRepaint()
-                        self.iface.messageBar().pushMessage(
-                            "Info",
-                            self.tr('Commit of your changes was successful'),
-                            level=Qgis.MessageLevel(0), duration=3)
-                        self.tools.setModified(self.layer_list)
-                        QApplication.restoreOverrideCursor()
+                        with self.wait_cursor():
+                            sql = "select * from versions.pgvscommit('%s.%s','%s')\
+                            " % (
+                                mySchema, myTable,
+                                self.dlgCommitMessage.textEdit.toPlainText())
+                            myDB = self.tools.layerDB('commit', theLayer)
+                            success,  error = myDB.run(sql)
+                            self.tools.layerRepaint()
+                            self.iface.messageBar().pushMessage(
+                                "Info",
+                                self.tr('Commit of your changes was successful'),
+                                level=Qgis.MessageLevel(0), duration=3)
+                            self.tools.setModified(self.layer_list)
                 else:
                     if self.w is not None:
                         self.w = None
@@ -494,39 +505,39 @@ Are you sure to rollback to revision {1}?""").format(currentLayer.name(), revisi
                 QMessageBox.Yes | QMessageBox.Cancel)
 
             if answer == QMessageBox.Yes:
-                QApplication.setOverrideCursor(Qt.WaitCursor)
-                provider = currentLayer.dataProvider()
-                uri = provider.dataSourceUri()
-                uniqueCol = QgsDataSourceUri(uri).keyColumn()
-                geomCol = QgsDataSourceUri(uri).geometryColumn()
+                with self.wait_cursor():
+                    provider = currentLayer.dataProvider()
+                    uri = provider.dataSourceUri()
+                    uniqueCol = QgsDataSourceUri(uri).keyColumn()
+                    geomCol = QgsDataSourceUri(uri).geometryColumn()
 
-                mySchema = QgsDataSourceUri(uri).schema()
-                myTable = QgsDataSourceUri(uri).table()
+                    mySchema = QgsDataSourceUri(uri).schema()
+                    myTable = QgsDataSourceUri(uri).table()
 
-                if len(mySchema) == 0:
-                    mySchema = 'public'
+                    if len(mySchema) == 0:
+                        mySchema = 'public'
 
-                sql = """select * from versions.pgvscheckout(NULL::"{0}"."{1}", {2})""".format(
-                            mySchema,
-                            myTable.replace('_version', ''),
-                            revision)
+                    sql = """select * from versions.pgvscheckout(NULL::"{0}"."{1}", {2})""".format(
+                                mySchema,
+                                myTable.replace('_version', ''),
+                                revision)
 
-                myUri = QgsDataSourceUri(uri)
-                myUri.setDataSource("", u"(%s\n)" % (sql), geomCol, "",
-                                    uniqueCol)
+                    myUri = QgsDataSourceUri(uri)
+                    myUri.setDataSource("", u"(%s\n)" % (sql), geomCol, "",
+                                        uniqueCol)
 
-                layer = None
+                    layer = None
 
-                if tag:
-                    table_ext = " (Tag: %s)" % tag
-                else:
-                    table_ext = " (Revision: %s)" % revision
+                    if tag:
+                        table_ext = " (Tag: %s)" % tag
+                    else:
+                        table_ext = " (Revision: %s)" % revision
 
-                layer = QgsVectorLayer(
-                    myUri.uri(), myTable + table_ext, "postgres")
+                    layer = QgsVectorLayer(
+                        myUri.uri(), myTable + table_ext, "postgres")
 
-                QgsProject().instance().addMapLayer(layer)
-                QApplication.restoreOverrideCursor()
+                    QgsProject().instance().addMapLayer(layer)
+
                 if layer.isValid():
                     self.iface.messageBar().pushMessage(
                         'Info', self.tr('Checkout to revision {0} was \
@@ -690,61 +701,60 @@ Are you sure to rollback to revision {1}?""").format(currentLayer.name(), revisi
                 level=Qgis.MessageLevel(1), duration=3)
             return
 
-        QApplication.setOverrideCursor(Qt.WaitCursor)
-        geomCol = self.tools.layerGeomCol(currentLayer)
-        geometryType = self.tools.layerGeometryType(currentLayer)
-        mySchema = self.tools.layerSchema(currentLayer)
-        myTable = self.tools.layerTable(currentLayer)
+        with self.wait_cursor():
+            geomCol = self.tools.layerGeomCol(currentLayer)
+            geometryType = self.tools.layerGeometryType(currentLayer)
+            mySchema = self.tools.layerSchema(currentLayer)
+            myTable = self.tools.layerTable(currentLayer)
 
-        if len(mySchema) == 0:
-            mySchema = 'public'
+            if len(mySchema) == 0:
+                mySchema = 'public'
 
-        extent = self.iface.mapCanvas().extent().toString().replace(
-            ':', ', ')
-        authority, crs = currentLayer.crs().authid().split(':')
-#        geo_idx = '%s && ST_MakeEnvelope(%s,%s)' % (geomCol, extent, crs)
-        
-        with open('{0}/sql/diff.sql'.format(os.path.dirname(os.path.abspath(__file__))),  'r') as sql_file:
-            sql = sql_file.read().format(
-            schema=mySchema,
-            table=myTable,
-            origin=myTable.replace(
-                '_version', ''))
-                
-#                , geo_idx=geo_idx)
+            extent = self.iface.mapCanvas().extent().toString().replace(
+                ':', ', ')
+            authority, crs = currentLayer.crs().authid().split(':')
+    #        geo_idx = '%s && ST_MakeEnvelope(%s,%s)' % (geomCol, extent, crs)
+            
+            with open('{0}/sql/diff.sql'.format(os.path.dirname(os.path.abspath(__file__))),  'r') as sql_file:
+                sql = sql_file.read().format(
+                schema=mySchema,
+                table=myTable,
+                origin=myTable.replace(
+                    '_version', ''))
+                    
+    #                , geo_idx=geo_idx)
 
-        myUri = QgsDataSourceUri(self.tools.layerUri(currentLayer))
-        myUri.setDataSource("", u"(%s\n)" % sql, geomCol, "", "rownum")
-        myUri.setSrid(crs)
-        layer_name = myTable + " (Diff to HEAD Revision)"
-        layer = QgsVectorLayer(myUri.uri(), layer_name, "postgres")
+            myUri = QgsDataSourceUri(self.tools.layerUri(currentLayer))
+            myUri.setDataSource("", u"(%s\n)" % sql, geomCol, "", "rownum")
+            myUri.setSrid(crs)
+            layer_name = myTable + " (Diff to HEAD Revision)"
+            layer = QgsVectorLayer(myUri.uri(), layer_name, "postgres")
 
-        mem_layer = self.tools.create_memory_layer(layer, layer_name)
+            mem_layer = self.tools.create_memory_layer(layer, layer_name)
 
-        if mem_layer != None:
-            if not mem_layer.isValid():
-                self.iface.messageBar().pushMessage(
-                        'Warning',
-                        self.tr('No diffs to HEAD in current extend detected!'),
-                        level=Qgis.MessageLevel(1), duration=3)
-            else:
-                legends_path = os.path.dirname(__file__)
-                if geometryType == 0:
-                    mem_layer.loadNamedStyle(
-                        legends_path + "/legends/diff_point.qml")
-                elif geometryType == 1:
-                    mem_layer.loadNamedStyle(
-                        legends_path + "/legends/diff_linestring.qml")
-                elif geometryType == 2:
-                    mem_layer.loadNamedStyle(
-                        legends_path + "/legends/diff_polygon.qml")
-                QgsProject().instance().addMapLayer(mem_layer)
-                self.iface.messageBar().pushMessage(
-                    'Info',
-                    self.tr('Diff to HEAD revision was successful!'),
-                    level=Qgis.MessageLevel(0), duration=3)
+            if mem_layer != None:
+                if not mem_layer.isValid():
+                    self.iface.messageBar().pushMessage(
+                            'Warning',
+                            self.tr('No diffs to HEAD in current extend detected!'),
+                            level=Qgis.MessageLevel(1), duration=3)
+                else:
+                    legends_path = os.path.dirname(__file__)
+                    if geometryType == 0:
+                        mem_layer.loadNamedStyle(
+                            legends_path + "/legends/diff_point.qml")
+                    elif geometryType == 1:
+                        mem_layer.loadNamedStyle(
+                            legends_path + "/legends/diff_linestring.qml")
+                    elif geometryType == 2:
+                        mem_layer.loadNamedStyle(
+                            legends_path + "/legends/diff_polygon.qml")
+                    QgsProject().instance().addMapLayer(mem_layer)
+                    self.iface.messageBar().pushMessage(
+                        'Info',
+                        self.tr('Diff to HEAD revision was successful!'),
+                        level=Qgis.MessageLevel(0), duration=3)
 
-        QApplication.restoreOverrideCursor()
         self.LogViewDialog.close()
         return
         
@@ -816,7 +826,7 @@ Are you sure to rollback to revision {1}?""").format(currentLayer.name(), revisi
         absolut_path_string = '%s/docs/help/dokumentation_pgversion_QGIS3_%s.html' % (os.path.dirname(__file__),  self.locale)
         helpUrl.setUrl(QUrl.fromLocalFile(absolut_path_string).toString())
 
-        self.helpDialog.webView.load(helpUrl)
+        self.helpDialog.webView.setSource(helpUrl)
         self.helpDialog.show()
 
     def doAbout(self):
