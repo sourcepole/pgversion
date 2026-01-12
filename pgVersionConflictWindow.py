@@ -104,7 +104,7 @@ class ConflictWindow(QMainWindow):
 
         self.conflictLayerList = []
 
-        if type is 'conflict':
+        if type == 'conflict':
             self.cmbMerge = QComboBox()
             self.cmbMerge.addItems(self.tools.confRecords(self.layer))
 
@@ -118,7 +118,17 @@ class ConflictWindow(QMainWindow):
             self.btnMerge.clicked.connect(self.runMerge)
 
         self.tabView.itemSelectionChanged.connect(self.showConfObject)
-        self.rBand = QgsRubberBand(self.canvas, False)
+        self.rBand = QgsRubberBand(self.canvas, self.layer.geometryType())
+        
+    from contextlib import contextmanager
+    
+    @contextmanager
+    def wait_cursor(self):
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        try:
+            yield
+        finally:
+            QApplication.restoreOverrideCursor()     
 
     def toggleBtnMerge(self):
         return
@@ -168,72 +178,69 @@ class ConflictWindow(QMainWindow):
         return
 
     def manageConflicts(self):
-        QApplication.setOverrideCursor(Qt.WaitCursor)
-        vLayer = self.tools.conflictLayer(self.layer)
-        if vLayer is None:
-            QApplication.restoreOverrideCursor()
-            self.parent.doCommit()
-            return
-        vLayerList = [vLayer, self.layer]
-        QgsProject.instance().addMapLayers(vLayerList, False)
-        self.vLayerId = vLayer.id()
-        self.canvas.setExtent(vLayer.extent())
-        self.canvas.refresh()
-        vLayer.triggerRepaint()
+        with self.wait_cursor():
+            vLayer = self.tools.conflictLayer(self.layer)
+            if vLayer is None:
+                self.parent.doCommit()
+                return
+            vLayerList = [vLayer, self.layer]
+            QgsProject.instance().addMapLayers(vLayerList, False)
+            self.vLayerId = vLayer.id()
+            self.canvas.setExtent(vLayer.extent())
+            self.canvas.refresh()
+            vLayer.triggerRepaint()
 
-        tabData = self.tools.tableRecords(self.layer)
-        
-        if tabData is not None:
-            self.tools.createGridView(
-                self.tabView, tabData[0], tabData[1], 100, 10)
-        else:
-            self.tools.setModified([vLayer])
-            QApplication.restoreOverrideCursor()
-            self.parent.doCommit()
+            tabData = self.tools.tableRecords(self.layer)
+            
+            if tabData is not None:
+                self.tools.createGridView(
+                    self.tabView, tabData[0], tabData[1], 100, 10)
+            else:
+                self.tools.setModified([vLayer])
+                self.parent.doCommit()
 
-        QApplication.restoreOverrideCursor()
 
     def runMerge(self):
-        QApplication.setOverrideCursor(Qt.WaitCursor)
-        currentLayer = self.layer
-        object = self.cmbMerge.currentText()
+        with self.wait_cursor():
+            currentLayer = self.layer
+            object = self.cmbMerge.currentText()
 
-        if currentLayer is None:
-            QMessageBox.information(
-                None, self.tr('Notice'),
-                self.tr('Please select a versioned layer for committing'))
-            return
-        else:
-            myDb = self.tools.layerDB('Merge', currentLayer)
-            mySchema = self.tools.layerSchema(currentLayer)
-            myTable = self.tools.layerTable(currentLayer).replace("_version", "")
+            if currentLayer is None:
+                QMessageBox.information(
+                    None, self.tr('Notice'),
+                    self.tr('Please select a versioned layer for committing'))
+                return
+            else:
+                myDb = self.tools.layerDB('Merge', currentLayer)
+                mySchema = self.tools.layerSchema(currentLayer)
+                myTable = self.tools.layerTable(currentLayer).replace("_version", "")
 
-        objectArray = object.split(" - ")
-        if len(objectArray) is 1:
-            self.parent.doCommit()
-            return
-        elif 'Commit all' in objectArray[0]:
-            projectName = objectArray[1].strip()
-            sql = """
-                        select objectkey from versions.pgvscheck('%s.%s') 
-                        where myuser = '%s' or conflict_user = '%s' 
-                        order by objectkey""" % (
-                mySchema, myTable, projectName, projectName)
-            result,  error = myDb.read(sql)
-            for i in range(len(result['OBJECTKEY'])):
+            objectArray = object.split(" - ")
+            if len(objectArray) is 1:
+                self.parent.doCommit()
+                return
+            elif 'Commit all' in objectArray[0]:
+                projectName = objectArray[1].strip()
+                sql = """
+                            select objectkey from versions.pgvscheck('%s.%s') 
+                            where myuser = '%s' or conflict_user = '%s' 
+                            order by objectkey""" % (
+                    mySchema, myTable, projectName, projectName)
+                result,  error = myDb.read(sql)
+                for i in range(len(result['OBJECTKEY'])):
+                    sql = "select versions.pgvsmerge('%s.%s',%s,'%s')" % (
+                        mySchema, myTable, result['OBJECTKEY'][i], projectName)
+                    success,  error = myDb.run(sql)
+            else:
+                projectName = objectArray[1].strip()
                 sql = "select versions.pgvsmerge('%s.%s',%s,'%s')" % (
-                    mySchema, myTable, result['OBJECTKEY'][i], projectName)
-                success,  error = myDb.run(sql)
-        else:
-            projectName = objectArray[1].strip()
-            sql = "select versions.pgvsmerge('%s.%s',%s,'%s')" % (
-                mySchema, myTable, objectArray[0], projectName)
-            success,  error= myDb.run(sql)
+                    mySchema, myTable, objectArray[0], projectName)
+                success,  error= myDb.run(sql)
 
-        self.canvas.refresh()
-        self.layer.triggerRepaint()
-        self.cmbMerge.clear()
-        QApplication.restoreOverrideCursor()
+            self.canvas.refresh()
+            self.layer.triggerRepaint()
+            self.cmbMerge.clear()
+
         if self.tools.confRecords(self.layer) is None:
             self.tabView.clear()
             self.tools.setModified(self.parent.layer_list)

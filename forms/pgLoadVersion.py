@@ -46,6 +46,16 @@ class PgVersionLoadDialog(QDialog, FORM_CLASS):
         self.buttonBox.accepted.connect(self.buttonBox_accepted)
         self.buttonBox.rejected.connect(self.close)
 
+    from contextlib import contextmanager
+    
+    @contextmanager
+    def wait_cursor(self):
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        try:
+            yield
+        finally:
+            QApplication.restoreOverrideCursor()     
+            
     def getDbSettings(self):
         settings = QSettings()
         settings.beginGroup('PostgreSQL/connections')
@@ -165,52 +175,42 @@ Please fix the PostgreSQL database connection."""))
         else:
             for item in self.lst_tables.selectedItems():
                 versionTable = item.text().split('.')
-#                connectionName = self.cmbServer.currentText()
                 self.loadVersionLayer(versionTable[0], versionTable[1])
 
     def loadVersionLayer(self, schema, table):
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        with self.wait_cursor():
 
-        sql = """select * from versions.version_tables 
-        where version_table_schema = '%s' 
-          and version_table_name = '%s'""" % (schema, table)
+            sql = """select * from versions.version_tables 
+            where version_table_schema = '%s' 
+              and version_table_name = '%s'""" % (schema, table)
 
-        layer, error = self.myDb.read(sql)
-        if error is not None:
-            QMessageBox.information(
-                None,
-                self.tr("DB error"),
-                self.tr("The following error came up when loading the layer:"
-                        "\n{0}".format(error)))
-            return
-        uri = QgsDataSourceUri()
-        
-#        try:
+            layer, error = self.myDb.read(sql)
+            if error is not None:
+                QMessageBox.information(
+                    None,
+                    self.tr("DB error"),
+                    self.tr("The following error came up when loading the layer:"
+                            "\n{0}".format(error)))
+                return
+            uri = QgsDataSourceUri()
 
-        if self.DBSERVICE != '':
-#            uri.setConnection(service=self.DBSERVICE) #,  self.DBNAME, self.DBUSER, self.DBPASSWD)
-            uri.setEncodedUri("service="+self.DBSERVICE)
-        else:
-            uri.setConnection(self.DBHOST, self.DBPORT, self.DBNAME, self.DBUSER, self.DBPASSWD)
-#        except:
-#            uri.setConnection(self.DBHOST, self.DBPORT, self.DBNAME, self.DBUSER, '')
-            
-        uri.setDataSource(layer['VERSION_VIEW_SCHEMA'][0], layer[
-            'VERSION_VIEW_NAME'][0], '' + layer[
-                'VERSION_VIEW_GEOMETRY_COLUMN'][0] + '', '', layer[
-                    'VERSION_VIEW_PKEY'][0])
-        layerName = layer['VERSION_TABLE_NAME'][0]
-        vLayer = QgsVectorLayer(uri.uri(), layerName, 'postgres')
+            if self.DBSERVICE != '':
+                uri.setEncodedUri("service="+self.DBSERVICE)
+            else:
+                uri.setConnection(self.DBHOST, self.DBPORT, self.DBNAME, self.DBUSER, self.DBPASSWD)
+                
+            uri.setDataSource(layer['VERSION_VIEW_SCHEMA'][0], layer[
+                'VERSION_VIEW_NAME'][0], '' + layer[
+                    'VERSION_VIEW_GEOMETRY_COLUMN'][0] + '', '', layer[
+                        'VERSION_VIEW_PKEY'][0])
+            layerName = layer['VERSION_TABLE_NAME'][0]
+            vLayer = QgsVectorLayer(uri.uri(), layerName, 'postgres')
 
-        if self.tools.vectorLayerExists(vLayer.name()) or self.tools.vectorLayerExists(vLayer.name() + ' (modified)'):
-            QMessageBox.warning(
-                None, '', self.tr('Layer {0} is already loaded').format(table))
-            QApplication.restoreOverrideCursor()
-            QApplication.setOverrideCursor(Qt.ArrowCursor)
-            return None
+            if self.tools.vectorLayerExists(vLayer.name()) or self.tools.vectorLayerExists(vLayer.name() + ' (modified)'):
+                QMessageBox.warning(
+                    None, '', self.tr('Layer {0} is already loaded').format(table))
+                return None
 
-        QgsProject().instance().addMapLayer(vLayer)
+            QgsProject().instance().addMapLayer(vLayer)
 
-#        self.myDb.close()
-        QApplication.restoreOverrideCursor()
-#        QApplication.setOverrideCursor(Qt.ArrowCursor)
+

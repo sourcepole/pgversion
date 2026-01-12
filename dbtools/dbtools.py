@@ -305,6 +305,9 @@ class DbObj:
 
   def dbPasswd(self):
       return self.password
+      
+  def dbService(self):
+      return self.service
 
   def connection(self):
       return "dbname="+self.dbName+" host="+self.dbHost+" user="+self.dbUser+" port="+self.dbPort

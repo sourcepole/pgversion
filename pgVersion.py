@@ -45,7 +45,7 @@ class PgVersion(QObject):
         self.layer_list = []
         self.tools = PgVersionTools(self)
 
-        # Initialise thetranslation environment
+        # Initialise the translation environment
         self.plugin_path = os.path.dirname(__file__)
         self.locale = QSettings().value('locale/userLocale')[0:2]
         locale_path = os.path.join(
@@ -58,7 +58,6 @@ class PgVersion(QObject):
             self.translator.load(locale_path)
 
     def initGui(self):
-
         self.helpDialog = HelpDialog()
         self.LogViewDialog = LogView(self)
 

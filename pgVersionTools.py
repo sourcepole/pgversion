@@ -402,8 +402,10 @@ class PgVersionTools(QObject):
 
         uri = QgsDataSourceUri()
 
-        uri.setConnection(myDb.dbHost(), str(myDb.dbport()), myDb.dbname(),
-                          myDb.user(), myDb.dbpasswd())
+        if myDb.dbService() != '':
+            uri.setEncodedUri(f"service={myDb.dbService()}")
+        else:
+            uri.setEncodeUri(f"host={myDb.dbHost()} port={myDb.dbPort()} dbname={myDb.dbName()} user={myDb.dbUser()} password={myDb.dbPasswd()}")
 
         sql = """
                 select * from versions.pgvscheck('{0}.{1}')
