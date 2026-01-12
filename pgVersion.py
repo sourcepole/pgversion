@@ -168,10 +168,22 @@ class PgVersion(QObject):
             if a.objectName() == 'mActionToggleEditing':
                 a.triggered.connect(self.SelectionChanged)
 
-        self.iface.mapCanvas().selectionChanged.connect(self.SelectionChanged)
+#        self.iface.mapCanvas().selectionChanged.connect(self.SelectionChanged)
         self.iface.currentLayerChanged.connect(self.layer_changed)
         QgsProject().instance().layerWasAdded.connect(self.add_layer)
         QgsProject().instance().layerWillBeRemoved.connect(self.remove_layer)
+
+        def layer_changed(self, layer):
+            # alte Verbindung lösen
+            try:
+                self._current_layer.selectionChanged.disconnect(self.SelectionChanged)
+            except Exception:
+                pass
+
+            self._current_layer = layer
+
+            if layer and isinstance(layer, QgsVectorLayer):
+                layer.selectionChanged.connect(self.SelectionChanged)
         
     from contextlib import contextmanager
     
@@ -222,15 +234,16 @@ class PgVersion(QObject):
         self.actionLogView.setEnabled(isActive)       
         self.actionIncrementalUpdate.setEnabled(isActive)        
 
-    def add_layer(self, l):
-        l.dataSourceChanged.connect(lambda my_layer=l: self.datasource_changed(my_layer))
-        if self.tools.hasVersion(l):
-            if l.id not in self.layer_list:
-                l.editingStopped.connect(
+    def add_layer(self, layer):
+        layer.dataSourceChanged.connect(lambda my_layer=layer: self.datasource_changed(my_layer))
+        if self.tools.hasVersion(layer):
+            if layer.id not in self.layer_list:
+                layer.editingStopped.connect(
                     lambda my_list=self.layer_list: self.tools.setModified(
                         my_list))
-                self.layer_list.append(l.id())
+                self.layer_list.append(layer.id())
                 self.tools.setModified(self.layer_list)
+                layer.setCustomProperty("pg_version", True)
                 
 
     def remove_layer(self, id):
@@ -246,6 +259,11 @@ class PgVersion(QObject):
         except:
             del self.menuBar
         del self.toolBar
+        
+        self.iface.currentLayerChanged.disconnect(self.layer_changed)
+        QgsProject.instance().layerWasAdded.disconnect(self.add_layer)
+        QgsProject.instance().layerWillBeRemoved.disconnect(self.remove_layer)
+        
 
     def doDelete(self):
 
