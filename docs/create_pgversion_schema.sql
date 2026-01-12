@@ -56,7 +56,7 @@ CREATE OR REPLACE FUNCTION versions.pgvsrevision ()
 DECLARE
   revision TEXT;
   BEGIN
-    revision := '2.1.20';
+    revision := '2.1.21';
     RETURN revision;
   END;
 $$;
@@ -237,7 +237,7 @@ with a listing of the conflicting objects.
 --RAISE EXCEPTION '%',myDebug;
     EXECUTE myDebug into confExists;
 
-    IF COUNT(confExists) > 1 THEN
+    IF COUNT(confExists) > 0 THEN
 	for conflictCheck IN EXECUTE myDebug
 	LOOP
 	  return next conflictCheck;
@@ -258,7 +258,7 @@ ALTER FUNCTION versions.pgvscheck(character varying) OWNER TO versions;
 
 -- object: versions.pgvscommit | type: FUNCTION --
 -- DROP FUNCTION IF EXISTS versions.pgvscommit(character varying,text) CASCADE;
-CREATE FUNCTION versions.pgvscommit (_param1 character varying, _param2 text)
+CREATE OR REPLACE FUNCTION versions.pgvscommit (_param1 character varying, _param2 text)
 	RETURNS SETOF versions.conflicts
 	LANGUAGE plpgsql
 	VOLATILE
