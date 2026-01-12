@@ -818,14 +818,24 @@ Are you sure to rollback to revision {1}?""").format(currentLayer.name(), revisi
 #      
         
     def doHelp(self):
-        helpUrl = QUrl()
         if self.locale != 'de':
             self.locale = 'en'
                 
-        absolut_path_string = '%s/docs/help/dokumentation_pgversion_QGIS3_%s.html' % (os.path.dirname(__file__),  self.locale)
-        helpUrl.setUrl(QUrl.fromLocalFile(absolut_path_string).toString())
+        html_path = f'{os.path.dirname(__file__)}/docs/help/dokumentation_pgversion_QGIS3_{self.locale}.html'
+        css_path = f"{os.path.dirname(__file__)}/docs/help/style/style.css"
+        
+        with open(css_path, "r", encoding="utf-8") as f:
+            css = f.read()
 
-        self.helpDialog.webView.setSource(helpUrl)
+        with open(html_path, "r", encoding="utf-8") as f:
+            html = f.read()
+
+        html = html.replace(
+            "</head>",
+            f"<style>{css}</style></head>"
+        )
+
+        self.helpDialog.textBrowser.setHtml(html)
         self.helpDialog.show()
 
     def doAbout(self):
