@@ -1,0 +1,3 @@
+Migrierte Funktionen:
+pgvsinit
+pgvsdrop
