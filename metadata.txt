@@ -2,7 +2,7 @@
 name=PgVersion
 description=Client for the Postgres Versioning System pgvs
 category=Database
-version=3.5.4
+version=3.6.0
 qgisMinimumVersion=3.0
 qgisMaximumVersion=3.99
 class_name=PgVersion
@@ -14,6 +14,8 @@ about=
 ; Optional items:
 
 changelog=
+    3.6.0
+    - Signal architecture changed to encapsulate the signals in the plugin
     3.5.4
     - Conflict Management fixed and old QGIS 2 staff removed
     3.5.3
