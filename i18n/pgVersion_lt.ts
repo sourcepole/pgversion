@@ -5,12 +5,12 @@
     <message>
         <location filename="../forms/CommitMessage.ui" line="0" />
         <source>Commit Message</source>
-        <translation>Commitbericht</translation>
+        <translation>Įrašo pranešimas</translation>
     </message>
     <message>
         <location filename="../forms/CommitMessage.ui" line="0" />
         <source>Recent commit messages:</source>
-        <translation>Recente commitberichten:</translation>
+        <translation>Naujausi įrašai:</translation>
     </message>
 </context>
 <context>
@@ -18,12 +18,12 @@
     <message>
         <location filename="../forms/CommitMessage.py" line="65" />
         <source>Error</source>
-        <translation>Fout</translation>
+        <translation>Klaida</translation>
     </message>
     <message>
         <location filename="../forms/CommitMessage.py" line="66" />
         <source>Please write a commit message</source>
-        <translation>Schrijf een commitbericht</translation>
+        <translation>Parašykite patvirtinimo pranešimą</translation>
     </message>
 </context>
 <context>
@@ -31,17 +31,17 @@
     <message>
         <location filename="../pgVersionConflictWindow.py" line="113" />
         <source>solve conflict</source>
-        <translation>conflicten oplossen</translation>
+        <translation>išspręsti konfliktą</translation>
     </message>
     <message>
         <location filename="../pgVersionConflictWindow.py" line="210" />
         <source>Notice</source>
-        <translation>Kennisgeving</translation>
+        <translation>Pranešimas</translation>
     </message>
     <message>
         <location filename="../pgVersionConflictWindow.py" line="211" />
         <source>Please select a versioned layer for committing</source>
-        <translation>Selecteer een versie van de laag om vast te leggen.</translation>
+        <translation>Prašome pasirinkti versiją sluoksnį, kurį norite patvirtinti.</translation>
     </message>
 </context>
 <context>
@@ -49,17 +49,17 @@
     <message>
         <location filename="../forms/dbVersionCheck.ui" line="0" />
         <source>Dialog</source>
-        <translation>Dialoog</translation>
+        <translation>Dialogas</translation>
     </message>
     <message>
         <location filename="../forms/dbVersionCheck.ui" line="0" />
         <source>DB-Update</source>
-        <translation>DB-update</translation>
+        <translation>DB atnaujinimas</translation>
     </message>
     <message>
         <location filename="../forms/dbVersionCheck.ui" line="0" />
         <source>Close</source>
-        <translation>Sluiten</translation>
+        <translation>Uždaryti</translation>
     </message>
     <message>
         <location filename="../forms/dbVersionCheck.ui" line="0" />
@@ -72,27 +72,27 @@
     <message>
         <location filename="../forms/dbVersionCheck.py" line="61" />
         <source>DB error</source>
-        <translation>Databasefout</translation>
+        <translation>Duomenų bazės klaida</translation>
     </message>
     <message>
         <location filename="../forms/dbVersionCheck.py" line="68" />
         <source>Installation</source>
-        <translation>Installatie</translation>
+        <translation>Įrengimas</translation>
     </message>
     <message>
         <location filename="../forms/dbVersionCheck.py" line="69" />
         <source>Installation of pgvs was successful</source>
-        <translation>De installatie van pgvs is geslaagd.</translation>
+        <translation>Pgvs įdiegimas buvo sėkmingas</translation>
     </message>
     <message>
         <location filename="../forms/dbVersionCheck.py" line="72" />
         <source>Upgrade</source>
-        <translation>Upgrade</translation>
+        <translation>Atnaujinimas</translation>
     </message>
     <message>
         <location filename="../forms/dbVersionCheck.py" line="73" />
         <source>Upgrade of pgvs was successful</source>
-        <translation>De upgrade van pgvs is geslaagd.</translation>
+        <translation>Pgvs atnaujinimas buvo sėkmingas</translation>
     </message>
 </context>
 <context>
@@ -100,12 +100,12 @@
     <message>
         <location filename="../forms/diff.py" line="154" />
         <source>Message</source>
-        <translation>Bericht</translation>
+        <translation>Pranešimas</translation>
     </message>
     <message>
         <location filename="../forms/diff.py" line="154" />
         <source>This combination is not implemented yet</source>
-        <translation>Deze combinatie is nog niet geïmplementeerd.</translation>
+        <translation>Ši kombinacija dar nėra įgyvendinta.</translation>
     </message>
     <message>
         <location filename="../forms/diff.ui" line="0" />
@@ -115,12 +115,12 @@
     <message>
         <location filename="../forms/diff.ui" line="0" />
         <source>Revision 1</source>
-        <translation>Herziening 1</translation>
+        <translation>1 redakcija</translation>
     </message>
     <message>
         <location filename="../forms/diff.ui" line="0" />
         <source>&amp;Number</source>
-        <translation>&amp;Aantal</translation>
+        <translation>&amp;Skaičius</translation>
     </message>
     <message>
         <location filename="../forms/diff.ui" line="0" />
@@ -131,28 +131,28 @@
         <location filename="../forms/diff.ui" line="0" />
         <location filename="../forms/diff.ui" line="0" />
         <source>HEAD</source>
-        <translation>HOOFD</translation>
+        <translation>GALVA</translation>
     </message>
     <message>
         <location filename="../forms/diff.ui" line="0" />
         <location filename="../forms/diff.ui" line="0" />
         <source>BASE</source>
-        <translation>BASIS</translation>
+        <translation>PAGRINDAS</translation>
     </message>
     <message>
         <location filename="../forms/diff.ui" line="0" />
         <source>Revision 2</source>
-        <translation>Herziening 2</translation>
+        <translation>2 redakcija</translation>
     </message>
     <message>
         <location filename="../forms/diff.ui" line="0" />
         <source>N&amp;umber</source>
-        <translation>Nummer</translation>
+        <translation>N&amp;umeris</translation>
     </message>
     <message>
         <location filename="../forms/diff.ui" line="0" />
         <source>Da&amp;te</source>
-        <translation>Ja&amp;te</translation>
+        <translation>Taip</translation>
     </message>
 </context>
 <context>
@@ -160,75 +160,75 @@
     <message>
         <location filename="../about/doAbout.py" line="42" />
         <source>About </source>
-        <translation>Over </translation>
+        <translation>Apie </translation>
     </message>
     <message>
         <location filename="../about/doAbout.py" line="44" />
         <source>Version: </source>
-        <translation>Versie: </translation>
+        <translation>Versija: </translation>
     </message>
     <message>
         <location filename="../about/doAbout.py" line="46" />
         <source>Author</source>
-        <translation>Auteur</translation>
+        <translation>Autorius</translation>
     </message>
     <message>
         <location filename="../about/doAbout.py" line="47" />
         <source>Contact</source>
-        <translation>Contact</translation>
+        <translation>Kontaktai</translation>
     </message>
     <message>
         <location filename="../about/doAbout.py" line="48" />
         <source>Sponsors</source>
-        <translation>Sponsors</translation>
+        <translation>Rėmėjai</translation>
     </message>
     <message>
         <location filename="../about/doAbout.py" line="49" />
         <source>Change Log</source>
-        <translation>Wijzigingslogboek</translation>
+        <translation>Keitimų žurnalas</translation>
     </message>
     <message>
         <location filename="../about/doAbout.py" line="53" />
         <source>&lt;p&gt;&lt;center&gt;&lt;b&gt;Author(s):&lt;/b&gt;&lt;/center&gt;&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;center&gt;&lt;b&gt;Auteur(s):&lt;/b&gt;&lt;/center&gt;&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;center&gt;&lt;b&gt;Autoriai:&lt;/b&gt;&lt;/center&gt;&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../about/doAbout.py" line="56" />
         <source>&lt;b&gt;The development of PgVersion was funded by:&lt;/b&gt;&lt;br&gt;&lt;br&gt;</source>
-        <translation>&lt;b&gt;De ontwikkeling van PgVersion werd gefinancierd door:&lt;/b&gt;&lt;br&gt;&lt;br&gt;</translation>
+        <translation>&lt;b&gt;PgVersion kūrimą finansavo:&lt;/b&gt;&lt;br&gt;&lt;br&gt;</translation>
     </message>
     <message>
         <location filename="../about/doAbout.py" line="58" />
         <source>- Sourcepole AG, Weberstrasse 5, CH-8004 Zurich&lt;br&gt;</source>
-        <translation>- Sourcepole AG, Weberstrasse 5, CH-8004 Zürich&lt;br&gt;</translation>
+        <translation>- Sourcepole AG, Weberstrasse 5, CH-8004 Ciurichas&lt;br&gt;</translation>
     </message>
     <message>
         <location filename="../about/doAbout.py" line="60" />
         <source>- Canton of Glarus / Switzerland&lt;br&gt;</source>
-        <translation>- Kanton Glarus / Zwitserland&lt;br&gt;</translation>
+        <translation>- Glarus kantonas / Šveicarija&lt;br&gt;</translation>
     </message>
     <message>
         <location filename="../about/doAbout.py" line="61" />
         <source>- Lower Saxony Ministry of Food, Agriculture and consumer             protection / Germany&lt;br&gt;</source>
-        <translation>- Ministerie van Voedsel, Landbouw en Consumentenbescherming van Nedersaksen / Duitsland&lt;br&gt;</translation>
+        <translation>- Žemutinės Saksonijos maisto, žemės ūkio ir vartotojų apsaugos ministerija / Vokietija&lt;br&gt;</translation>
     </message>
     <message>
         <location filename="../about/doAbout.py" line="65" />
         <source>Sourcepole AG - Linux &amp; Open Source Solutions
 </source>
-        <translation>Sourcepole AG - Linux- en open source-oplossingen </translation>
+        <translation>Sourcepole AG – Linux ir atvirojo kodo sprendimai </translation>
     </message>
     <message>
         <location filename="../about/doAbout.py" line="67" />
         <source>Weberstrasse 5, 8004 Zï¿½rich, Switzerland
 </source>
-        <translation>Weberstrasse 5, 8004 Zürich, Zwitserland </translation>
+        <translation>Weberstrasse 5, 8004 Ciurichas, Šveicarija </translation>
     </message>
     <message>
         <location filename="../about/doAbout.py" line="71" />
         <source>Contact:
 </source>
-        <translation>Contact: </translation>
+        <translation>Kontaktas: </translation>
     </message>
 </context>
 <context>
@@ -236,12 +236,12 @@
     <message>
         <location filename="../forms/incrementalLayerUpdate.ui" line="0" />
         <source>Incremental Layer Import</source>
-        <translation>Incrementele laag importeren</translation>
+        <translation>Palaipsnis sluoksnių importavimas</translation>
     </message>
     <message>
         <location filename="../forms/incrementalLayerUpdate.ui" line="0" />
         <source>Import Layer:</source>
-        <translation>Importlaag:</translation>
+        <translation>Importuoti sluoksnį:</translation>
     </message>
 </context>
 <context>
@@ -249,27 +249,27 @@
     <message>
         <location filename="../forms/incrementalLayerUpdate.py" line="99" />
         <source>Warning</source>
-        <translation>Waarschuwing</translation>
+        <translation>Įspėjimas</translation>
     </message>
     <message>
         <location filename="../forms/incrementalLayerUpdate.py" line="100" />
         <source>Please select an import layer.</source>
-        <translation>Selecteer een importlaag.</translation>
+        <translation>Prašome pasirinkti importuojamą sluoksnį.</translation>
     </message>
     <message>
         <location filename="../forms/incrementalLayerUpdate.py" line="117" />
         <source>Do you like to overwrite the table? </source>
-        <translation>Wilt u de tabel overschrijven? </translation>
+        <translation>Ar norite perrašyti lentelę? </translation>
     </message>
     <message>
         <location filename="../forms/incrementalLayerUpdate.py" line="156" />
         <source>Import Error</source>
-        <translation>Importfout</translation>
+        <translation>Importavimo klaida</translation>
     </message>
     <message>
         <location filename="../forms/incrementalLayerUpdate.py" line="183" />
         <source>Update Error</source>
-        <translation>Updatefout</translation>
+        <translation>Atnaujinimo klaida</translation>
     </message>
 </context>
 <context>
@@ -277,79 +277,79 @@
     <message>
         <location filename="../forms/LogView.ui" line="0" />
         <source>PG-Version LogView</source>
-        <translation>PG-versie LogView</translation>
+        <translation>PG versijos žurnalasPeržiūrėti</translation>
     </message>
     <message>
         <location filename="../forms/LogView.ui" line="0" />
         <source>-- checkout Tag --</source>
-        <translation>-- afrekenen Tag --</translation>
+        <translation>-- išsiregistruoti Žymė --</translation>
     </message>
     <message>
         <location filename="../forms/LogView.ui" line="0" />
         <source>Revision</source>
-        <translation>Herziening</translation>
+        <translation>Peržiūra</translation>
     </message>
     <message>
         <location filename="../forms/LogView.ui" line="0" />
         <source>Date</source>
-        <translation>Gegevens</translation>
+        <translation>Duomenys</translation>
     </message>
     <message>
         <location filename="../forms/LogView.ui" line="0" />
         <source>User</source>
-        <translation>Gebruiker</translation>
+        <translation>Vartotojas</translation>
     </message>
     <message>
         <location filename="../forms/LogView.ui" line="0" />
         <source>Log-Message</source>
-        <translation>Logbericht</translation>
+        <translation>Žurnalo pranešimas</translation>
     </message>
     <message>
         <location filename="../forms/LogView.ui" line="0" />
         <source>checkout Tag</source>
-        <translation>Afrekenen Tag</translation>
+        <translation>atsiskaitymo žymė</translation>
     </message>
     <message>
         <location filename="../forms/LogView.ui" line="0" />
         <source>checkout selected revision</source>
-        <translation>geselecteerde revisie afrekenen</translation>
+        <translation>patikrinti pasirinktą peržiūrą</translation>
     </message>
     <message>
         <location filename="../forms/LogView.ui" line="0" />
         <source>diff to HEAD revision</source>
-        <translation>verschil met HEAD-revisie</translation>
+        <translation>skirtumas nuo HEAD versijos</translation>
     </message>
     <message>
         <location filename="../forms/LogView.ui" line="0" />
         <source>rollback to selected revision</source>
-        <translation>terugzetten naar geselecteerde revisie</translation>
+        <translation>grįžti prie pasirinktos versijos</translation>
     </message>
     <message>
         <location filename="../forms/LogView.py" line="56" />
         <location filename="../forms/LogView.py" line="54" />
         <source>Set Tag for current revision</source>
-        <translation>Tag instellen voor huidige revisie</translation>
+        <translation>Nustatyti žymę dabartinei versijai</translation>
     </message>
     <message>
         <location filename="../forms/LogView.py" line="105" />
         <source>Set Tag for Revision </source>
-        <translation>Set Tag voor revisie </translation>
+        <translation>Nustatyti žymę peržiūrai </translation>
     </message>
     <message>
         <location filename="../forms/LogView.py" line="150" />
         <location filename="../forms/LogView.py" line="113" />
         <source>Warning</source>
-        <translation>Waarschuwing</translation>
+        <translation>Įspėjimas</translation>
     </message>
     <message>
         <location filename="../forms/LogView.py" line="114" />
         <source>This version is already tagged</source>
-        <translation>Deze versie is al getagd.</translation>
+        <translation>Ši versija jau yra pažymėta</translation>
     </message>
     <message>
         <location filename="../forms/LogView.py" line="151" />
         <source>Please select a revision for rollback</source>
-        <translation>Selecteer een revisie voor terugdraaien</translation>
+        <translation>Prašome pasirinkti versiją, kurią norite atkurti</translation>
     </message>
 </context>
 <context>
@@ -357,78 +357,78 @@
     <message>
         <location filename="../pgVersion.py" line="69" />
         <source>Prepare Layer for Versioning</source>
-        <translation>Laag voorbereiden voor versiebeheer</translation>
+        <translation>Paruoškite sluoksnį versijavimui</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="74" />
         <source>Load Versioned Layer</source>
-        <translation>Laad versiebeheerlaag</translation>
+        <translation>Įkelti versijuotą sluoksnį</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="78" />
         <source>Commit Changes</source>
-        <translation>Wijzigingen vastleggen</translation>
+        <translation>Įrašyti pakeitimus</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="82" />
         <source>Revert to HEAD Revision</source>
-        <translation>Terugkeren naar HEAD-revisie</translation>
+        <translation>Grįžti prie HEAD versijos</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="86" />
         <source>Show Logs</source>
-        <translation>Logs weergeven</translation>
+        <translation>Rodyti žurnalus</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="90" />
         <source>Show Diffs</source>
-        <translation>Verschillen weergeven</translation>
+        <translation>Rodyti skirtumus</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="94" />
         <source>Drop Versioning from Layer</source>
-        <translation>Versiebeheer uit laag verwijderen</translation>
+        <translation>Atmesti versijų kūrimą iš sluoksnio</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="98" />
         <source>Help</source>
-        <translation>Help</translation>
+        <translation>Pagalba</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="101" />
         <source>About</source>
-        <translation>Over</translation>
+        <translation>Apie</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="106" />
         <source>Bulk delete directly in the database</source>
-        <translation>Bulk verwijderen rechtstreeks in de database</translation>
+        <translation>Masinis ištrynimas tiesiogiai duomenų bazėje</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="111" />
         <source>Incremental Layer Update</source>
-        <translation>Incrementele laagupdate</translation>
+        <translation>Palaipsnis sluoksnio atnaujinimas</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="272" />
         <source>Question</source>
-        <translation>Vraag</translation>
+        <translation>Klausimas</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="273" />
         <source>Are you sure to delete all selected features. You cannot undo this action!</source>
-        <translation>Weet u zeker dat u alle geselecteerde functies wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt!</translation>
+        <translation>Ar tikrai norite ištrinti visas pasirinktas funkcijas? Šio veiksmo negalima atšaukti!</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="791" />
         <location filename="../pgVersion.py" line="309" />
         <source>Please select a layer for versioning</source>
-        <translation>Selecteer een laag voor versiebeheer</translation>
+        <translation>Prašome pasirinkti versijos sluoksnį</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="313" />
         <source>Please select a postgres layer for versioning</source>
-        <translation>Selecteer een Postgres-laag voor versiebeheer.</translation>
+        <translation>Prašome pasirinkti postgres sluoksnį versijavimui</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="806" />
@@ -439,22 +439,22 @@
         <location filename="../pgVersion.py" line="323" />
         <location filename="../pgVersion.py" line="317" />
         <source>Warning</source>
-        <translation>Waarschuwing</translation>
+        <translation>Įspėjimas</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="318" />
         <source>The selected layer is no serial defined!</source>
-        <translation>De geselecteerde laag is niet serieel gedefinieerd!</translation>
+        <translation>Pasirinkta sluoksnis nėra serijinis!</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="324" />
         <source>The selected layer is already under versioning!</source>
-        <translation>De geselecteerde laag wordt al beheerd!</translation>
+        <translation>Pasirinkta sluoksnis jau yra versijuojamas!</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="335" />
         <source>Do you want to create the version environment for the table {0}?</source>
-        <translation>Wilt u de versieomgeving voor de tabel {0} aanmaken?</translation>
+        <translation>Ar norite sukurti versijos aplinką lentelei {0}?</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="348" />
@@ -465,12 +465,12 @@ Please set the user permissions for table {0} and reload it via Database -&gt; P
 
 Further information on rights management can be found in the help in section 1.3.3</source>
         <translation>
-Het initialiseren is gelukt! Stel de gebruikersrechten voor tabel {0} in en laad deze opnieuw via Database -&gt; PG-versie! Meer informatie over rechtenbeheer vindt u in de helpfunctie in paragraaf 1.3.3.</translation>
+Inicijavimas pavyko! Nustatykite vartotojo teises lentelei {0} ir perkraukite ją per „Duomenų bazė“ -&gt; „PG versija“! Daugiau informacijos apie teisių valdymą rasite pagalbos skyriuje 1.3.3.</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="362" />
         <source>Init Error</source>
-        <translation>Eerste fout</translation>
+        <translation>Pradinė klaida</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="363" />
@@ -481,7 +481,7 @@ Error:
 {1}
                         </source>
         <translation>
-Initialisatie van tabel {0} mislukt! Fout: {1} </translation>
+Nepavyko inicijuoti lentelės {0}! Klaida: {1} </translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="835" />
@@ -489,129 +489,129 @@ Initialisatie van tabel {0} mislukt! Fout: {1} </translation>
         <location filename="../pgVersion.py" line="506" />
         <location filename="../pgVersion.py" line="393" />
         <source>Error</source>
-        <translation>Fout</translation>
+        <translation>Klaida</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="507" />
         <location filename="../pgVersion.py" line="394" />
         <source>Please select a valid revision</source>
-        <translation>Selecteer een geldige revisie</translation>
+        <translation>Prašome pasirinkti galiojančią versiją</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="515" />
         <location filename="../pgVersion.py" line="404" />
         <source>Please select a versioned layer</source>
-        <translation>Selecteer een versie van de laag</translation>
+        <translation>Prašome pasirinkti versiją</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="408" />
         <source>Are you sure to rollback to revision {0}?</source>
-        <translation>Weet u zeker dat u wilt terugkeren naar revisie {0}?</translation>
+        <translation>Ar tikrai norite grįžti prie versijos {0}?</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="418" />
         <source>Layer {0} has modifications which will be lost after rollback! If you want to keep this modifications please commit them before you execute the rollback. 
 
 Are you sure to rollback to revision {1}?</source>
-        <translation>Laag {0} bevat wijzigingen die verloren gaan na het terugdraaien! Als u deze wijzigingen wilt behouden, moet u ze vastleggen voordat u het terugdraaien uitvoert. Weet u zeker dat u wilt terugdraaien naar revisie {1}?</translation>
+        <translation>Sluoksnis {0} turi pakeitimų, kurie bus prarasti po atstatymo! Jei norite išsaugoti šiuos pakeitimus, prieš vykdydami atstatymą juos įrašykite. Ar tikrai norite atstatyti iki versijos {1}?</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="446" />
         <source>Rollback to revision {0} was successful!</source>
-        <translation>Terugzetten naar revisie {0} is gelukt!</translation>
+        <translation>Grįžimas prie versijos {0} buvo sėkmingas!</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="454" />
         <source>Please select a versioned layer for committing</source>
-        <translation>Selecteer een versie van de laag om vast te leggen.</translation>
+        <translation>Prašome pasirinkti versiją sluoksnį, kurį norite patvirtinti.</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="631" />
         <location filename="../pgVersion.py" line="591" />
         <location filename="../pgVersion.py" line="466" />
         <source>Please select a versioned layer!</source>
-        <translation>Selecteer een versie van de laag!</translation>
+        <translation>Prašome pasirinkti versiją!</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="486" />
         <source>Commit of your changes was successful</source>
-        <translation>Het opslaan van uw wijzigingen is gelukt.</translation>
+        <translation>Jūsų pakeitimų įrašymas buvo sėkmingas</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="498" />
         <source>No layer changes for committing, everything is                            OK</source>
-        <translation>Geen laagwijzigingen voor vastleggen, alles is in orde</translation>
+        <translation>Nėra sluoksnių pakeitimų, viskas gerai</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="520" />
         <source>Are you sure to checkout the layer to revision {0}?</source>
-        <translation>Weet u zeker dat u de laag naar revisie {0} wilt afrekenen?</translation>
+        <translation>Ar tikrai norite peržiūrėti sluoksnį iki versijos {0}?</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="560" />
         <source>Checkout to revision {0} was                                         successful!</source>
-        <translation>Het afrekenen voor revisie {0} is gelukt!</translation>
+        <translation>Patikrinimas iki peržiūros {0} buvo sėkmingas!</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="566" />
         <source>Something went wrong during checkout                                         to revision {0}!</source>
-        <translation>Er is iets misgegaan tijdens het afrekenen naar revisie {0}!</translation>
+        <translation>Kažkas nepavyko peržiūrint {0}!</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="578" />
         <source>No Layer was selected. Please select one Layer.</source>
-        <translation>Er is geen laag geselecteerd. Selecteer een laag.</translation>
+        <translation>Nė vienas sluoksnis nebuvo pasirinktas. Pasirinkite vieną sluoksnį.</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="596" />
         <source>The selected Layer is already at the HEAD Revision.</source>
-        <translation>De geselecteerde laag bevindt zich al in de HEAD-revisie.</translation>
+        <translation>Pasirinkta sluoksnis jau yra HEAD versijoje.</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="605" />
         <source>Are you sure to revert to the HEAD revision?</source>
-        <translation>Weet u zeker dat u wilt terugkeren naar de HEAD-revisie?</translation>
+        <translation>Ar tikrai norite grįžti prie HEAD versijos?</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="618" />
         <source>All changes are set back to the HEAD                                 revision: {0}</source>
-        <translation>Alle wijzigingen worden teruggezet naar de HEAD-revisie: {0}</translation>
+        <translation>Visi pakeitimai grąžinami į HEAD versiją: {0}</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="709" />
         <source>Please select a versioned layer.</source>
-        <translation>Selecteer een versie van de laag.</translation>
+        <translation>Prašome pasirinkti versiją turintį sluoksnį.</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="716" />
         <source>The selected Layer is at the HEAD Revision.</source>
-        <translation>De geselecteerde laag bevindt zich in de HEAD-revisie.</translation>
+        <translation>Pasirinkta sluoksnis yra HEAD versijoje.</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="756" />
         <source>No diffs to HEAD in current extend detected!</source>
-        <translation>Geen verschillen met HEAD in huidige uitbreiding gedetecteerd!</translation>
+        <translation>Nėra skirtumų su HEAD dabartiniame išplėtime!</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="772" />
         <source>Diff to HEAD revision was successful!</source>
-        <translation>Diff naar HEAD-revisie is geslaagd!</translation>
+        <translation>Skirtumas nuo HEAD versijos buvo sėkmingas!</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="797" />
         <source>Are you sure to to drop pgvs from the table {0}?</source>
-        <translation>Weet u zeker dat u pgvs uit de tabel {0} wilt verwijderen?</translation>
+        <translation>Ar tikrai norite ištrinti pgvs iš lentelės {0}?</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="821" />
         <source>Versioning for layer {0} dropped!</source>
-        <translation>Versiebeheer voor laag {0} verwijderd!</translation>
+        <translation>Versijos numeravimas sluoksniui {0} panaikintas!</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="835" />
         <location filename="../pgVersion.py" line="833" />
         <source>Please select a versioned layer to upgrade</source>
-        <translation>Selecteer een versie van de laag om te upgraden.</translation>
+        <translation>Prašome pasirinkti versiją, kurią norite atnaujinti</translation>
     </message>
 </context>
 <context>
@@ -619,7 +619,7 @@ Are you sure to rollback to revision {1}?</source>
     <message>
         <location filename="../forms/pgVersionAbout.ui" line="0" />
         <source>PgVersion About</source>
-        <translation>PgVersion Over</translation>
+        <translation>PgVersion Apie</translation>
     </message>
     <message>
         <location filename="../forms/pgVersionAbout.ui" line="0" />
@@ -635,22 +635,22 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../forms/pgVersionAbout.ui" line="0" />
         <source>Help</source>
-        <translation>Help</translation>
+        <translation>Pagalba</translation>
     </message>
     <message>
         <location filename="../forms/pgVersionAbout.ui" line="0" />
         <source>Close</source>
-        <translation>Sluiten</translation>
+        <translation>Uždaryti</translation>
     </message>
     <message>
         <location filename="../forms/pgVersionAbout.ui" line="0" />
         <source>Web</source>
-        <translation>Web</translation>
+        <translation>Internetas</translation>
     </message>
     <message>
         <location filename="../forms/pgVersionAbout.ui" line="0" />
         <source>Version x.x-xxxxxx</source>
-        <translation>Versie x.x-xxxxxx</translation>
+        <translation>Versija x.x-xxxxxx</translation>
     </message>
     <message>
         <location filename="../forms/pgVersionAbout.ui" line="0" />
@@ -664,7 +664,7 @@ p, li { white-space: pre-wrap; }
         <location filename="../forms/pgLoadVersion.py" line="172" />
         <location filename="../forms/pgLoadVersion.py" line="119" />
         <source>Error</source>
-        <translation>Fout</translation>
+        <translation>Klaida</translation>
     </message>
     <message>
         <location filename="../forms/pgLoadVersion.py" line="120" />
@@ -672,22 +672,22 @@ p, li { white-space: pre-wrap; }
 In order to work with pgversion properly, the database connection must contain at least one user name! 
 Please fix the PostgreSQL database connection.</source>
         <translation>
-Om correct met pgversion te kunnen werken, moet de databaseverbinding ten minste één gebruikersnaam bevatten! Corrigeer de PostgreSQL-databaseverbinding.</translation>
+Kad pgversion veiktų tinkamai, duomenų bazės ryšys turi turėti bent vieną vartotojo vardą! Pataisykite PostgreSQL duomenų bazės ryšį.</translation>
     </message>
     <message>
         <location filename="../forms/pgLoadVersion.py" line="173" />
         <source>No Layer was selected.</source>
-        <translation>Er is geen laag geselecteerd.</translation>
+        <translation>Nė vienas sluoksnis nebuvo pasirinktas.</translation>
     </message>
     <message>
         <location filename="../forms/pgLoadVersion.py" line="191" />
         <source>DB error</source>
-        <translation>Databasefout</translation>
+        <translation>Duomenų bazės klaida</translation>
     </message>
     <message>
         <location filename="../forms/pgLoadVersion.py" line="211" />
         <source>Layer {0} is already loaded</source>
-        <translation>Laag {0} is al geladen</translation>
+        <translation>Sluoksnis {0} jau įkeltas</translation>
     </message>
 </context>
 <context>
@@ -695,32 +695,32 @@ Om correct met pgversion te kunnen werken, moet de databaseverbinding ten minste
     <message>
         <location filename="../pgVersionTools.py" line="223" />
         <source>Layer error</source>
-        <translation>Laagfout</translation>
+        <translation>Sluoksnio klaida</translation>
     </message>
     <message>
         <location filename="../pgVersionTools.py" line="224" />
         <source>Please select a postgres layer for versioning.</source>
-        <translation>Selecteer een Postgres-laag voor versiebeheer.</translation>
+        <translation>Prašome pasirinkti postgres sluoksnį versijavimui.</translation>
     </message>
     <message>
         <location filename="../pgVersionTools.py" line="244" />
         <source>Table {schema}.{table} is already versionized</source>
-        <translation>Tabel {schema}.{table} is al van een versie voorzien.</translation>
+        <translation>Lentelė {schema}.{table} jau yra versijuota</translation>
     </message>
     <message>
         <location filename="../pgVersionTools.py" line="303" />
         <source>Table {0}.{1} is not versionized</source>
-        <translation>Tabel {0}.{1} heeft geen versie.</translation>
+        <translation>Lentelė {0}.{1} nėra versijuojama</translation>
     </message>
     <message>
         <location filename="../pgVersionTools.py" line="334" />
         <source>select Candidate</source>
-        <translation>kandidaat selecteren</translation>
+        <translation>pasirinkti kandidatą</translation>
     </message>
     <message>
         <location filename="../pgVersionTools.py" line="480" />
         <source>No diffs to HEAD detected!</source>
-        <translation>Geen verschillen met HEAD gedetecteerd!</translation>
+        <translation>HEAD skirtumų nerasta!</translation>
     </message>
     <message>
         <location filename="../pgVersionTools.py" line="526" />
@@ -732,12 +732,12 @@ Please contact your DB-administrator to upgrade the DB-functions from the file:
 
 If you have appropriate DB permissions you can update the DB directly with click on DB-Update.</source>
         <translation>
-De plug-in verwacht pgvs-revisie %s, maar DB-functies van revisie %s zijn geïnstalleerd. Neem contact op met uw DB-beheerder om de DB-functies te upgraden vanuit het bestand: %s Als u over de juiste DB-rechten beschikt, kunt u de DB rechtstreeks bijwerken door op DB-Update te klikken.</translation>
+Įskiepis tikisi pgvs versijos %s, bet įdiegtos DB funkcijos yra versijos %s. Susisiekite su savo DB administratoriumi, kad atnaujintumėte DB funkcijas iš failo: %s Jei turite atitinkamus DB leidimus, galite atnaujinti DB tiesiogiai spustelėdami DB atnaujinimas.</translation>
     </message>
     <message>
         <location filename="../pgVersionTools.py" line="537" />
         <source>Upgrade pgvs to Revision %s</source>
-        <translation>Upgrade pgvs naar revisie %s</translation>
+        <translation>Atnaujinkite pgvs iki versijos %s</translation>
     </message>
 </context>
 <context>
@@ -745,7 +745,7 @@ De plug-in verwacht pgvs-revisie %s, maar DB-functies van revisie %s zijn geïns
     <message>
         <location filename="../forms/help.ui" line="0" />
         <source>PgVersion Help</source>
-        <translation>PgVersion Help</translation>
+        <translation>PgVersion Pagalba</translation>
     </message>
 </context>
 <context>
@@ -753,37 +753,37 @@ De plug-in verwacht pgvs-revisie %s, maar DB-functies van revisie %s zijn geïns
     <message>
         <location filename="../about/about.ui" line="0" />
         <source>About</source>
-        <translation>Over</translation>
+        <translation>Apie</translation>
     </message>
     <message>
         <location filename="../about/about.ui" line="0" />
         <source>Version:</source>
-        <translation>Versie:</translation>
+        <translation>Versija:</translation>
     </message>
     <message>
         <location filename="../about/about.ui" line="0" />
         <source>About </source>
-        <translation>Over </translation>
+        <translation>Apie </translation>
     </message>
     <message>
         <location filename="../about/about.ui" line="0" />
         <source>Contributors</source>
-        <translation>Bijdragers</translation>
+        <translation>Autoriai</translation>
     </message>
     <message>
         <location filename="../about/about.ui" line="0" />
         <source>Contact</source>
-        <translation>Contact</translation>
+        <translation>Kontaktai</translation>
     </message>
     <message>
         <location filename="../about/about.ui" line="0" />
         <source>Sponsors</source>
-        <translation>Sponsors</translation>
+        <translation>Rėmėjai</translation>
     </message>
     <message>
         <location filename="../about/about.ui" line="0" />
         <source>Change Log</source>
-        <translation>Wijzigingslogboek</translation>
+        <translation>Keitimų žurnalas</translation>
     </message>
 </context>
 <context>
@@ -791,22 +791,22 @@ De plug-in verwacht pgvs-revisie %s, maar DB-functies van revisie %s zijn geïns
     <message>
         <location filename="../forms/pgLoadVersion.ui" line="0" />
         <source>PostGIS Versioning System</source>
-        <translation>PostGIS-versiebeheersysteem</translation>
+        <translation>PostGIS versijų valdymo sistema</translation>
     </message>
     <message>
         <location filename="../forms/pgLoadVersion.ui" line="0" />
         <source>select versioned layer for loading into canvas:</source>
-        <translation>selecteer versie van laag om in canvas te laden:</translation>
+        <translation>pasirinkite versiją sluoksnį, kurį norite įkelti į drobę:</translation>
     </message>
     <message>
         <location filename="../forms/pgLoadVersion.ui" line="0" />
         <source>Current Database Connection Name:</source>
-        <translation>Huidige databaseverbindingsnaam:</translation>
+        <translation>Dabartinis duomenų bazės ryšio pavadinimas:</translation>
     </message>
     <message>
         <location filename="../forms/pgLoadVersion.ui" line="0" />
         <source>Current Database User:</source>
-        <translation>Huidige databasegebruiker:</translation>
+        <translation>Dabartinis duomenų bazės vartotojas:</translation>
     </message>
 </context>
 </TS>

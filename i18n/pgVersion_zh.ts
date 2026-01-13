@@ -5,12 +5,12 @@
     <message>
         <location filename="../forms/CommitMessage.ui" line="0" />
         <source>Commit Message</source>
-        <translation>Commitbericht</translation>
+        <translation>提交信息</translation>
     </message>
     <message>
         <location filename="../forms/CommitMessage.ui" line="0" />
         <source>Recent commit messages:</source>
-        <translation>Recente commitberichten:</translation>
+        <translation>最近的提交信息：</translation>
     </message>
 </context>
 <context>
@@ -18,12 +18,12 @@
     <message>
         <location filename="../forms/CommitMessage.py" line="65" />
         <source>Error</source>
-        <translation>Fout</translation>
+        <translation>错误</translation>
     </message>
     <message>
         <location filename="../forms/CommitMessage.py" line="66" />
         <source>Please write a commit message</source>
-        <translation>Schrijf een commitbericht</translation>
+        <translation>请编写提交信息</translation>
     </message>
 </context>
 <context>
@@ -31,17 +31,17 @@
     <message>
         <location filename="../pgVersionConflictWindow.py" line="113" />
         <source>solve conflict</source>
-        <translation>conflicten oplossen</translation>
+        <translation>解决冲突</translation>
     </message>
     <message>
         <location filename="../pgVersionConflictWindow.py" line="210" />
         <source>Notice</source>
-        <translation>Kennisgeving</translation>
+        <translation>通告</translation>
     </message>
     <message>
         <location filename="../pgVersionConflictWindow.py" line="211" />
         <source>Please select a versioned layer for committing</source>
-        <translation>Selecteer een versie van de laag om vast te leggen.</translation>
+        <translation>请选择一个版本化图层进行提交</translation>
     </message>
 </context>
 <context>
@@ -49,22 +49,22 @@
     <message>
         <location filename="../forms/dbVersionCheck.ui" line="0" />
         <source>Dialog</source>
-        <translation>Dialoog</translation>
+        <translation>对话</translation>
     </message>
     <message>
         <location filename="../forms/dbVersionCheck.ui" line="0" />
         <source>DB-Update</source>
-        <translation>DB-update</translation>
+        <translation>DB更新</translation>
     </message>
     <message>
         <location filename="../forms/dbVersionCheck.ui" line="0" />
         <source>Close</source>
-        <translation>Sluiten</translation>
+        <translation>关闭</translation>
     </message>
     <message>
         <location filename="../forms/dbVersionCheck.ui" line="0" />
         <source>Ctrl+S</source>
-        <translation>Control+S</translation>
+        <translation>Ctrl+S</translation>
     </message>
 </context>
 <context>
@@ -72,27 +72,27 @@
     <message>
         <location filename="../forms/dbVersionCheck.py" line="61" />
         <source>DB error</source>
-        <translation>Databasefout</translation>
+        <translation>数据库错误</translation>
     </message>
     <message>
         <location filename="../forms/dbVersionCheck.py" line="68" />
         <source>Installation</source>
-        <translation>Installatie</translation>
+        <translation>安装</translation>
     </message>
     <message>
         <location filename="../forms/dbVersionCheck.py" line="69" />
         <source>Installation of pgvs was successful</source>
-        <translation>De installatie van pgvs is geslaagd.</translation>
+        <translation>pgvs的安装已成功完成</translation>
     </message>
     <message>
         <location filename="../forms/dbVersionCheck.py" line="72" />
         <source>Upgrade</source>
-        <translation>Upgrade</translation>
+        <translation>升级</translation>
     </message>
     <message>
         <location filename="../forms/dbVersionCheck.py" line="73" />
         <source>Upgrade of pgvs was successful</source>
-        <translation>De upgrade van pgvs is geslaagd.</translation>
+        <translation>pgvs的升级已成功完成</translation>
     </message>
 </context>
 <context>
@@ -100,59 +100,59 @@
     <message>
         <location filename="../forms/diff.py" line="154" />
         <source>Message</source>
-        <translation>Bericht</translation>
+        <translation>消息</translation>
     </message>
     <message>
         <location filename="../forms/diff.py" line="154" />
         <source>This combination is not implemented yet</source>
-        <translation>Deze combinatie is nog niet geïmplementeerd.</translation>
+        <translation>此组合尚未实现</translation>
     </message>
     <message>
         <location filename="../forms/diff.ui" line="0" />
         <source>PgVersion DIFF</source>
-        <translation>PgVersion DIFF</translation>
+        <translation>PgVersion 差异</translation>
     </message>
     <message>
         <location filename="../forms/diff.ui" line="0" />
         <source>Revision 1</source>
-        <translation>Herziening 1</translation>
+        <translation>修订版 1</translation>
     </message>
     <message>
         <location filename="../forms/diff.ui" line="0" />
         <source>&amp;Number</source>
-        <translation>&amp;Aantal</translation>
+        <translation>&amp;Number</translation>
     </message>
     <message>
         <location filename="../forms/diff.ui" line="0" />
         <source>&amp;Date</source>
-        <translation>&amp;Data</translation>
+        <translation>&amp;日期</translation>
     </message>
     <message>
         <location filename="../forms/diff.ui" line="0" />
         <location filename="../forms/diff.ui" line="0" />
         <source>HEAD</source>
-        <translation>HOOFD</translation>
+        <translation>HEAD</translation>
     </message>
     <message>
         <location filename="../forms/diff.ui" line="0" />
         <location filename="../forms/diff.ui" line="0" />
         <source>BASE</source>
-        <translation>BASIS</translation>
+        <translation>BASE</translation>
     </message>
     <message>
         <location filename="../forms/diff.ui" line="0" />
         <source>Revision 2</source>
-        <translation>Herziening 2</translation>
+        <translation>修订版 2</translation>
     </message>
     <message>
         <location filename="../forms/diff.ui" line="0" />
         <source>N&amp;umber</source>
-        <translation>Nummer</translation>
+        <translation>编号</translation>
     </message>
     <message>
         <location filename="../forms/diff.ui" line="0" />
         <source>Da&amp;te</source>
-        <translation>Ja&amp;te</translation>
+        <translation>是的</translation>
     </message>
 </context>
 <context>
@@ -160,75 +160,75 @@
     <message>
         <location filename="../about/doAbout.py" line="42" />
         <source>About </source>
-        <translation>Over </translation>
+        <translation>关于</translation>
     </message>
     <message>
         <location filename="../about/doAbout.py" line="44" />
         <source>Version: </source>
-        <translation>Versie: </translation>
+        <translation>版本：</translation>
     </message>
     <message>
         <location filename="../about/doAbout.py" line="46" />
         <source>Author</source>
-        <translation>Auteur</translation>
+        <translation>作者</translation>
     </message>
     <message>
         <location filename="../about/doAbout.py" line="47" />
         <source>Contact</source>
-        <translation>Contact</translation>
+        <translation>联系</translation>
     </message>
     <message>
         <location filename="../about/doAbout.py" line="48" />
         <source>Sponsors</source>
-        <translation>Sponsors</translation>
+        <translation>赞助商</translation>
     </message>
     <message>
         <location filename="../about/doAbout.py" line="49" />
         <source>Change Log</source>
-        <translation>Wijzigingslogboek</translation>
+        <translation>变更日志</translation>
     </message>
     <message>
         <location filename="../about/doAbout.py" line="53" />
         <source>&lt;p&gt;&lt;center&gt;&lt;b&gt;Author(s):&lt;/b&gt;&lt;/center&gt;&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;center&gt;&lt;b&gt;Auteur(s):&lt;/b&gt;&lt;/center&gt;&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;center&gt;&lt;b&gt;作者：&lt;/b&gt;&lt;/center&gt;&lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="../about/doAbout.py" line="56" />
         <source>&lt;b&gt;The development of PgVersion was funded by:&lt;/b&gt;&lt;br&gt;&lt;br&gt;</source>
-        <translation>&lt;b&gt;De ontwikkeling van PgVersion werd gefinancierd door:&lt;/b&gt;&lt;br&gt;&lt;br&gt;</translation>
+        <translation>&lt;b&gt;PgVersion 的开发由以下机构资助：&lt;/b&gt;&lt;br&gt;&lt;br&gt;</translation>
     </message>
     <message>
         <location filename="../about/doAbout.py" line="58" />
         <source>- Sourcepole AG, Weberstrasse 5, CH-8004 Zurich&lt;br&gt;</source>
-        <translation>- Sourcepole AG, Weberstrasse 5, CH-8004 Zürich&lt;br&gt;</translation>
+        <translation>- Sourcepole AG，Weberstrasse 5，CH-8004 苏黎世</translation>
     </message>
     <message>
         <location filename="../about/doAbout.py" line="60" />
         <source>- Canton of Glarus / Switzerland&lt;br&gt;</source>
-        <translation>- Kanton Glarus / Zwitserland&lt;br&gt;</translation>
+        <translation>- 格拉鲁斯州 / 瑞士&lt;br&gt;</translation>
     </message>
     <message>
         <location filename="../about/doAbout.py" line="61" />
         <source>- Lower Saxony Ministry of Food, Agriculture and consumer             protection / Germany&lt;br&gt;</source>
-        <translation>- Ministerie van Voedsel, Landbouw en Consumentenbescherming van Nedersaksen / Duitsland&lt;br&gt;</translation>
+        <translation>- 下萨克森州食品、农业和消费者保护部 / 德国&lt;br&gt;</translation>
     </message>
     <message>
         <location filename="../about/doAbout.py" line="65" />
         <source>Sourcepole AG - Linux &amp; Open Source Solutions
 </source>
-        <translation>Sourcepole AG - Linux- en open source-oplossingen </translation>
+        <translation>源极科技股份有限公司 - Linux与开源解决方案</translation>
     </message>
     <message>
         <location filename="../about/doAbout.py" line="67" />
         <source>Weberstrasse 5, 8004 Zï¿½rich, Switzerland
 </source>
-        <translation>Weberstrasse 5, 8004 Zürich, Zwitserland </translation>
+        <translation>Weberstrasse 5, 8004 苏黎世，瑞士</translation>
     </message>
     <message>
         <location filename="../about/doAbout.py" line="71" />
         <source>Contact:
 </source>
-        <translation>Contact: </translation>
+        <translation>联系方式：</translation>
     </message>
 </context>
 <context>
@@ -236,12 +236,12 @@
     <message>
         <location filename="../forms/incrementalLayerUpdate.ui" line="0" />
         <source>Incremental Layer Import</source>
-        <translation>Incrementele laag importeren</translation>
+        <translation>增量图层导入</translation>
     </message>
     <message>
         <location filename="../forms/incrementalLayerUpdate.ui" line="0" />
         <source>Import Layer:</source>
-        <translation>Importlaag:</translation>
+        <translation>导入层：</translation>
     </message>
 </context>
 <context>
@@ -249,27 +249,27 @@
     <message>
         <location filename="../forms/incrementalLayerUpdate.py" line="99" />
         <source>Warning</source>
-        <translation>Waarschuwing</translation>
+        <translation>警告</translation>
     </message>
     <message>
         <location filename="../forms/incrementalLayerUpdate.py" line="100" />
         <source>Please select an import layer.</source>
-        <translation>Selecteer een importlaag.</translation>
+        <translation>请选择一个导入图层。</translation>
     </message>
     <message>
         <location filename="../forms/incrementalLayerUpdate.py" line="117" />
         <source>Do you like to overwrite the table? </source>
-        <translation>Wilt u de tabel overschrijven? </translation>
+        <translation>您是否要覆盖该表？</translation>
     </message>
     <message>
         <location filename="../forms/incrementalLayerUpdate.py" line="156" />
         <source>Import Error</source>
-        <translation>Importfout</translation>
+        <translation>导入错误</translation>
     </message>
     <message>
         <location filename="../forms/incrementalLayerUpdate.py" line="183" />
         <source>Update Error</source>
-        <translation>Updatefout</translation>
+        <translation>更新错误</translation>
     </message>
 </context>
 <context>
@@ -277,79 +277,79 @@
     <message>
         <location filename="../forms/LogView.ui" line="0" />
         <source>PG-Version LogView</source>
-        <translation>PG-versie LogView</translation>
+        <translation>PG版本 LogView</translation>
     </message>
     <message>
         <location filename="../forms/LogView.ui" line="0" />
         <source>-- checkout Tag --</source>
-        <translation>-- afrekenen Tag --</translation>
+        <translation>-- 结账标签 --</translation>
     </message>
     <message>
         <location filename="../forms/LogView.ui" line="0" />
         <source>Revision</source>
-        <translation>Herziening</translation>
+        <translation>修订</translation>
     </message>
     <message>
         <location filename="../forms/LogView.ui" line="0" />
         <source>Date</source>
-        <translation>Gegevens</translation>
+        <translation>数据</translation>
     </message>
     <message>
         <location filename="../forms/LogView.ui" line="0" />
         <source>User</source>
-        <translation>Gebruiker</translation>
+        <translation>用户</translation>
     </message>
     <message>
         <location filename="../forms/LogView.ui" line="0" />
         <source>Log-Message</source>
-        <translation>Logbericht</translation>
+        <translation>日志消息</translation>
     </message>
     <message>
         <location filename="../forms/LogView.ui" line="0" />
         <source>checkout Tag</source>
-        <translation>Afrekenen Tag</translation>
+        <translation>结账标签</translation>
     </message>
     <message>
         <location filename="../forms/LogView.ui" line="0" />
         <source>checkout selected revision</source>
-        <translation>geselecteerde revisie afrekenen</translation>
+        <translation>检出所选修订版本</translation>
     </message>
     <message>
         <location filename="../forms/LogView.ui" line="0" />
         <source>diff to HEAD revision</source>
-        <translation>verschil met HEAD-revisie</translation>
+        <translation>与HEAD修订版的差异</translation>
     </message>
     <message>
         <location filename="../forms/LogView.ui" line="0" />
         <source>rollback to selected revision</source>
-        <translation>terugzetten naar geselecteerde revisie</translation>
+        <translation>回退至所选修订版本</translation>
     </message>
     <message>
         <location filename="../forms/LogView.py" line="56" />
         <location filename="../forms/LogView.py" line="54" />
         <source>Set Tag for current revision</source>
-        <translation>Tag instellen voor huidige revisie</translation>
+        <translation>为当前修订版本设置标签</translation>
     </message>
     <message>
         <location filename="../forms/LogView.py" line="105" />
         <source>Set Tag for Revision </source>
-        <translation>Set Tag voor revisie </translation>
+        <translation>为修订设置标签</translation>
     </message>
     <message>
         <location filename="../forms/LogView.py" line="150" />
         <location filename="../forms/LogView.py" line="113" />
         <source>Warning</source>
-        <translation>Waarschuwing</translation>
+        <translation>警告</translation>
     </message>
     <message>
         <location filename="../forms/LogView.py" line="114" />
         <source>This version is already tagged</source>
-        <translation>Deze versie is al getagd.</translation>
+        <translation>此版本已完成标记</translation>
     </message>
     <message>
         <location filename="../forms/LogView.py" line="151" />
         <source>Please select a revision for rollback</source>
-        <translation>Selecteer een revisie voor terugdraaien</translation>
+        <translation>请选择要回滚的修订版本</translation>
     </message>
 </context>
 <context>
@@ -357,78 +357,78 @@
     <message>
         <location filename="../pgVersion.py" line="69" />
         <source>Prepare Layer for Versioning</source>
-        <translation>Laag voorbereiden voor versiebeheer</translation>
+        <translation>为版本控制准备层</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="74" />
         <source>Load Versioned Layer</source>
-        <translation>Laad versiebeheerlaag</translation>
+        <translation>加载版本化图层</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="78" />
         <source>Commit Changes</source>
-        <translation>Wijzigingen vastleggen</translation>
+        <translation>提交更改</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="82" />
         <source>Revert to HEAD Revision</source>
-        <translation>Terugkeren naar HEAD-revisie</translation>
+        <translation>回退至HEAD修订版</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="86" />
         <source>Show Logs</source>
-        <translation>Logs weergeven</translation>
+        <translation>显示日志</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="90" />
         <source>Show Diffs</source>
-        <translation>Verschillen weergeven</translation>
+        <translation>显示差异</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="94" />
         <source>Drop Versioning from Layer</source>
-        <translation>Versiebeheer uit laag verwijderen</translation>
+        <translation>从图层中移除版本控制</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="98" />
         <source>Help</source>
-        <translation>Help</translation>
+        <translation>帮助</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="101" />
         <source>About</source>
-        <translation>Over</translation>
+        <translation>关于</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="106" />
         <source>Bulk delete directly in the database</source>
-        <translation>Bulk verwijderen rechtstreeks in de database</translation>
+        <translation>直接在数据库中批量删除</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="111" />
         <source>Incremental Layer Update</source>
-        <translation>Incrementele laagupdate</translation>
+        <translation>增量层更新</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="272" />
         <source>Question</source>
-        <translation>Vraag</translation>
+        <translation>问题</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="273" />
         <source>Are you sure to delete all selected features. You cannot undo this action!</source>
-        <translation>Weet u zeker dat u alle geselecteerde functies wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt!</translation>
+        <translation>您确定要删除所有选定特征吗？此操作无法撤销！</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="791" />
         <location filename="../pgVersion.py" line="309" />
         <source>Please select a layer for versioning</source>
-        <translation>Selecteer een laag voor versiebeheer</translation>
+        <translation>请选择要进行版本控制的图层</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="313" />
         <source>Please select a postgres layer for versioning</source>
-        <translation>Selecteer een Postgres-laag voor versiebeheer.</translation>
+        <translation>请选择一个Postgres层用于版本控制</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="806" />
@@ -439,22 +439,22 @@
         <location filename="../pgVersion.py" line="323" />
         <location filename="../pgVersion.py" line="317" />
         <source>Warning</source>
-        <translation>Waarschuwing</translation>
+        <translation>警告</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="318" />
         <source>The selected layer is no serial defined!</source>
-        <translation>De geselecteerde laag is niet serieel gedefinieerd!</translation>
+        <translation>所选图层未定义序列！</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="324" />
         <source>The selected layer is already under versioning!</source>
-        <translation>De geselecteerde laag wordt al beheerd!</translation>
+        <translation>所选图层已处于版本控制中！</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="335" />
         <source>Do you want to create the version environment for the table {0}?</source>
-        <translation>Wilt u de versieomgeving voor de tabel {0} aanmaken?</translation>
+        <translation>是否要为表 {0} 创建版本环境？</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="348" />
@@ -465,12 +465,12 @@ Please set the user permissions for table {0} and reload it via Database -&gt; P
 
 Further information on rights management can be found in the help in section 1.3.3</source>
         <translation>
-Het initialiseren is gelukt! Stel de gebruikersrechten voor tabel {0} in en laad deze opnieuw via Database -&gt; PG-versie! Meer informatie over rechtenbeheer vindt u in de helpfunctie in paragraaf 1.3.3.</translation>
+初始化成功！请为表{0}设置用户权限，并通过数据库-&gt;PG版本重新加载该表！有关权限管理的更多信息，请参阅帮助文档第1.3.3节。</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="362" />
         <source>Init Error</source>
-        <translation>Eerste fout</translation>
+        <translation>初始错误</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="363" />
@@ -481,7 +481,7 @@ Error:
 {1}
                         </source>
         <translation>
-Initialisatie van tabel {0} mislukt! Fout: {1} </translation>
+表 {0} 初始化失败！错误：{1}</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="835" />
@@ -489,129 +489,129 @@ Initialisatie van tabel {0} mislukt! Fout: {1} </translation>
         <location filename="../pgVersion.py" line="506" />
         <location filename="../pgVersion.py" line="393" />
         <source>Error</source>
-        <translation>Fout</translation>
+        <translation>错误</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="507" />
         <location filename="../pgVersion.py" line="394" />
         <source>Please select a valid revision</source>
-        <translation>Selecteer een geldige revisie</translation>
+        <translation>请选择有效的修订版本</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="515" />
         <location filename="../pgVersion.py" line="404" />
         <source>Please select a versioned layer</source>
-        <translation>Selecteer een versie van de laag</translation>
+        <translation>请选择一个版本化图层</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="408" />
         <source>Are you sure to rollback to revision {0}?</source>
-        <translation>Weet u zeker dat u wilt terugkeren naar revisie {0}?</translation>
+        <translation>您确定要回滚到版本 {0} 吗？</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="418" />
         <source>Layer {0} has modifications which will be lost after rollback! If you want to keep this modifications please commit them before you execute the rollback. 
 
 Are you sure to rollback to revision {1}?</source>
-        <translation>Laag {0} bevat wijzigingen die verloren gaan na het terugdraaien! Als u deze wijzigingen wilt behouden, moet u ze vastleggen voordat u het terugdraaien uitvoert. Weet u zeker dat u wilt terugdraaien naar revisie {1}?</translation>
+        <translation>层 {0} 存在修改内容，回滚后这些修改将丢失！若需保留这些修改，请在执行回滚前提交。您确定要回滚至修订版本 {1} 吗？</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="446" />
         <source>Rollback to revision {0} was successful!</source>
-        <translation>Terugzetten naar revisie {0} is gelukt!</translation>
+        <translation>回退到版本 {0} 成功！</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="454" />
         <source>Please select a versioned layer for committing</source>
-        <translation>Selecteer een versie van de laag om vast te leggen.</translation>
+        <translation>请选择一个版本化图层进行提交</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="631" />
         <location filename="../pgVersion.py" line="591" />
         <location filename="../pgVersion.py" line="466" />
         <source>Please select a versioned layer!</source>
-        <translation>Selecteer een versie van de laag!</translation>
+        <translation>请选择一个版本化图层！</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="486" />
         <source>Commit of your changes was successful</source>
-        <translation>Het opslaan van uw wijzigingen is gelukt.</translation>
+        <translation>提交更改已成功</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="498" />
         <source>No layer changes for committing, everything is                            OK</source>
-        <translation>Geen laagwijzigingen voor vastleggen, alles is in orde</translation>
+        <translation>提交时无需更改层，一切正常</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="520" />
         <source>Are you sure to checkout the layer to revision {0}?</source>
-        <translation>Weet u zeker dat u de laag naar revisie {0} wilt afrekenen?</translation>
+        <translation>您确定要将图层检查到修订版本 {0} 吗？</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="560" />
         <source>Checkout to revision {0} was                                         successful!</source>
-        <translation>Het afrekenen voor revisie {0} is gelukt!</translation>
+        <translation>检查到修订版本 {0} 成功！</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="566" />
         <source>Something went wrong during checkout                                         to revision {0}!</source>
-        <translation>Er is iets misgegaan tijdens het afrekenen naar revisie {0}!</translation>
+        <translation>在修订版本 {0} 的结账过程中出现错误！</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="578" />
         <source>No Layer was selected. Please select one Layer.</source>
-        <translation>Er is geen laag geselecteerd. Selecteer een laag.</translation>
+        <translation>未选择图层。请选择一个图层。</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="596" />
         <source>The selected Layer is already at the HEAD Revision.</source>
-        <translation>De geselecteerde laag bevindt zich al in de HEAD-revisie.</translation>
+        <translation>所选图层已处于HEAD修订版本。</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="605" />
         <source>Are you sure to revert to the HEAD revision?</source>
-        <translation>Weet u zeker dat u wilt terugkeren naar de HEAD-revisie?</translation>
+        <translation>您确定要还原到HEAD修订版本吗？</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="618" />
         <source>All changes are set back to the HEAD                                 revision: {0}</source>
-        <translation>Alle wijzigingen worden teruggezet naar de HEAD-revisie: {0}</translation>
+        <translation>所有更改均已回退至最新修订版本：{0}</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="709" />
         <source>Please select a versioned layer.</source>
-        <translation>Selecteer een versie van de laag.</translation>
+        <translation>请选择一个版本化图层。</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="716" />
         <source>The selected Layer is at the HEAD Revision.</source>
-        <translation>De geselecteerde laag bevindt zich in de HEAD-revisie.</translation>
+        <translation>所选图层处于HEAD修订版本。</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="756" />
         <source>No diffs to HEAD in current extend detected!</source>
-        <translation>Geen verschillen met HEAD in huidige uitbreiding gedetecteerd!</translation>
+        <translation>当前扩展中未检测到与HEAD的差异！</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="772" />
         <source>Diff to HEAD revision was successful!</source>
-        <translation>Diff naar HEAD-revisie is geslaagd!</translation>
+        <translation>与HEAD版本的差异比较已成功完成！</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="797" />
         <source>Are you sure to to drop pgvs from the table {0}?</source>
-        <translation>Weet u zeker dat u pgvs uit de tabel {0} wilt verwijderen?</translation>
+        <translation>您确定要从表 {0} 中删除 pgvs 列吗？</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="821" />
         <source>Versioning for layer {0} dropped!</source>
-        <translation>Versiebeheer voor laag {0} verwijderd!</translation>
+        <translation>层{0}的版本控制已移除！</translation>
     </message>
     <message>
         <location filename="../pgVersion.py" line="835" />
         <location filename="../pgVersion.py" line="833" />
         <source>Please select a versioned layer to upgrade</source>
-        <translation>Selecteer een versie van de laag om te upgraden.</translation>
+        <translation>请选择一个版本化图层进行升级</translation>
     </message>
 </context>
 <context>
@@ -619,7 +619,7 @@ Are you sure to rollback to revision {1}?</source>
     <message>
         <location filename="../forms/pgVersionAbout.ui" line="0" />
         <source>PgVersion About</source>
-        <translation>PgVersion Over</translation>
+        <translation>PgVersion 关于</translation>
     </message>
     <message>
         <location filename="../forms/pgVersionAbout.ui" line="0" />
@@ -635,27 +635,27 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../forms/pgVersionAbout.ui" line="0" />
         <source>Help</source>
-        <translation>Help</translation>
+        <translation>帮助</translation>
     </message>
     <message>
         <location filename="../forms/pgVersionAbout.ui" line="0" />
         <source>Close</source>
-        <translation>Sluiten</translation>
+        <translation>关闭</translation>
     </message>
     <message>
         <location filename="../forms/pgVersionAbout.ui" line="0" />
         <source>Web</source>
-        <translation>Web</translation>
+        <translation>网页</translation>
     </message>
     <message>
         <location filename="../forms/pgVersionAbout.ui" line="0" />
         <source>Version x.x-xxxxxx</source>
-        <translation>Versie x.x-xxxxxx</translation>
+        <translation>版本 x.x-xxxxxx</translation>
     </message>
     <message>
         <location filename="../forms/pgVersionAbout.ui" line="0" />
         <source>PgVersion</source>
-        <translation>PgVersion</translation>
+        <translation>版本号</translation>
     </message>
 </context>
 <context>
@@ -664,7 +664,7 @@ p, li { white-space: pre-wrap; }
         <location filename="../forms/pgLoadVersion.py" line="172" />
         <location filename="../forms/pgLoadVersion.py" line="119" />
         <source>Error</source>
-        <translation>Fout</translation>
+        <translation>错误</translation>
     </message>
     <message>
         <location filename="../forms/pgLoadVersion.py" line="120" />
@@ -672,22 +672,22 @@ p, li { white-space: pre-wrap; }
 In order to work with pgversion properly, the database connection must contain at least one user name! 
 Please fix the PostgreSQL database connection.</source>
         <translation>
-Om correct met pgversion te kunnen werken, moet de databaseverbinding ten minste één gebruikersnaam bevatten! Corrigeer de PostgreSQL-databaseverbinding.</translation>
+为正确使用 pgversion，数据库连接必须至少包含一个用户名！请修正 PostgreSQL 数据库连接。</translation>
     </message>
     <message>
         <location filename="../forms/pgLoadVersion.py" line="173" />
         <source>No Layer was selected.</source>
-        <translation>Er is geen laag geselecteerd.</translation>
+        <translation>未选择图层。</translation>
     </message>
     <message>
         <location filename="../forms/pgLoadVersion.py" line="191" />
         <source>DB error</source>
-        <translation>Databasefout</translation>
+        <translation>数据库错误</translation>
     </message>
     <message>
         <location filename="../forms/pgLoadVersion.py" line="211" />
         <source>Layer {0} is already loaded</source>
-        <translation>Laag {0} is al geladen</translation>
+        <translation>层 {0} 已加载</translation>
     </message>
 </context>
 <context>
@@ -695,32 +695,32 @@ Om correct met pgversion te kunnen werken, moet de databaseverbinding ten minste
     <message>
         <location filename="../pgVersionTools.py" line="223" />
         <source>Layer error</source>
-        <translation>Laagfout</translation>
+        <translation>层错误</translation>
     </message>
     <message>
         <location filename="../pgVersionTools.py" line="224" />
         <source>Please select a postgres layer for versioning.</source>
-        <translation>Selecteer een Postgres-laag voor versiebeheer.</translation>
+        <translation>请选择用于版本控制的Postgres层。</translation>
     </message>
     <message>
         <location filename="../pgVersionTools.py" line="244" />
         <source>Table {schema}.{table} is already versionized</source>
-        <translation>Tabel {schema}.{table} is al van een versie voorzien.</translation>
+        <translation>表 {schema}.{table} 已启用版本控制</translation>
     </message>
     <message>
         <location filename="../pgVersionTools.py" line="303" />
         <source>Table {0}.{1} is not versionized</source>
-        <translation>Tabel {0}.{1} heeft geen versie.</translation>
+        <translation>表 {0}.{1} 未进行版本控制</translation>
     </message>
     <message>
         <location filename="../pgVersionTools.py" line="334" />
         <source>select Candidate</source>
-        <translation>kandidaat selecteren</translation>
+        <translation>选择候选人</translation>
     </message>
     <message>
         <location filename="../pgVersionTools.py" line="480" />
         <source>No diffs to HEAD detected!</source>
-        <translation>Geen verschillen met HEAD gedetecteerd!</translation>
+        <translation>未检测到与HEAD的差异！</translation>
     </message>
     <message>
         <location filename="../pgVersionTools.py" line="526" />
@@ -732,12 +732,12 @@ Please contact your DB-administrator to upgrade the DB-functions from the file:
 
 If you have appropriate DB permissions you can update the DB directly with click on DB-Update.</source>
         <translation>
-De plug-in verwacht pgvs-revisie %s, maar DB-functies van revisie %s zijn geïnstalleerd. Neem contact op met uw DB-beheerder om de DB-functies te upgraden vanuit het bestand: %s Als u over de juiste DB-rechten beschikt, kunt u de DB rechtstreeks bijwerken door op DB-Update te klikken.</translation>
+该插件要求数据库版本为%s，但当前安装的数据库函数版本为%s。请联系您的数据库管理员，从文件%s升级数据库函数。若您拥有相应数据库权限，可直接点击"数据库更新"进行升级。</translation>
     </message>
     <message>
         <location filename="../pgVersionTools.py" line="537" />
         <source>Upgrade pgvs to Revision %s</source>
-        <translation>Upgrade pgvs naar revisie %s</translation>
+        <translation>将 pgvs 升级至修订版本 %s</translation>
     </message>
 </context>
 <context>
@@ -745,7 +745,7 @@ De plug-in verwacht pgvs-revisie %s, maar DB-functies van revisie %s zijn geïns
     <message>
         <location filename="../forms/help.ui" line="0" />
         <source>PgVersion Help</source>
-        <translation>PgVersion Help</translation>
+        <translation>PgVersion 帮助</translation>
     </message>
 </context>
 <context>
@@ -753,37 +753,37 @@ De plug-in verwacht pgvs-revisie %s, maar DB-functies van revisie %s zijn geïns
     <message>
         <location filename="../about/about.ui" line="0" />
         <source>About</source>
-        <translation>Over</translation>
+        <translation>关于</translation>
     </message>
     <message>
         <location filename="../about/about.ui" line="0" />
         <source>Version:</source>
-        <translation>Versie:</translation>
+        <translation>版本：</translation>
     </message>
     <message>
         <location filename="../about/about.ui" line="0" />
         <source>About </source>
-        <translation>Over </translation>
+        <translation>关于</translation>
     </message>
     <message>
         <location filename="../about/about.ui" line="0" />
         <source>Contributors</source>
-        <translation>Bijdragers</translation>
+        <translation>贡献者</translation>
     </message>
     <message>
         <location filename="../about/about.ui" line="0" />
         <source>Contact</source>
-        <translation>Contact</translation>
+        <translation>联系</translation>
     </message>
     <message>
         <location filename="../about/about.ui" line="0" />
         <source>Sponsors</source>
-        <translation>Sponsors</translation>
+        <translation>赞助商</translation>
     </message>
     <message>
         <location filename="../about/about.ui" line="0" />
         <source>Change Log</source>
-        <translation>Wijzigingslogboek</translation>
+        <translation>变更日志</translation>
     </message>
 </context>
 <context>
@@ -791,22 +791,22 @@ De plug-in verwacht pgvs-revisie %s, maar DB-functies van revisie %s zijn geïns
     <message>
         <location filename="../forms/pgLoadVersion.ui" line="0" />
         <source>PostGIS Versioning System</source>
-        <translation>PostGIS-versiebeheersysteem</translation>
+        <translation>PostGIS 版本控制系统</translation>
     </message>
     <message>
         <location filename="../forms/pgLoadVersion.ui" line="0" />
         <source>select versioned layer for loading into canvas:</source>
-        <translation>selecteer versie van laag om in canvas te laden:</translation>
+        <translation>选择要加载到画布中的版本化图层：</translation>
     </message>
     <message>
         <location filename="../forms/pgLoadVersion.ui" line="0" />
         <source>Current Database Connection Name:</source>
-        <translation>Huidige databaseverbindingsnaam:</translation>
+        <translation>当前数据库连接名称：</translation>
     </message>
     <message>
         <location filename="../forms/pgLoadVersion.ui" line="0" />
         <source>Current Database User:</source>
-        <translation>Huidige databasegebruiker:</translation>
+        <translation>当前数据库用户：</translation>
     </message>
 </context>
 </TS>
