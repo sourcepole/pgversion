@@ -118,8 +118,8 @@ class PgVersionTools(QObject):
             try:
                 myLayerUri = QgsDataSourceUri(theLayer.source())
             except:
-#                error = self.tr("Please select a versioned layer to display its log information.")
-#                QMessageBox.warning(None,  self.tr('No versioned layer selected'),  str(error))
+                error = self.tr("Please select a versioned layer to display its log information.")
+                QMessageBox.warning(None,  self.tr('No versioned layer selected'),  str(error))
                 return False
             myDb = self.layerDB('hasVersion', theLayer)
 
@@ -134,18 +134,24 @@ class PgVersionTools(QObject):
             pgversion_exists = myDb.exists('table', 'versions.version_tables')    
                         
             if pgversion_exists:
-                sql = """
-                        select count(version_table_name) 
-                        from versions.version_tables import 
-                        where version_view_schema = '%s' 
-                            and version_view_name = '%s'""" % (schema, myLayerUri.table())
-                        
-                result,  error = myDb.read(sql)
-                if error == None:
-                    if result['COUNT'][0] == 1:
-                        return True
-                    else:
-                        return False
+
+# Nur ausführen, wenn es sich nicht um einen Zeitstand eines Layers handel                
+                if 'SELECT' not in myLayerUri.table().upper():
+                    sql = """
+                        select exists (
+                            select version_table_name 
+                            from versions.version_tables import 
+                            where version_view_schema = '%s' 
+                                and version_view_name = '%s')""" % (schema, myLayerUri.table())
+                    
+                    result,  error = myDb.read(sql)
+                    if error == None:
+                        if result['EXISTS'][0]:
+                            return True
+                        else:
+                            return False
+                else:
+                    return False
             else:
                 return False
 #            else:
