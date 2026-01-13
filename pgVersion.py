@@ -235,8 +235,8 @@ class PgVersion(QObject):
         self.actionIncrementalUpdate.setEnabled(isActive)        
 
     def add_layer(self, layer):
-        layer.dataSourceChanged.connect(lambda my_layer=layer: self.datasource_changed(my_layer))
         if self.tools.hasVersion(layer):
+            layer.dataSourceChanged.connect(lambda my_layer=layer: self.datasource_changed(my_layer))            
             if layer.id not in self.layer_list:
                 layer.editingStopped.connect(
                     lambda my_list=self.layer_list: self.tools.setModified(
