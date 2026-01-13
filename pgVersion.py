@@ -52,10 +52,12 @@ class PgVersion(QObject):
             self.plugin_path,
             'i18n',
             'pgVersion_{}.qm'.format(self.locale))
-
+        
         if os.path.exists(locale_path):
             self.translator = QTranslator()
             self.translator.load(locale_path)
+            
+        QCoreApplication.installTranslator(self.translator)        
 
     def initGui(self):
         self.helpDialog = HelpDialog()
