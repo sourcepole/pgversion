@@ -2,7 +2,7 @@
 name=PgVersion
 description=Client for the Postgres Versioning System pgvs
 category=Database
-version=3.6.1
+version=3.6.2
 qgisMinimumVersion=3.0
 qgisMaximumVersion=3.99
 class_name=PgVersion
@@ -14,6 +14,8 @@ about=
 ; Optional items:
 
 changelog=
+    3.6.2
+    - Translations added
     3.6.1
     - bug fixing
     3.6.0
@@ -96,7 +98,7 @@ changelog=
     3.0.0
     - initial release for QGIS3
 
-homepage=https://github.com/sourcepole/pgversion
-tracker=https://github.com/sourcepole/pgversion/issues
-repository=https://github.com/sourcepole/pgversion.git
+homepage=https://github.com/hdus/pgversion
+tracker=https://github.com/hdus/pgversion/issues
+repository=https://github.com/hdus/pgversion.git
 icon=icons/pgversion-log.svg
