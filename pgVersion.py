@@ -169,22 +169,29 @@ class PgVersion(QObject):
             if a.objectName() == 'mActionToggleEditing':
                 a.triggered.connect(self.SelectionChanged)
 
+        self.versioned_layers = []
+        
 #        self.iface.mapCanvas().selectionChanged.connect(self.SelectionChanged)
         self.iface.currentLayerChanged.connect(self.layer_changed)
         QgsProject().instance().layerWasAdded.connect(self.add_layer)
         QgsProject().instance().layerWillBeRemoved.connect(self.remove_layer)
 
-        def layer_changed(self, layer):
-            # alte Verbindung lösen
-            try:
-                self._current_layer.selectionChanged.disconnect(self.SelectionChanged)
-            except Exception:
-                pass
+    def layer_changed(self, layer):
+        # alte Verbindung lösen
+        try:
+            self._current_layer.selectionChanged.disconnect(self.SelectionChanged)
+        except Exception:
+            pass
 
-            self._current_layer = layer
+        self._current_layer = layer
 
-            if layer and isinstance(layer, QgsVectorLayer):
-                layer.selectionChanged.connect(self.SelectionChanged)
+        if layer and isinstance(layer, QgsVectorLayer):
+            layer.selectionChanged.connect(self.SelectionChanged)
+            
+        if self.iface.activeLayer() in self.versioned_layers:
+            self.set_actions(True)
+        else:
+            self.set_actions(False)            
         
     from contextlib import contextmanager
     
@@ -196,6 +203,12 @@ class PgVersion(QObject):
         finally:
             QApplication.restoreOverrideCursor()              
 
+    def initialize_layer_list(self):
+        """Liste beim Start füllen."""
+        for layer in QgsProject.instance().mapLayers().values():
+            if self.tools.hasVersion(layer):
+                self.versioned_layers.append(layer)
+
     def datasource_changed(self,  l):
         if self.tools.hasVersion(l):
             self.add_layer(l)
@@ -205,12 +218,6 @@ class PgVersion(QObject):
                     l.setName(l.name() + ' (modified)')
             else:
                 l.setName(l.name().replace(' (modified)', ''))        
-        
-    def layer_changed(self):
-        if self.tools.hasVersion(self.iface.activeLayer()):
-            self.set_actions(True)
-        else:
-            self.set_actions(False)
 
     def SelectionChanged(self):
         current_layer = self.iface.activeLayer()
@@ -243,6 +250,7 @@ class PgVersion(QObject):
                     lambda my_list=self.layer_list: self.tools.setModified(
                         my_list))
                 self.layer_list.append(layer.id())
+                self.versioned_layers.append(layer)
                 self.tools.setModified(self.layer_list)
                 layer.setCustomProperty("pg_version", True)
                 

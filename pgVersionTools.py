@@ -156,7 +156,7 @@ class PgVersionTools(QObject):
                 return False
 #            else:
 #                QMessageBox.warning(None,  self.tr('Init error'),  str(error))
-
+    
     def isModified(self, myLayer=None):
         if myLayer is None:
             return None
@@ -171,23 +171,19 @@ class PgVersionTools(QObject):
         else:
             schema = myLayerUri.schema()
 
-        sql = """
-          select count(project)
+        sql = """select exists (
+          select project
           from versions."%s_%s_log"
-          where project = '%s' and not commit""" % (
+          where project = '%s' and not commit)""" % (
               schema, myLayerUri.table(), myDb.dbUser())
         result,  error = myDb.read(sql)
 
-        try:
-            if int(result["COUNT"][0]) == 0:
-                return False
-            else:
-                return True
-        except:
+        if result["EXISTS"][0]:
+            return True
+        else:
             return False
-
+            
     def setModified(self, layer_list):
-
         layer_list = list(set(layer_list))
         for i in range(len(layer_list)):
             map_layer = QgsProject().instance().mapLayer(layer_list[i])
