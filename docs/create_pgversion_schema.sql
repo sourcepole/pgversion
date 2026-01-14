@@ -56,7 +56,7 @@ CREATE OR REPLACE FUNCTION versions.pgvsrevision ()
 DECLARE
   revision TEXT;
   BEGIN
-    revision := '2.1.21';
+    revision := '2.1.22';
     RETURN revision;
   END;
 $$;
@@ -103,54 +103,48 @@ CREATE TYPE versions.logview AS
 ALTER TYPE versions.logview OWNER TO versions;
 -- ddl-end --
 
+
 -- object: versions._hasserial | type: FUNCTION --
--- DROP FUNCTION IF EXISTS versions._hasserial(character varying) CASCADE;
-CREATE OR REPLACE FUNCTION versions._hasserial (in_table character varying)
-	RETURNS boolean
-	LANGUAGE plpgsql
-	VOLATILE
-	CALLED ON NULL INPUT
-	SECURITY INVOKER
-	PARALLEL UNSAFE
-	COST 1
-	AS $$
-DECLARE
-  qry TEXT;
-  pos INTEGER;
-  my_schema TEXT;
-  my_table TEXT;
-  my_serial_rec RECORD;
-
-
-BEGIN
-    pos := strpos(in_table,'.');
-
-    if pos=0 then
-      my_schema := 'public';
-  	  my_table := in_table;
-    else
-        my_schema := substr(in_table,0,pos);
-        pos := pos + 1;
-        my_table := substr(in_table,pos);
-    END IF;
-
-  -- Check if SERIAL exists and which column represents it
-    select into my_serial_rec column_name as att,
-               data_type as typ, column_default
-    from information_schema.columns as col
-    where table_schema = my_schema::name
-      and table_name = my_table::name
-      and (position('nextval' in lower(column_default)) is NOT NULL
-      or position('nextval' in lower(column_default)) <> 0);
-
-    IF FOUND THEN
-       RETURN 'true';
-    else
-       RAISE EXCEPTION 'Table %.% does not has a serial defined', my_schema, my_table;
-    END IF;
-END;
+-- DROP FUNCTION IF EXISTS versions._hasserial(character varying) CASCADE
+CREATE OR REPLACE FUNCTION versions._hasserial (
+    p_fullname text
+)
+RETURNS boolean
+LANGUAGE sql
+AS $$
+WITH parts AS (
+    SELECT
+        CASE
+            WHEN strpos(p_fullname, '.') > 0 THEN split_part(p_fullname, '.', 1)
+            ELSE 'public'
+        END AS schema_name,
+        CASE
+            WHEN strpos(p_fullname, '.') > 0 THEN split_part(p_fullname, '.', 2)
+            ELSE p_fullname
+        END AS table_name
+)
+SELECT EXISTS (
+    SELECT 1
+    FROM information_schema.table_constraints tc
+    JOIN information_schema.key_column_usage kcu
+      ON tc.constraint_name = kcu.constraint_name
+     AND tc.table_schema = kcu.table_schema
+    JOIN information_schema.columns c
+      ON c.table_schema = tc.table_schema
+     AND c.table_name = tc.table_name
+     AND c.column_name = kcu.column_name
+    CROSS JOIN parts p
+    WHERE tc.constraint_type = 'PRIMARY KEY'
+      AND tc.table_schema = p.schema_name
+      AND tc.table_name = p.table_name
+      AND (
+          c.is_identity = 'YES'
+          OR pg_get_serial_sequence(format('%I.%I', c.table_schema, c.table_name), c.column_name) IS NOT NULL
+      )
+);
 $$;
--- ddl-end --
+
+
 ALTER FUNCTION versions._hasserial(character varying) OWNER TO versions;
 -- ddl-end --
 
@@ -636,6 +630,7 @@ DECLARE
     testTab TEXT;
     archiveWhere TEXT;
     sql TEXT;
+	has_serial BOOLEAN;
 
   BEGIN
     pos := strpos(inTable,'.');
@@ -661,7 +656,13 @@ DECLARE
         myTable = substr(inTable,pos);
     END IF;
 
-    execute 'select * from versions._hasserial('''||mySchema||'.'||myTable||''')';
+	EXECUTE format('SELECT versions._hasserial(%L)', mySchema || '.' || myTable) INTO has_serial;
+
+	IF NOT has_serial THEN
+		RAISE EXCEPTION 'No Sequence defined for Table %.%', mySchema, myTable;
+		RETURN FALSE;
+	END IF;
+
 
     versionTable := quote_ident(mySchema||'.'||myTable||'_version_t');
     versionView := quote_ident(mySchema)||'.'||quote_ident(myTable||'_version');
@@ -777,11 +778,6 @@ DECLARE
         newFields := substring(newFields,2);
         oldFields := substring(oldFields,2);
         updateFields := substring(updateFields,2);
-
-        IF length(mySequence)=0 THEN
-          RAISE EXCEPTION 'No Sequence defined for Table %.%', mySchema,myTable;
-          RETURN False;
-        END IF;
 
      execute 'create or replace view '||versionView||' as
                 SELECT v.'||myPkey||', '||fields||'
