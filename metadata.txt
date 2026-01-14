@@ -2,7 +2,7 @@
 name=PgVersion
 description=Client for the Postgres Versioning System pgvs
 category=Database
-version=3.6.2
+version=3.6.3
 qgisMinimumVersion=3.0
 qgisMaximumVersion=3.99
 class_name=PgVersion
@@ -14,6 +14,8 @@ about=
 ; Optional items:
 
 changelog=
+    3.6.3
+    - Translations startup bug fixed
     3.6.2
     - Translations added
     3.6.1
