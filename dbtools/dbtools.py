@@ -261,7 +261,6 @@ class DbObj:
   # @param name String  Name der Tabelle
   # @return Boolean
   def hasSerial(self, name):
-
         tmp_arr = name.split(".");
         if (len(tmp_arr) == 1):
             schema = "public"
@@ -278,9 +277,9 @@ class DbObj:
               and (position('nextval' in lower(column_default)) is NOT NULL
               or position('nextval' in lower(column_default)) <> 0))
             """
-                
+        sql = f"""select versions._hasserial('{schema}.{name}')"""
         result,  error =  self.read(sql)
-        return result['EXISTS'][0]
+        return result['_HASSERIAL'][0]
 
   def dbConn(self):
       return self.db
